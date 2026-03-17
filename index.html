@@ -391,6 +391,17 @@ function clearCalcData() {
   allCourses.forEach(c => { delete c._calcDist; delete c._calcTime; });
 }
 
+// Haversine fallback for when OSRM fails
+function haversineFallback(origin, c) {
+  const R = 6371;
+  const dLat = (c.lat - origin.lat) * Math.PI / 180;
+  const dLon = (c.lng - origin.lng) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(origin.lat*Math.PI/180)*Math.cos(c.lat*Math.PI/180)*Math.sin(dLon/2)**2;
+  const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.4;
+  c._calcDist = dist;
+  c._calcTime = dist / 40;
+}
+
 // OSRM Table API - batch calculate real driving distances/times
 async function calcRealDrivingTimes(origin, courses) {
   clearCalcData(); // 출발지 변경 시 이전 결과 제거
@@ -419,29 +430,17 @@ async function calcRealDrivingTimes(origin, courses) {
             c._calcTime = (durations[j] * trafficFactor(distKm)) / 3600;
             okCount++;
           } else {
-            // OSRM이 null 반환 (도서지역 등) → 직선거리 기반 추정
-            const R = 6371;
-            const dLat = (c.lat - origin.lat) * Math.PI / 180;
-            const dLon = (c.lng - origin.lng) * Math.PI / 180;
-            const a = Math.sin(dLat/2)**2 + Math.cos(origin.lat*Math.PI/180)*Math.cos(c.lat*Math.PI/180)*Math.sin(dLon/2)**2;
-            const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.4;
-            c._calcDist = dist;
-            c._calcTime = dist / 40;
+            haversineFallback(origin, c);
           }
         });
         console.log(`OSRM batch ${i}-${i+chunk.length}: ${okCount}/${chunk.length} OK`);
+      } else {
+        // OSRM 응답은 왔지만 code가 Ok가 아닌 경우
+        chunk.forEach(c => haversineFallback(origin, c));
       }
     } catch(e) {
       console.error('OSRM batch error:', e);
-      chunk.forEach(c => {
-        const R = 6371;
-        const dLat = (c.lat - origin.lat) * Math.PI / 180;
-        const dLon = (c.lng - origin.lng) * Math.PI / 180;
-        const a = Math.sin(dLat/2)**2 + Math.cos(origin.lat*Math.PI/180)*Math.cos(c.lat*Math.PI/180)*Math.sin(dLon/2)**2;
-        const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.4;
-        c._calcDist = dist;
-        c._calcTime = dist / 40; // 보수적 40km/h
-      });
+      chunk.forEach(c => haversineFallback(origin, c));
     }
 
     const pct = Math.min(100, Math.round((i + chunk.length) / validCourses.length * 100));
@@ -494,21 +493,26 @@ async function doSearch() {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 계산중...';
   btn.disabled = true;
 
-  // GPS로 이미 좌표가 세팅된 경우가 아니면 geocode
-  if (!userCoords || !userCoords._fromGps) {
-    if (addr) {
-      const coords = await geocode(addr);
-      if (coords) {
-        userCoords = coords;
-      } else {
-        alert('주소를 찾을 수 없습니다. 다시 입력해주세요.');
-        btn.innerHTML = '<i class="fas fa-search"></i> 검색';
-        btn.disabled = false;
-        return;
-      }
+  // GPS로 이미 좌표가 세팅된 경우 → geocode 건너뜀
+  if (userCoords && userCoords._fromGps) {
+    delete userCoords._fromGps;
+  } else if (addr) {
+    const coords = await geocode(addr);
+    if (coords) {
+      userCoords = coords;
+    } else {
+      alert('주소를 찾을 수 없습니다. 다시 입력해주세요.');
+      btn.innerHTML = '<i class="fas fa-search"></i> 검색';
+      btn.disabled = false;
+      return;
     }
+  } else {
+    // 주소도 없고 GPS도 아니면 종료
+    btn.innerHTML = '<i class="fas fa-search"></i> 검색';
+    btn.disabled = false;
+    applyFilters();
+    return;
   }
-  delete userCoords._fromGps; // 일회성 플래그 제거
 
   await calcRealDrivingTimes(userCoords, allCourses);
   btn.innerHTML = '<i class="fas fa-search"></i> 검색';
@@ -578,7 +582,10 @@ function applyFilters() {
     if (holesMin && (!c.h || c.h < holesMin)) return false;
     if (ratingMin && (!c.rt || c.rt < ratingMin)) return false;
     if (grassVal && c.g !== grassVal) return false;
-    if (priceMax < 400000 && c.weekday && c.weekday > priceMax) return false;
+    if (priceMax < 400000) {
+      if (!c.weekday || c.weekday <= 0) return false; // 가격 데이터 없으면 제외
+      if (c.weekday > priceMax) return false;
+    }
     if (nameQ && !c.n.toLowerCase().includes(nameQ)) return false;
     if (timeLimit > 0) {
       if (userCoords) {
@@ -589,9 +596,12 @@ function applyFilters() {
           // 좌표 없어서 시간 계산 못한 골프장은 제외
           return false;
         }
-      } else if (c.tm) {
+      } else {
         // 출발지 미입력 → 엑셀 원본 시간 데이터로 필터
-        if (c.tm > timeLimit) return false;
+        if (c.tm) {
+          if (c.tm > timeLimit) return false;
+        }
+        // c.tm도 없으면 필터 적용 불가 → 그냥 통과 (출발지 입력 유도)
       }
     }
     return true;
@@ -696,7 +706,10 @@ function renderResults() {
 
   renderPagination();
   grid.querySelectorAll('.card').forEach(card => {
-    card.addEventListener('click', () => showDetail(filtered[parseInt(card.dataset.index)]));
+    card.addEventListener('click', () => {
+      const pageIdx = parseInt(card.dataset.index); // this is start + i = absolute index in filtered[]
+      if (filtered[pageIdx]) showDetail(filtered[pageIdx]);
+    });
   });
 }
 
