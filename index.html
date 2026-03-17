@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a7a3a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SmartGolf">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<title>SmartGolf - 전국 골프장 파인더</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --primary: #1a7a3a; --primary-dark: #0f5a28; --primary-light: #e8f5e9;
+  --accent: #ff6b35; --bg: #f5f7f5; --card-bg: #fff; --text: #1a1a1a;
+  --text-muted: #666; --border: #e0e0e0;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08); --shadow-hover: 0 4px 20px rgba(0,0,0,0.12);
+  --radius: 12px;
+}
+body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg); color: var(--text); }
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  color: white; padding: 16px 0; position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+.header-inner { max-width: 1400px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; gap: 15px; }
+.logo { font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+.logo span { color: #7bed9f; }
+.header-stats { margin-left: auto; font-size: 13px; opacity: 0.9; display: flex; gap: 15px; }
+.header-stat { display: flex; align-items: center; gap: 5px; }
+.view-toggle { display: flex; gap: 4px; margin-left: 10px; }
+.view-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+.view-btn.active { background: rgba(255,255,255,0.4); }
+
+/* Search */
+.search-section { max-width: 1400px; margin: 0 auto; padding: 16px 20px; }
+.search-bar {
+  background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: end;
+}
+.search-group { display: flex; flex-direction: column; gap: 4px; }
+.search-group label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.search-group input, .search-group select {
+  padding: 9px 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 13px; outline: none; transition: border-color 0.2s;
+}
+.search-group input:focus, .search-group select:focus { border-color: var(--primary); }
+.sg-addr { flex: 2; min-width: 180px; }
+.sg-name { flex: 1; min-width: 140px; }
+.sg-sm { flex: 0.5; min-width: 90px; }
+.btn-search {
+  padding: 9px 20px; background: var(--primary); color: white; border: none; border-radius: 8px;
+  font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.2s;
+}
+.btn-search:hover { background: var(--primary-dark); }
+.btn-reset {
+  padding: 9px 14px; background: #f5f5f5; color: var(--text-muted); border: 1px solid var(--border);
+  border-radius: 8px; font-size: 13px; cursor: pointer; white-space: nowrap;
+}
+
+/* Tags */
+.filter-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.tag {
+  padding: 5px 12px; background: var(--primary-light); color: var(--primary-dark);
+  border-radius: 20px; font-size: 12px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent;
+}
+.tag:hover, .tag.active { background: var(--primary); color: white; }
+
+/* Price filter row */
+.price-range { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.price-range label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.price-range input[type="range"] { flex: 1; min-width: 200px; accent-color: var(--primary); }
+.price-display { font-size: 13px; font-weight: 700; color: var(--primary); min-width: 100px; }
+
+/* Map */
+#map-section { max-width: 1400px; margin: 0 auto; padding: 0 20px 16px; display: none; }
+#map { width: 100%; height: 450px; border-radius: var(--radius); box-shadow: var(--shadow); }
+
+/* Results */
+.results-section { max-width: 1400px; margin: 0 auto; padding: 0 20px 20px; }
+.results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+.results-count { font-size: 13px; color: var(--text-muted); }
+.results-count strong { color: var(--primary); }
+.sort-btns { display: flex; gap: 4px; }
+.sort-btn {
+  padding: 5px 10px; background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 6px; font-size: 11px; cursor: pointer; transition: all 0.2s;
+}
+.sort-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* Cards */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+.card {
+  background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow);
+  overflow: hidden; transition: all 0.3s; cursor: pointer; position: relative;
+}
+.card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+.card-top { padding: 14px 16px 0; display: flex; justify-content: space-between; align-items: start; }
+.card-name { font-size: 16px; font-weight: 700; max-width: 65%; line-height: 1.3; }
+.card-rating { display: flex; align-items: center; gap: 3px; background: #fff8e1; padding: 3px 8px; border-radius: 6px; font-weight: 700; font-size: 14px; color: #f59e0b; }
+.card-rating i { font-size: 11px; }
+.card-badges { padding: 6px 16px; display: flex; gap: 4px; flex-wrap: wrap; }
+.badge { padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+.badge-type { background: #e3f2fd; color: #1565c0; }
+.badge-grass { background: #e8f5e9; color: #2e7d32; }
+.badge-holes { background: #f3e5f5; color: #7b1fa2; }
+.badge-region { background: #fff3e0; color: #e65100; }
+
+/* Price section in card */
+.card-price {
+  padding: 6px 16px; display: flex; gap: 12px; align-items: center;
+}
+.price-tag { font-size: 12px; display: flex; align-items: center; gap: 4px; }
+.price-tag .label { color: var(--text-muted); }
+.price-tag .value { font-weight: 700; color: var(--text); }
+.price-tag .value.weekday { color: #1565c0; }
+.price-tag .value.weekend { color: #c62828; }
+
+/* Distance/time */
+.card-travel { padding: 4px 16px; display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.card-travel .km { font-weight: 700; color: var(--primary); }
+.time-badge { padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+.time-green { background: #e8f5e9; color: #2e7d32; }
+.time-yellow { background: #fff8e1; color: #f57f17; }
+.time-red { background: #fce4ec; color: #c62828; }
+
+.card-info { padding: 6px 16px; display: flex; flex-direction: column; gap: 3px; }
+.card-info-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
+.card-info-row i { width: 14px; text-align: center; color: var(--primary); font-size: 11px; }
+
+.card-actions { padding: 10px 16px; display: flex; gap: 6px; border-top: 1px solid var(--border); margin-top: 6px; }
+.card-btn {
+  flex: 1; padding: 7px; border: none; border-radius: 6px; font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+  gap: 4px; text-decoration: none;
+}
+.btn-naver { background: #e8f5e9; color: var(--primary); }
+.btn-naver:hover { background: var(--primary); color: white; }
+.btn-kakao { background: #fee500; color: #3c1e1e; }
+.btn-kakao:hover { background: #fdd835; }
+.btn-booking { background: #e3f2fd; color: #1565c0; }
+.btn-booking:hover { background: #1565c0; color: white; }
+.btn-call { background: #fce4ec; color: #c62828; }
+.btn-call:hover { background: #c62828; color: white; }
+
+/* Modal */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.active { display: flex; }
+.modal { background: white; border-radius: var(--radius); max-width: 650px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.modal-header { padding: 18px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.modal-header h2 { font-size: 18px; }
+.modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-muted); }
+.modal-body { padding: 16px 20px; }
+.modal-row { display: flex; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
+.modal-label { width: 90px; font-weight: 600; color: var(--text-muted); font-size: 12px; }
+.modal-value { flex: 1; font-size: 13px; }
+.modal-price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 10px 0; }
+.modal-price-card { background: #f8f9fa; border-radius: 8px; padding: 10px; text-align: center; }
+.modal-price-card .label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+.modal-price-card .amount { font-size: 16px; font-weight: 800; }
+.modal-price-card .amount.wd { color: #1565c0; }
+.modal-price-card .amount.we { color: #c62828; }
+.modal-price-card .amount.hd { color: #e65100; }
+.modal-extra-costs { display: flex; gap: 15px; margin: 8px 0; font-size: 12px; color: var(--text-muted); }
+.modal-extra-costs span { display: flex; align-items: center; gap: 4px; }
+.modal-actions { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; }
+.modal-btn {
+  padding: 9px 14px; border: none; border-radius: 8px; font-size: 12px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; gap: 5px; text-decoration: none; transition: all 0.2s;
+}
+.modal-btn-primary { background: var(--primary); color: white; }
+.modal-btn-primary:hover { background: var(--primary-dark); }
+
+/* Mini map in modal */
+#modal-map { width: 100%; height: 200px; border-radius: 8px; margin: 10px 0; }
+
+/* Pagination */
+.pagination { display: flex; justify-content: center; gap: 6px; margin-top: 16px; flex-wrap: wrap; }
+.page-btn { padding: 7px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--card-bg); cursor: pointer; font-size: 12px; transition: all 0.2s; }
+.page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+.page-btn:hover:not(.active) { background: var(--primary-light); }
+
+/* Empty */
+.empty-state { text-align: center; padding: 50px 20px; color: var(--text-muted); }
+.empty-state i { font-size: 40px; margin-bottom: 12px; color: #ccc; display: block; }
+
+/* Stats bar */
+.stats-bar { max-width: 1400px; margin: 0 auto; padding: 0 20px 10px; display: flex; gap: 12px; flex-wrap: wrap; }
+.stat-card { background: var(--card-bg); border-radius: 8px; padding: 10px 16px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.stat-card i { color: var(--primary); font-size: 16px; }
+.stat-card .stat-num { font-weight: 800; font-size: 16px; color: var(--primary); }
+
+@media (max-width: 768px) {
+  .search-bar { flex-direction: column; }
+  .search-group { width: 100%; }
+  .card-grid { grid-template-columns: 1fr; }
+  .header-inner { flex-wrap: wrap; }
+  .header-stats { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo"><i class="fas fa-golf-ball-tee"></i> Smart<span>Golf</span></div>
+    <div class="header-stats">
+      <div class="header-stat"><i class="fas fa-flag"></i> <span id="total-count">590</span>개 골프장</div>
+      <div class="header-stat"><i class="fas fa-won-sign"></i> 실시간 가격</div>
+      <div class="header-stat"><i class="fas fa-map-marker-alt"></i> GPS 거리계산</div>
+    </div>
+    <div class="view-toggle">
+      <button class="view-btn active" id="viewGrid" title="카드뷰"><i class="fas fa-th-large"></i></button>
+      <button class="view-btn" id="viewMap" title="지도뷰"><i class="fas fa-map"></i></button>
+    </div>
+  </div>
+</div>
+
+<div class="search-section">
+  <div class="search-bar">
+    <div class="search-group sg-addr">
+      <label><i class="fas fa-map-marker-alt"></i> 출발지</label>
+      <div style="display:flex;gap:4px">
+        <input type="text" id="addressInput" placeholder="예: 서울시 강남구, 판교역, 분당..." style="flex:1" />
+        <button id="gpsBtn" title="현재위치" style="padding:8px 12px;border:2px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-size:14px;color:var(--primary);white-space:nowrap"><i class="fas fa-crosshairs"></i></button>
+      </div>
+    </div>
+    <div class="search-group sg-name">
+      <label><i class="fas fa-search"></i> 골프장 검색</label>
+      <input type="text" id="nameSearch" placeholder="골프장 이름..." />
+    </div>
+    <div class="search-group sg-sm">
+      <label><i class="fas fa-filter"></i> 종류</label>
+      <select id="typeFilter">
+        <option value="">전체</option>
+        <option value="대중제">대중제</option>
+        <option value="회원제">회원제</option>
+        <option value="군골프장">군골프장</option>
+      </select>
+    </div>
+    <div class="search-group sg-sm">
+      <label><i class="fas fa-flag"></i> 홀수</label>
+      <select id="holesFilter">
+        <option value="0">전체</option>
+        <option value="9">9홀+</option>
+        <option value="18">18홀+</option>
+        <option value="27">27홀+</option>
+        <option value="36">36홀+</option>
+      </select>
+    </div>
+    <div class="search-group sg-sm">
+      <label><i class="fas fa-leaf"></i> 잔디</label>
+      <select id="grassFilter">
+        <option value="">전체</option>
+        <option value="조선">조선잔디</option>
+        <option value="양잔디">양잔디</option>
+      </select>
+    </div>
+    <div class="search-group sg-sm">
+      <label><i class="fas fa-star"></i> 평점</label>
+      <select id="ratingFilter">
+        <option value="0">전체</option>
+        <option value="7">7.0+</option>
+        <option value="8">8.0+</option>
+        <option value="8.5">8.5+</option>
+        <option value="9">9.0+</option>
+      </select>
+    </div>
+    <button class="btn-search" id="searchBtn"><i class="fas fa-search"></i> 검색</button>
+    <button class="btn-reset" id="resetBtn"><i class="fas fa-undo"></i> 초기화</button>
+  </div>
+
+  <div class="filter-tags" id="regionTags">
+    <span class="tag active" data-region="">전체</span>
+    <span class="tag" data-region="서울">서울</span>
+    <span class="tag" data-region="경기">경기</span>
+    <span class="tag" data-region="인천">인천</span>
+    <span class="tag" data-region="강원">강원</span>
+    <span class="tag" data-region="충북">충북</span>
+    <span class="tag" data-region="충남">충남</span>
+    <span class="tag" data-region="대전">대전</span>
+    <span class="tag" data-region="세종">세종</span>
+    <span class="tag" data-region="전북">전북</span>
+    <span class="tag" data-region="전남">전남</span>
+    <span class="tag" data-region="광주">광주</span>
+    <span class="tag" data-region="경북">경북</span>
+    <span class="tag" data-region="경남">경남</span>
+    <span class="tag" data-region="대구">대구</span>
+    <span class="tag" data-region="부산">부산</span>
+    <span class="tag" data-region="울산">울산</span>
+    <span class="tag" data-region="제주">제주</span>
+  </div>
+
+  <div class="price-range">
+    <label><i class="fas fa-clock"></i> 최대 이동시간:</label>
+    <input type="range" id="timeSlider" min="0" max="300" step="10" value="300">
+    <div class="price-display" id="timeDisplay">전체</div>
+  </div>
+  <div class="price-range">
+    <label><i class="fas fa-won-sign"></i> 주중 최대 그린피:</label>
+    <input type="range" id="priceSlider" min="0" max="400000" step="10000" value="400000">
+    <div class="price-display" id="priceDisplay">전체</div>
+  </div>
+</div>
+
+<div class="stats-bar" id="statsBar"></div>
+
+<div id="map-section">
+  <div id="map"></div>
+</div>
+
+<div class="results-section">
+  <div class="results-header">
+    <div class="results-count" id="resultsCount"></div>
+    <div class="sort-btns">
+      <button class="sort-btn active" data-sort="rating">평점순</button>
+      <button class="sort-btn" data-sort="distance">거리순</button>
+      <button class="sort-btn" data-sort="price">가격순</button>
+      <button class="sort-btn" data-sort="name">이름순</button>
+      <button class="sort-btn" data-sort="holes">홀수순</button>
+    </div>
+  </div>
+  <div class="card-grid" id="cardGrid"></div>
+  <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle"></h2>
+      <button class="modal-close" id="modalClose">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
+</div>
+
+<script>
+let allCourses = [], filtered = [], currentSort = 'rating', currentRegion = '', currentPage = 1;
+const PAGE_SIZE = 24;
+let userCoords = null, map = null, markers = [], modalMap = null;
+
+// Format price
+function fmtPrice(v) {
+  if (!v || v <= 0) return '-';
+  return (v/10000).toFixed(v % 10000 === 0 ? 0 : 1) + '만';
+}
+function fmtPriceFull(v) {
+  if (!v || v <= 0) return '-';
+  return v.toLocaleString() + '원';
+}
+
+// Load enriched data
+fetch('courses_enriched.json')
+  .then(r => r.json())
+  .then(data => {
+    allCourses = data;
+    document.getElementById('total-count').textContent = data.length;
+    applyFilters();
+    updateStats();
+  });
+
+// Geocode
+async function geocode(address) {
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address+' 대한민국')}&format=json&limit=1`);
+    const d = await r.json();
+    if (d.length) return { lat: +d[0].lat, lng: +d[0].lon };
+  } catch(e) {}
+  return null;
+}
+
+// 거리별 교통 보정 계수
+// OSRM은 교통 미반영 → 한국 실도로 기준 보정
+// 시내(~30km): x2.2 (신호, 정체), 근교(30~80km): x1.7, 고속도로(80km+): x1.35
+function trafficFactor(distKm) {
+  if (distKm < 30) return 2.2;
+  if (distKm < 80) return 1.7;
+  return 1.35;
+}
+
+// 이전 계산 결과 전부 초기화
+function clearCalcData() {
+  allCourses.forEach(c => { delete c._calcDist; delete c._calcTime; });
+}
+
+// OSRM Table API - batch calculate real driving distances/times
+async function calcRealDrivingTimes(origin, courses) {
+  clearCalcData(); // 출발지 변경 시 이전 결과 제거
+  const validCourses = courses.filter(c => c.lat && c.lng);
+  const CHUNK = 80;
+
+  for (let i = 0; i < validCourses.length; i += CHUNK) {
+    const chunk = validCourses.slice(i, i + CHUNK);
+    const coords = [`${origin.lng},${origin.lat}`, ...chunk.map(c => `${c.lng},${c.lat}`)].join(';');
+    const sources = '0';
+    const dests = chunk.map((_, j) => j + 1).join(';');
+
+    try {
+      const url = `https://router.project-osrm.org/table/v1/driving/${coords}?sources=${sources}&destinations=${dests}&annotations=distance,duration`;
+      const resp = await fetch(url);
+      const data = await resp.json();
+
+      if (data.code === 'Ok') {
+        const durations = data.durations[0];
+        const distances = data.distances[0];
+        let okCount = 0;
+        chunk.forEach((c, j) => {
+          if (durations[j] !== null && durations[j] > 0) {
+            const distKm = distances[j] / 1000;
+            c._calcDist = distKm;
+            c._calcTime = (durations[j] * trafficFactor(distKm)) / 3600;
+            okCount++;
+          } else {
+            // OSRM이 null 반환 (도서지역 등) → 직선거리 기반 추정
+            const R = 6371;
+            const dLat = (c.lat - origin.lat) * Math.PI / 180;
+            const dLon = (c.lng - origin.lng) * Math.PI / 180;
+            const a = Math.sin(dLat/2)**2 + Math.cos(origin.lat*Math.PI/180)*Math.cos(c.lat*Math.PI/180)*Math.sin(dLon/2)**2;
+            const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.4;
+            c._calcDist = dist;
+            c._calcTime = dist / 40;
+          }
+        });
+        console.log(`OSRM batch ${i}-${i+chunk.length}: ${okCount}/${chunk.length} OK`);
+      }
+    } catch(e) {
+      console.error('OSRM batch error:', e);
+      chunk.forEach(c => {
+        const R = 6371;
+        const dLat = (c.lat - origin.lat) * Math.PI / 180;
+        const dLon = (c.lng - origin.lng) * Math.PI / 180;
+        const a = Math.sin(dLat/2)**2 + Math.cos(origin.lat*Math.PI/180)*Math.cos(c.lat*Math.PI/180)*Math.sin(dLon/2)**2;
+        const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.4;
+        c._calcDist = dist;
+        c._calcTime = dist / 40; // 보수적 40km/h
+      });
+    }
+
+    const pct = Math.min(100, Math.round((i + chunk.length) / validCourses.length * 100));
+    document.getElementById('searchBtn').innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${pct}%`;
+  }
+}
+
+// GPS 현재위치 버튼
+document.getElementById('gpsBtn').addEventListener('click', () => {
+  const btn = document.getElementById('gpsBtn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  btn.disabled = true;
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude, _fromGps: true };
+        // 역지오코딩으로 주소 표시
+        try {
+          const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${userCoords.lat}&lon=${userCoords.lng}&format=json&accept-language=ko`);
+          const d = await r.json();
+          document.getElementById('addressInput').value = d.display_name ? d.display_name.split(',').slice(0,3).join(',') : `${userCoords.lat.toFixed(4)}, ${userCoords.lng.toFixed(4)}`;
+        } catch(e) {
+          document.getElementById('addressInput').value = `현재위치 (${userCoords.lat.toFixed(4)}, ${userCoords.lng.toFixed(4)})`;
+        }
+        // 거리 계산 실행
+        doSearch();
+        btn.innerHTML = '<i class="fas fa-crosshairs"></i>';
+        btn.disabled = false;
+      },
+      (err) => {
+        alert('위치 권한을 허용해주세요.');
+        btn.innerHTML = '<i class="fas fa-crosshairs"></i>';
+        btn.disabled = false;
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  } else {
+    alert('이 브라우저에서 위치 서비스를 지원하지 않습니다.');
+    btn.innerHTML = '<i class="fas fa-crosshairs"></i>';
+    btn.disabled = false;
+  }
+});
+
+// 공통 검색 실행 함수
+async function doSearch() {
+  const btn = document.getElementById('searchBtn');
+  const addr = document.getElementById('addressInput').value.trim();
+  if (!addr && !userCoords) { applyFilters(); return; }
+
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 계산중...';
+  btn.disabled = true;
+
+  // GPS로 이미 좌표가 세팅된 경우가 아니면 geocode
+  if (!userCoords || !userCoords._fromGps) {
+    if (addr) {
+      const coords = await geocode(addr);
+      if (coords) {
+        userCoords = coords;
+      } else {
+        alert('주소를 찾을 수 없습니다. 다시 입력해주세요.');
+        btn.innerHTML = '<i class="fas fa-search"></i> 검색';
+        btn.disabled = false;
+        return;
+      }
+    }
+  }
+  delete userCoords._fromGps; // 일회성 플래그 제거
+
+  await calcRealDrivingTimes(userCoords, allCourses);
+  btn.innerHTML = '<i class="fas fa-search"></i> 검색';
+  btn.disabled = false;
+  applyFilters();
+}
+
+// Search button - 항상 새로 geocode (출발지 변경 대응)
+document.getElementById('searchBtn').addEventListener('click', () => {
+  userCoords = null; // 기존 좌표 초기화 → geocode 다시 실행
+  doSearch();
+});
+
+// Reset
+document.getElementById('resetBtn').addEventListener('click', () => {
+  document.getElementById('addressInput').value = '';
+  document.getElementById('nameSearch').value = '';
+  document.getElementById('timeSlider').value = 300;
+  document.getElementById('timeDisplay').textContent = '전체';
+  document.getElementById('typeFilter').value = '';
+  document.getElementById('holesFilter').value = '0';
+  document.getElementById('ratingFilter').value = '0';
+  document.getElementById('grassFilter').value = '';
+  document.getElementById('priceSlider').value = 400000;
+  document.getElementById('priceDisplay').textContent = '전체';
+  userCoords = null;
+  currentRegion = '';
+  document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+  document.querySelector('.tag[data-region=""]').classList.add('active');
+  clearCalcData();
+  applyFilters();
+});
+
+// Time slider
+document.getElementById('timeSlider').addEventListener('input', (e) => {
+  const v = parseInt(e.target.value);
+  if (v >= 300) {
+    document.getElementById('timeDisplay').textContent = '전체';
+  } else {
+    const h = Math.floor(v / 60), m = v % 60;
+    document.getElementById('timeDisplay').textContent = (h > 0 ? h + '시간 ' : '') + (m > 0 ? m + '분' : '');
+  }
+  applyFilters();
+});
+
+// Price slider
+document.getElementById('priceSlider').addEventListener('input', (e) => {
+  const v = parseInt(e.target.value);
+  document.getElementById('priceDisplay').textContent = v >= 400000 ? '전체' : fmtPriceFull(v);
+  applyFilters();
+});
+
+// Filters
+function applyFilters() {
+  const timeMinutes = parseInt(document.getElementById('timeSlider').value);
+  const timeLimit = timeMinutes >= 300 ? 0 : timeMinutes / 60; // 0 means no filter
+  const typeVal = document.getElementById('typeFilter').value;
+  const holesMin = parseInt(document.getElementById('holesFilter').value);
+  const ratingMin = parseFloat(document.getElementById('ratingFilter').value);
+  const grassVal = document.getElementById('grassFilter').value;
+  const priceMax = parseInt(document.getElementById('priceSlider').value);
+  const nameQ = document.getElementById('nameSearch').value.trim().toLowerCase();
+
+  filtered = allCourses.filter(c => {
+    if (currentRegion && c.r !== currentRegion) return false;
+    if (typeVal && c.t !== typeVal) return false;
+    if (holesMin && (!c.h || c.h < holesMin)) return false;
+    if (ratingMin && (!c.rt || c.rt < ratingMin)) return false;
+    if (grassVal && c.g !== grassVal) return false;
+    if (priceMax < 400000 && c.weekday && c.weekday > priceMax) return false;
+    if (nameQ && !c.n.toLowerCase().includes(nameQ)) return false;
+    if (timeLimit > 0) {
+      if (userCoords) {
+        // 거리 계산됨 → 시간으로 필터
+        if (c._calcTime !== undefined) {
+          if (c._calcTime > timeLimit) return false;
+        } else {
+          // 좌표 없어서 시간 계산 못한 골프장은 제외
+          return false;
+        }
+      } else if (c.tm) {
+        // 출발지 미입력 → 엑셀 원본 시간 데이터로 필터
+        if (c.tm > timeLimit) return false;
+      }
+    }
+    return true;
+  });
+  sortResults();
+  updateStats();
+}
+
+function sortResults() {
+  filtered.sort((a, b) => {
+    switch(currentSort) {
+      case 'rating': return (b.rt||0) - (a.rt||0);
+      case 'distance':
+        if (userCoords) return (a._calcDist||9999) - (b._calcDist||9999);
+        return (a.d||9999) - (b.d||9999);
+      case 'price': return (a.weekday||999999) - (b.weekday||999999);
+      case 'name': return a.n.localeCompare(b.n, 'ko');
+      case 'holes': return (b.h||0) - (a.h||0);
+    }
+  });
+  currentPage = 1;
+  renderResults();
+  if (map) updateMapMarkers();
+}
+
+function updateStats() {
+  const withPrice = filtered.filter(c => c.weekday > 0);
+  const avgPrice = withPrice.length ? Math.round(withPrice.reduce((s,c) => s+c.weekday, 0)/withPrice.length) : 0;
+  const avgRating = filtered.filter(c=>c.rt).length ?
+    (filtered.filter(c=>c.rt).reduce((s,c) => s+c.rt, 0)/filtered.filter(c=>c.rt).length).toFixed(1) : '-';
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-card"><i class="fas fa-flag"></i> 검색결과 <span class="stat-num">${filtered.length}</span>개</div>
+    <div class="stat-card"><i class="fas fa-won-sign"></i> 평균 주중 그린피 <span class="stat-num">${avgPrice > 0 ? fmtPrice(avgPrice) : '-'}</span></div>
+    <div class="stat-card"><i class="fas fa-star"></i> 평균 평점 <span class="stat-num">${avgRating}</span></div>
+    ${userCoords ? '<div class="stat-card"><i class="fas fa-car"></i> 거리 계산 <span class="stat-num" style="color:#2e7d32">ON</span></div>' : ''}
+  `;
+}
+
+// Render cards
+function renderResults() {
+  const grid = document.getElementById('cardGrid');
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageData = filtered.slice(start, start + PAGE_SIZE);
+
+  document.getElementById('resultsCount').innerHTML =
+    `검색 결과 <strong>${filtered.length}</strong>개` + (userCoords ? ' <span style="color:#2e7d32">(거리 계산됨)</span>' : '');
+
+  if (!pageData.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-golf-ball-tee"></i><p>조건에 맞는 골프장이 없습니다</p></div>';
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+
+  grid.innerHTML = pageData.map((c, i) => {
+    const idx = start + i;
+    const ratingHTML = c.rt ? `<div class="card-rating"><i class="fas fa-star"></i> ${c.rt.toFixed(1)}</div>` : '';
+    const sq = encodeURIComponent(c.n + ' 골프장');
+    const bq = encodeURIComponent(c.n + ' 골프장 예약');
+
+    let priceHTML = '';
+    if (c.weekday > 0 || c.weekend > 0) {
+      priceHTML = `<div class="card-price">
+        ${c.weekday > 0 ? `<span class="price-tag"><span class="label">주중</span><span class="value weekday">${fmtPrice(c.weekday)}</span></span>` : ''}
+        ${c.weekend > 0 ? `<span class="price-tag"><span class="label">주말</span><span class="value weekend">${fmtPrice(c.weekend)}</span></span>` : ''}
+        ${c.cart > 0 ? `<span class="price-tag"><span class="label">카트</span><span class="value">${fmtPrice(c.cart)}</span></span>` : ''}
+      </div>`;
+    }
+
+    let travelHTML = '';
+    if (userCoords && c._calcTime) {
+      const t = c._calcTime, h = Math.floor(t), m = Math.round((t-h)*60);
+      const cls = t > 2 ? 'time-red' : t > 1.5 ? 'time-yellow' : 'time-green';
+      const tl = h > 0 ? `${h}시간${m>0?' '+m+'분':''}` : `${m}분`;
+      const distLabel = c._calcDist ? `${Math.round(c._calcDist)}km` : '';
+      travelHTML = `<div class="card-travel"><span class="km"><i class="fas fa-car"></i> ${distLabel}</span><span class="time-badge ${cls}"><i class="fas fa-clock"></i> ${tl}</span></div>`;
+    } else if (c.d) {
+      travelHTML = `<div class="card-travel"><span class="km"><i class="fas fa-road"></i> ${c.d}km (서울기준)</span></div>`;
+    }
+
+    return `<div class="card" data-index="${idx}">
+      <div class="card-top"><div class="card-name">${c.n}</div>${ratingHTML}</div>
+      <div class="card-badges">
+        ${c.r ? `<span class="badge badge-region">${c.r} ${c.c||''}</span>` : ''}
+        ${c.t ? `<span class="badge badge-type">${c.t}</span>` : ''}
+        ${c.g ? `<span class="badge badge-grass">${c.g}</span>` : ''}
+        ${c.h ? `<span class="badge badge-holes">${c.h}홀</span>` : ''}
+      </div>
+      ${priceHTML}
+      ${travelHTML}
+      <div class="card-info">
+        ${c.a ? `<div class="card-info-row"><i class="fas fa-map-marker-alt"></i> ${c.a}</div>` : ''}
+        ${c.p ? `<div class="card-info-row"><i class="fas fa-phone"></i> ${c.p}</div>` : ''}
+      </div>
+      <div class="card-actions">
+        <a class="card-btn btn-booking" href="https://search.naver.com/search.naver?query=${bq}" target="_blank" onclick="event.stopPropagation()"><i class="fas fa-calendar-check"></i> 예약</a>
+        <a class="card-btn btn-naver" href="https://map.naver.com/v5/search/${sq}" target="_blank" onclick="event.stopPropagation()"><i class="fas fa-map"></i> 지도</a>
+        <a class="card-btn btn-kakao" href="https://map.kakao.com/?q=${sq}" target="_blank" onclick="event.stopPropagation()"><i class="fas fa-location-dot"></i> 카카오</a>
+        ${c.p ? `<a class="card-btn btn-call" href="tel:${c.p.replace(/[^0-9-]/g,'')}" onclick="event.stopPropagation()"><i class="fas fa-phone"></i></a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  renderPagination();
+  grid.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => showDetail(filtered[parseInt(card.dataset.index)]));
+  });
+}
+
+// Pagination
+function renderPagination() {
+  const tp = Math.ceil(filtered.length / PAGE_SIZE);
+  if (tp <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
+  let h = '';
+  const s = Math.max(1, currentPage-3), e = Math.min(tp, s+6);
+  if (currentPage > 1) h += `<button class="page-btn" data-page="${currentPage-1}"><i class="fas fa-chevron-left"></i></button>`;
+  for (let i = s; i <= e; i++) h += `<button class="page-btn ${i===currentPage?'active':''}" data-page="${i}">${i}</button>`;
+  if (currentPage < tp) h += `<button class="page-btn" data-page="${currentPage+1}"><i class="fas fa-chevron-right"></i></button>`;
+  const p = document.getElementById('pagination');
+  p.innerHTML = h;
+  p.querySelectorAll('.page-btn').forEach(b => b.addEventListener('click', () => {
+    currentPage = parseInt(b.dataset.page);
+    renderResults();
+    window.scrollTo({ top: 300, behavior: 'smooth' });
+  }));
+}
+
+// Map
+function initMap() {
+  if (map) return;
+  map = L.map('map').setView([36.5, 127.5], 7);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+  updateMapMarkers();
+}
+
+function updateMapMarkers() {
+  if (!map) return;
+  markers.forEach(m => map.removeLayer(m));
+  markers = [];
+
+  // User location
+  if (userCoords) {
+    const um = L.marker([userCoords.lat, userCoords.lng], {
+      icon: L.divIcon({ className: '', html: '<div style="background:#c62828;color:white;padding:4px 8px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.3)"><i class="fas fa-user"></i> 출발지</div>' })
+    }).addTo(map);
+    markers.push(um);
+  }
+
+  const shown = filtered.slice(0, 200);
+  shown.forEach(c => {
+    if (!c.lat || !c.lng) return;
+    const priceLabel = c.weekday > 0 ? ` | ${fmtPrice(c.weekday)}` : '';
+    const popup = `<b>${c.n}</b><br>${c.r} ${c.c||''} | ${c.rt ? c.rt.toFixed(1)+'점' : ''}${priceLabel}<br>${c.a||''}<br>
+      <a href="https://search.naver.com/search.naver?query=${encodeURIComponent(c.n+' 골프장 예약')}" target="_blank">예약검색</a> |
+      <a href="https://map.kakao.com/?q=${encodeURIComponent(c.n+' 골프장')}" target="_blank">카카오맵</a>`;
+    const color = c.rt >= 9 ? '#1a7a3a' : c.rt >= 8 ? '#2196f3' : '#ff9800';
+    const m = L.circleMarker([c.lat, c.lng], {
+      radius: 6, fillColor: color, color: '#fff', weight: 1, fillOpacity: 0.8
+    }).bindPopup(popup).addTo(map);
+    markers.push(m);
+  });
+
+  if (userCoords) {
+    map.setView([userCoords.lat, userCoords.lng], 9);
+  }
+}
+
+// View toggle
+document.getElementById('viewMap').addEventListener('click', () => {
+  document.getElementById('map-section').style.display = 'block';
+  document.getElementById('viewMap').classList.add('active');
+  document.getElementById('viewGrid').classList.remove('active');
+  initMap();
+  setTimeout(() => map.invalidateSize(), 100);
+});
+document.getElementById('viewGrid').addEventListener('click', () => {
+  document.getElementById('map-section').style.display = 'none';
+  document.getElementById('viewGrid').classList.add('active');
+  document.getElementById('viewMap').classList.remove('active');
+});
+
+// Detail modal
+function showDetail(c) {
+  document.getElementById('modalTitle').textContent = c.n;
+  const sq = encodeURIComponent(c.n + ' 골프장');
+  const bq = encodeURIComponent(c.n + ' 골프장 예약');
+
+  let priceSection = '';
+  if (c.weekday > 0 || c.weekend > 0 || c.holiday > 0) {
+    priceSection = `
+      <div class="modal-row"><div class="modal-label">그린피</div><div class="modal-value">
+        <div class="modal-price-grid">
+          <div class="modal-price-card"><div class="label">주중 (월-금)</div><div class="amount wd">${fmtPriceFull(c.weekday)}</div></div>
+          <div class="modal-price-card"><div class="label">주말 (토)</div><div class="amount we">${fmtPriceFull(c.weekend)}</div></div>
+          <div class="modal-price-card"><div class="label">공휴일</div><div class="amount hd">${fmtPriceFull(c.holiday || c.weekend)}</div></div>
+        </div>
+        ${(c.cart > 0 || c.caddie > 0) ? `<div class="modal-extra-costs">
+          ${c.cart > 0 ? `<span><i class="fas fa-car-side"></i> 카트비: ${fmtPriceFull(c.cart)}</span>` : ''}
+          ${c.caddie > 0 ? `<span><i class="fas fa-person"></i> 캐디비: ${fmtPriceFull(c.caddie)}</span>` : ''}
+        </div>` : ''}
+      </div></div>`;
+  }
+
+  let travelSection = '';
+  if (userCoords && c._calcDist) {
+    const t = c._calcTime, h = Math.floor(t), m = Math.round((t-h)*60);
+    travelSection = `
+      <div class="modal-row"><div class="modal-label">차량거리</div><div class="modal-value"><strong>${Math.round(c._calcDist)}km</strong></div></div>
+      <div class="modal-row"><div class="modal-label">예상시간</div><div class="modal-value"><strong>${h>0?h+'시간 ':''}${m>0?m+'분':''}</strong> (평균 교통 기준)</div></div>`;
+  } else if (c.d) {
+    travelSection = `<div class="modal-row"><div class="modal-label">서울거리</div><div class="modal-value">${c.d}km</div></div>`;
+  }
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-row"><div class="modal-label">지역</div><div class="modal-value">${c.r} ${c.c||''}</div></div>
+    ${c.rt ? `<div class="modal-row"><div class="modal-label">평점</div><div class="modal-value"><span style="color:#f59e0b;font-weight:700;font-size:18px">${c.rt.toFixed(1)}</span> / 10.0</div></div>` : ''}
+    ${c.t ? `<div class="modal-row"><div class="modal-label">종류</div><div class="modal-value">${c.t}</div></div>` : ''}
+    ${c.g ? `<div class="modal-row"><div class="modal-label">잔디</div><div class="modal-value">${c.g}</div></div>` : ''}
+    ${c.h ? `<div class="modal-row"><div class="modal-label">홀수</div><div class="modal-value">${c.h}홀</div></div>` : ''}
+    ${priceSection}
+    ${travelSection}
+    ${c.a ? `<div class="modal-row"><div class="modal-label">주소</div><div class="modal-value">${c.a}</div></div>` : ''}
+    ${c.p ? `<div class="modal-row"><div class="modal-label">전화</div><div class="modal-value"><a href="tel:${c.p}">${c.p}</a></div></div>` : ''}
+    ${c.lat ? `<div id="modal-map"></div>` : ''}
+  `;
+
+  // Mini map
+  if (c.lat && c.lng) {
+    setTimeout(() => {
+      if (modalMap) { modalMap.remove(); modalMap = null; }
+      const container = document.getElementById('modal-map');
+      if (container) {
+        modalMap = L.map('modal-map').setView([c.lat, c.lng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(modalMap);
+        L.marker([c.lat, c.lng]).addTo(modalMap).bindPopup(c.n).openPopup();
+        if (userCoords) {
+          L.marker([userCoords.lat, userCoords.lng], {
+            icon: L.divIcon({ className: '', html: '<div style="background:#c62828;color:white;padding:3px 6px;border-radius:10px;font-size:10px;font-weight:700"><i class="fas fa-user"></i></div>' })
+          }).addTo(modalMap);
+          const bounds = L.latLngBounds([[c.lat, c.lng], [userCoords.lat, userCoords.lng]]);
+          modalMap.fitBounds(bounds, { padding: [30, 30] });
+        }
+      }
+    }, 100);
+  }
+
+  document.getElementById('modalActions').innerHTML = `
+    <a class="modal-btn modal-btn-primary" href="https://search.naver.com/search.naver?query=${bq}" target="_blank"><i class="fas fa-calendar-check"></i> 예약 검색</a>
+    <a class="modal-btn" style="background:#e8f5e9;color:#2e7d32" href="https://map.naver.com/v5/search/${sq}" target="_blank"><i class="fas fa-map"></i> 네이버지도</a>
+    <a class="modal-btn" style="background:#fee500;color:#3c1e1e" href="https://map.kakao.com/?q=${sq}" target="_blank"><i class="fas fa-location-dot"></i> 카카오맵</a>
+    <a class="modal-btn" style="background:#e3f2fd;color:#1565c0" href="https://www.google.com/maps/search/${sq}" target="_blank"><i class="fab fa-google"></i> 구글맵</a>
+    <a class="modal-btn" style="background:#f3e5f5;color:#7b1fa2" href="https://kimcaddie.com/golfcourse?search=${encodeURIComponent(c.n)}" target="_blank"><i class="fas fa-chart-line"></i> 김캐디</a>
+    ${c.p ? `<a class="modal-btn" style="background:#fce4ec;color:#c62828" href="tel:${c.p.replace(/[^0-9-]/g,'')}"><i class="fas fa-phone"></i> 전화</a>` : ''}
+  `;
+
+  document.getElementById('modalOverlay').classList.add('active');
+}
+
+// Close modal
+document.getElementById('modalClose').addEventListener('click', () => {
+  document.getElementById('modalOverlay').classList.remove('active');
+  if (modalMap) { modalMap.remove(); modalMap = null; }
+});
+document.getElementById('modalOverlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) {
+    e.currentTarget.classList.remove('active');
+    if (modalMap) { modalMap.remove(); modalMap = null; }
+  }
+});
+
+// Region tags
+document.querySelectorAll('.tag').forEach(tag => {
+  tag.addEventListener('click', () => {
+    document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+    tag.classList.add('active');
+    currentRegion = tag.dataset.region;
+    applyFilters();
+  });
+});
+
+// Sort buttons
+document.querySelectorAll('.sort-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSort = btn.dataset.sort;
+    sortResults();
+  });
+});
+
+// Filter listeners
+['typeFilter','holesFilter','ratingFilter','grassFilter'].forEach(id => {
+  document.getElementById(id).addEventListener('change', applyFilters);
+});
+document.getElementById('nameSearch').addEventListener('input', applyFilters);
+document.getElementById('addressInput').addEventListener('keypress', e => {
+  if (e.key === 'Enter') { userCoords = null; doSearch(); }
+});
+
+// PWA Service Worker 등록
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').then(() => console.log('SW registered'));
+}
+
+// Keyboard shortcut - Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('modalOverlay').classList.remove('active');
+    if (modalMap) { modalMap.remove(); modalMap = null; }
+  }
+});
+</script>
+</body>
+</html>
