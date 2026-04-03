@@ -21,7 +21,36 @@
   --text-muted: #666; --border: #e0e0e0;
   --shadow: 0 2px 12px rgba(0,0,0,0.08); --shadow-hover: 0 4px 20px rgba(0,0,0,0.12);
   --radius: 12px;
+  --glass-bg: rgba(255,255,255,0.85); --glass-border: rgba(255,255,255,0.3);
+  --toast-bg: #333; --compare-bg: #1a7a3a;
 }
+[data-theme="dark"] {
+  --bg: #121212; --card-bg: #1e1e1e; --text: #e0e0e0; --text-muted: #999;
+  --border: #333; --primary-light: #1b3a25;
+  --shadow: 0 2px 12px rgba(0,0,0,0.3); --shadow-hover: 0 4px 20px rgba(0,0,0,0.5);
+  --glass-bg: rgba(30,30,30,0.9); --glass-border: rgba(255,255,255,0.1);
+  --toast-bg: #444;
+}
+[data-theme="dark"] .header { background: linear-gradient(135deg, #0a3015, #0f5a28); }
+[data-theme="dark"] .search-bar { background: var(--card-bg); }
+[data-theme="dark"] .modal { background: #1e1e1e; color: #e0e0e0; }
+[data-theme="dark"] .modal-row { border-bottom-color: #333; }
+[data-theme="dark"] .modal-price-card { background: #2a2a2a; }
+[data-theme="dark"] .badge-type { background: #1a3a5a; color: #7ab8f5; }
+[data-theme="dark"] .badge-grass { background: #1a3a25; color: #7bed9f; }
+[data-theme="dark"] .badge-holes { background: #2a1a3a; color: #c9a0dc; }
+[data-theme="dark"] .badge-region { background: #3a2a1a; color: #f0c070; }
+[data-theme="dark"] .card-rating { background: #3a3000; }
+[data-theme="dark"] .btn-naver { background: #1a3a25; }
+[data-theme="dark"] .btn-kakao { background: #3a3000; color: #fdd835; }
+[data-theme="dark"] .btn-booking { background: #1a2a3a; }
+[data-theme="dark"] .btn-call { background: #3a1a1a; }
+[data-theme="dark"] .sort-btn { background: #2a2a2a; border-color: #444; color: #ccc; }
+[data-theme="dark"] .page-btn { background: #2a2a2a; border-color: #444; color: #ccc; }
+[data-theme="dark"] .tag { background: #1a3a25; color: #7bed9f; }
+[data-theme="dark"] .btn-reset { background: #2a2a2a; color: #ccc; border-color: #444; }
+[data-theme="dark"] input, [data-theme="dark"] select { background: #2a2a2a; color: #e0e0e0; border-color: #444; }
+* { transition: background-color 0.3s, color 0.2s, border-color 0.3s; }
 body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg); color: var(--text); }
 
 /* Header */
@@ -196,12 +225,114 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
 .stat-card i { color: var(--primary); font-size: 16px; }
 .stat-card .stat-num { font-weight: 800; font-size: 16px; color: var(--primary); }
 
+/* Card animations */
+@keyframes cardFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulseGlow { 0%,100% { box-shadow: 0 0 0 0 rgba(26,122,58,0.4); } 50% { box-shadow: 0 0 12px 4px rgba(26,122,58,0.3); } }
+@keyframes skeletonPulse { 0% { background-position: -200px 0; } 100% { background-position: calc(200px + 100%) 0; } }
+@keyframes toastSlide { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes floatUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.card { animation: cardFadeIn 0.4s ease both; }
+.card:nth-child(2) { animation-delay: 0.05s; }
+.card:nth-child(3) { animation-delay: 0.1s; }
+.card:nth-child(4) { animation-delay: 0.15s; }
+.card:nth-child(5) { animation-delay: 0.2s; }
+.card:nth-child(6) { animation-delay: 0.25s; }
+.card:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px) scale(1.01); }
+.gps-pulse { animation: pulseGlow 1.5s infinite; }
+
+/* Type border colors */
+.card[data-type="대중제"] { border-left: 4px solid #2196f3; }
+.card[data-type="회원제"] { border-left: 4px solid #9c27b0; }
+.card[data-type="공공대중제"] { border-left: 4px solid #ff9800; }
+
+/* Skeleton loading */
+.skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200px 100%; animation: skeletonPulse 1.2s infinite; border-radius: 8px; }
+[data-theme="dark"] .skeleton { background: linear-gradient(90deg, #2a2a2a 25%, #333 50%, #2a2a2a 75%); background-size: 200px 100%; }
+.skeleton-card { height: 200px; margin-bottom: 14px; }
+
+/* Favorites button */
+.fav-btn { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.9); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px; color: #ccc; z-index: 5; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.fav-btn:hover { transform: scale(1.15); }
+.fav-btn.active { color: #e53935; }
+[data-theme="dark"] .fav-btn { background: rgba(40,40,40,0.9); }
+
+/* Compare bar */
+.compare-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--compare-bg); color: white; padding: 12px 20px; display: none; align-items: center; justify-content: center; gap: 12px; z-index: 150; box-shadow: 0 -4px 20px rgba(0,0,0,0.2); animation: floatUp 0.3s ease; }
+.compare-bar.active { display: flex; }
+.compare-bar button { padding: 8px 20px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 13px; }
+.compare-btn-go { background: white; color: var(--primary-dark); }
+.compare-btn-clear { background: rgba(255,255,255,0.2); color: white; }
+.compare-check { position: absolute; top: 12px; left: 12px; width: 24px; height: 24px; border-radius: 6px; border: 2px solid var(--border); background: rgba(255,255,255,0.9); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; color: transparent; z-index: 5; transition: all 0.2s; }
+.compare-check.active { background: var(--primary); border-color: var(--primary); color: white; }
+[data-theme="dark"] .compare-check { background: rgba(40,40,40,0.9); }
+
+/* Compare modal */
+.compare-modal { max-width: 900px; }
+.compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.compare-table th { background: var(--primary); color: white; padding: 10px 12px; text-align: left; }
+.compare-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+.compare-table tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
+[data-theme="dark"] .compare-table tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+
+/* Toast */
+.toast-container { position: fixed; top: 80px; right: 20px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
+.toast { background: var(--toast-bg); color: white; padding: 12px 20px; border-radius: 10px; font-size: 13px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); animation: toastSlide 0.3s ease; display: flex; align-items: center; gap: 8px; }
+.toast i { font-size: 16px; }
+.toast-success i { color: #4caf50; }
+.toast-info i { color: #2196f3; }
+.toast-warning i { color: #ff9800; }
+
+/* Dark mode toggle */
+.dark-toggle { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 16px; transition: all 0.2s; }
+.dark-toggle:hover { background: rgba(255,255,255,0.3); }
+
+/* Favorites filter toggle */
+.fav-filter { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+.fav-filter.active { background: #e53935; }
+
+/* Quick filter buttons */
+.quick-filters { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.quick-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--primary); background: transparent; color: var(--primary); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.quick-btn:hover, .quick-btn.active { background: var(--primary); color: white; }
+[data-theme="dark"] .quick-btn { border-color: #4caf50; color: #4caf50; }
+[data-theme="dark"] .quick-btn:hover, [data-theme="dark"] .quick-btn.active { background: #4caf50; color: white; }
+
+/* Recent searches */
+.recent-searches { margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; }
+.recent-item { padding: 3px 10px; background: #f0f0f0; border-radius: 12px; font-size: 11px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+.recent-item:hover { background: var(--primary-light); color: var(--primary); }
+[data-theme="dark"] .recent-item { background: #2a2a2a; }
+
+/* Region bar chart */
+.region-chart { display: flex; gap: 2px; align-items: end; height: 30px; margin-top: 6px; }
+.region-bar { background: var(--primary); border-radius: 2px 2px 0 0; min-width: 8px; transition: height 0.3s; cursor: pointer; position: relative; }
+.region-bar:hover { opacity: 0.8; }
+.region-bar-tooltip { display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 3px 8px; border-radius: 4px; font-size: 10px; white-space: nowrap; }
+.region-bar:hover .region-bar-tooltip { display: block; }
+
+/* Mobile bottom nav */
+.mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); border-top: 1px solid var(--border); padding: 8px 0; z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+.mobile-nav-inner { display: flex; justify-content: space-around; }
+.mobile-nav-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 10px; padding: 4px 12px; }
+.mobile-nav-btn i { font-size: 18px; }
+.mobile-nav-btn.active { color: var(--primary); }
+
+/* FAB GPS button mobile */
+.fab-gps { display: none; position: fixed; bottom: 70px; right: 16px; width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: white; border: none; box-shadow: 0 4px 16px rgba(26,122,58,0.4); font-size: 20px; cursor: pointer; z-index: 99; }
+
 @media (max-width: 768px) {
   .search-bar { flex-direction: column; }
   .search-group { width: 100%; }
   .card-grid { grid-template-columns: 1fr; }
   .header-inner { flex-wrap: wrap; }
   .header-stats { display: none; }
+  .mobile-nav { display: block; }
+  .fab-gps { display: flex; align-items: center; justify-content: center; }
+  body { padding-bottom: 60px; }
+  .compare-bar { bottom: 56px; }
+  .card-btn { padding: 10px; font-size: 12px; min-height: 44px; }
+  .tag { padding: 8px 14px; font-size: 13px; }
+  .sort-btn { padding: 8px 12px; font-size: 12px; }
 }
 </style>
 </head>
@@ -215,9 +346,11 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
       <div class="header-stat"><i class="fas fa-won-sign"></i> 실시간 가격</div>
       <div class="header-stat"><i class="fas fa-map-marker-alt"></i> GPS 거리계산</div>
     </div>
+    <button class="fav-filter" id="favFilter" title="즐겨찾기만"><i class="fas fa-heart"></i> <span id="favCount">0</span></button>
     <div class="view-toggle">
       <button class="view-btn active" id="viewGrid" title="카드뷰"><i class="fas fa-th-large"></i></button>
       <button class="view-btn" id="viewMap" title="지도뷰"><i class="fas fa-map"></i></button>
+      <button class="dark-toggle" id="darkToggle" title="다크모드"><i class="fas fa-moon"></i></button>
     </div>
   </div>
 </div>
@@ -307,6 +440,14 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
     <input type="range" id="priceSlider" min="0" max="400000" step="10000" value="400000">
     <div class="price-display" id="priceDisplay">전체</div>
   </div>
+  <div class="quick-filters" id="quickFilters">
+    <button class="quick-btn" data-quick="time60"><i class="fas fa-clock"></i> 1시간 이내</button>
+    <button class="quick-btn" data-quick="price10"><i class="fas fa-won-sign"></i> 10만원 이하</button>
+    <button class="quick-btn" data-quick="holes27"><i class="fas fa-flag"></i> 27홀 이상</button>
+    <button class="quick-btn" data-quick="rating9"><i class="fas fa-star"></i> 평점 9+</button>
+    <button class="quick-btn" data-quick="public"><i class="fas fa-users"></i> 대중제만</button>
+  </div>
+  <div class="recent-searches" id="recentSearches"></div>
 </div>
 
 <div class="stats-bar" id="statsBar"></div>
@@ -342,10 +483,126 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
   </div>
 </div>
 
+<!-- Compare Modal -->
+<div class="modal-overlay" id="compareOverlay">
+  <div class="modal compare-modal">
+    <div class="modal-header">
+      <h2><i class="fas fa-columns"></i> 골프장 비교</h2>
+      <button class="modal-close" id="compareClose">&times;</button>
+    </div>
+    <div class="modal-body" id="compareBody"></div>
+  </div>
+</div>
+
+<!-- Compare Bar -->
+<div class="compare-bar" id="compareBar">
+  <span id="compareLabel"><i class="fas fa-columns"></i> <span id="compareNum">0</span>개 선택됨</span>
+  <button class="compare-btn-go" id="compareGo"><i class="fas fa-eye"></i> 비교하기</button>
+  <button class="compare-btn-clear" id="compareClear"><i class="fas fa-times"></i> 초기화</button>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Mobile bottom nav -->
+<div class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mobile-nav-btn active" data-nav="home"><i class="fas fa-home"></i> 홈</button>
+    <button class="mobile-nav-btn" data-nav="search"><i class="fas fa-search"></i> 검색</button>
+    <button class="mobile-nav-btn" data-nav="map"><i class="fas fa-map"></i> 지도</button>
+    <button class="mobile-nav-btn" data-nav="favs"><i class="fas fa-heart"></i> 찜</button>
+  </div>
+</div>
+
+<!-- FAB GPS button for mobile -->
+<button class="fab-gps" id="fabGps" title="내 위치"><i class="fas fa-crosshairs"></i></button>
+
 <script>
 let allCourses = [], filtered = [], currentSort = 'rating', currentRegion = '', currentPage = 1;
 const PAGE_SIZE = 24;
 let userCoords = null, map = null, markers = [], modalMap = null;
+let favorites = JSON.parse(localStorage.getItem('sg_favs') || '[]');
+let compareList = [];
+let showFavsOnly = false;
+let recentSearches = JSON.parse(localStorage.getItem('sg_recent') || '[]');
+let activeQuickFilters = new Set();
+
+// Dark mode init
+if (localStorage.getItem('sg_dark') === 'true' || (!localStorage.getItem('sg_dark') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+  document.documentElement.setAttribute('data-theme', 'dark');
+}
+
+// Toast notification system
+function showToast(message, type = 'info', duration = 2500) {
+  const icons = { success: 'fa-check-circle', info: 'fa-info-circle', warning: 'fa-exclamation-triangle' };
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${message}`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; setTimeout(() => toast.remove(), 300); }, duration);
+}
+
+// Debounce utility
+function debounce(fn, delay) { let t; return function(...args) { clearTimeout(t); t = setTimeout(() => fn.apply(this, args), delay); }; }
+
+// Favorites helpers
+function toggleFav(name) {
+  const idx = favorites.indexOf(name);
+  if (idx >= 0) { favorites.splice(idx, 1); showToast(`${name} 즐겨찾기 해제`, 'info'); }
+  else { favorites.push(name); showToast(`${name} 즐겨찾기 추가`, 'success'); }
+  localStorage.setItem('sg_favs', JSON.stringify(favorites));
+  updateFavCount();
+}
+function isFav(name) { return favorites.includes(name); }
+function updateFavCount() { document.getElementById('favCount').textContent = favorites.length; }
+
+// Compare helpers
+function toggleCompare(name) {
+  const idx = compareList.indexOf(name);
+  if (idx >= 0) { compareList.splice(idx, 1); }
+  else if (compareList.length < 3) { compareList.push(name); showToast(`비교 목록에 추가 (${compareList.length}/3)`, 'info'); }
+  else { showToast('최대 3개까지 비교 가능합니다', 'warning'); return; }
+  updateCompareBar();
+}
+function updateCompareBar() {
+  const bar = document.getElementById('compareBar');
+  document.getElementById('compareNum').textContent = compareList.length;
+  bar.classList.toggle('active', compareList.length >= 2);
+  document.querySelectorAll('.compare-check').forEach(el => {
+    el.classList.toggle('active', compareList.includes(el.dataset.name));
+    el.innerHTML = compareList.includes(el.dataset.name) ? '<i class="fas fa-check"></i>' : '';
+  });
+}
+
+// Recent searches
+function addRecentSearch(addr) {
+  if (!addr) return;
+  recentSearches = recentSearches.filter(s => s !== addr);
+  recentSearches.unshift(addr);
+  if (recentSearches.length > 5) recentSearches.pop();
+  localStorage.setItem('sg_recent', JSON.stringify(recentSearches));
+  renderRecentSearches();
+}
+function renderRecentSearches() {
+  const el = document.getElementById('recentSearches');
+  if (!recentSearches.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<span style="font-size:11px;color:var(--text-muted);margin-right:4px"><i class="fas fa-history"></i></span>' +
+    recentSearches.map(s => `<span class="recent-item" data-addr="${s}"><i class="fas fa-map-marker-alt"></i> ${s}</span>`).join('');
+  el.querySelectorAll('.recent-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.getElementById('addressInput').value = item.dataset.addr;
+      userCoords = null;
+      doSearch();
+    });
+  });
+}
+
+// Skeleton loading
+function showSkeleton() {
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = Array(6).fill('<div class="skeleton skeleton-card"></div>').join('');
+}
 
 // Format price
 function fmtPrice(v) {
@@ -358,6 +615,7 @@ function fmtPriceFull(v) {
 }
 
 // Load enriched data
+showSkeleton();
 fetch('courses_enriched.json')
   .then(r => r.json())
   .then(data => {
@@ -365,6 +623,9 @@ fetch('courses_enriched.json')
     document.getElementById('total-count').textContent = data.length;
     applyFilters();
     updateStats();
+    updateFavCount();
+    renderRecentSearches();
+    showToast(`${data.length}개 골프장 데이터 로드 완료`, 'success');
   });
 
 // Geocode
@@ -577,6 +838,7 @@ function applyFilters() {
   const nameQ = document.getElementById('nameSearch').value.trim().toLowerCase();
 
   filtered = allCourses.filter(c => {
+    if (showFavsOnly && !isFav(c.n)) return false;
     if (currentRegion && c.r !== currentRegion) return false;
     if (typeVal && c.t !== typeVal) return false;
     if (holesMin && (!c.h || c.h < holesMin)) return false;
@@ -632,11 +894,24 @@ function updateStats() {
   const avgPrice = withPrice.length ? Math.round(withPrice.reduce((s,c) => s+c.weekday, 0)/withPrice.length) : 0;
   const avgRating = filtered.filter(c=>c.rt).length ?
     (filtered.filter(c=>c.rt).reduce((s,c) => s+c.rt, 0)/filtered.filter(c=>c.rt).length).toFixed(1) : '-';
+  // Region distribution
+  const regionCounts = {};
+  filtered.forEach(c => { regionCounts[c.r] = (regionCounts[c.r]||0)+1; });
+  const maxRegion = Math.max(...Object.values(regionCounts), 1);
+  const regionBars = Object.entries(regionCounts).sort((a,b) => b[1]-a[1]).slice(0, 10)
+    .map(([r,cnt]) => `<div class="region-bar" style="height:${Math.max(4, cnt/maxRegion*28)}px;width:${Math.max(8, 100/10)}px" title="${r}: ${cnt}개"><div class="region-bar-tooltip">${r} ${cnt}개</div></div>`).join('');
+  // Type breakdown
+  const typeCounts = {};
+  filtered.forEach(c => { typeCounts[c.t||'기타'] = (typeCounts[c.t||'기타']||0)+1; });
+  const typeInfo = Object.entries(typeCounts).map(([t,n]) => `${t} ${n}`).join(' / ');
+
   document.getElementById('statsBar').innerHTML = `
     <div class="stat-card"><i class="fas fa-flag"></i> 검색결과 <span class="stat-num">${filtered.length}</span>개</div>
-    <div class="stat-card"><i class="fas fa-won-sign"></i> 평균 주중 그린피 <span class="stat-num">${avgPrice > 0 ? fmtPrice(avgPrice) : '-'}</span></div>
+    <div class="stat-card"><i class="fas fa-won-sign"></i> 평균 그린피 <span class="stat-num">${avgPrice > 0 ? fmtPrice(avgPrice) : '-'}</span></div>
     <div class="stat-card"><i class="fas fa-star"></i> 평균 평점 <span class="stat-num">${avgRating}</span></div>
-    ${userCoords ? '<div class="stat-card"><i class="fas fa-car"></i> 거리 계산 <span class="stat-num" style="color:#2e7d32">ON</span></div>' : ''}
+    <div class="stat-card"><i class="fas fa-list"></i> <span style="font-size:11px">${typeInfo}</span></div>
+    ${userCoords ? '<div class="stat-card"><i class="fas fa-car"></i> GPS <span class="stat-num" style="color:#2e7d32">ON</span></div>' : ''}
+    <div class="stat-card" style="flex-direction:column;align-items:stretch"><div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">지역분포</div><div class="region-chart">${regionBars}</div></div>
   `;
 }
 
@@ -681,7 +956,12 @@ function renderResults() {
       travelHTML = `<div class="card-travel"><span class="km"><i class="fas fa-road"></i> ${c.d}km (서울기준)</span></div>`;
     }
 
-    return `<div class="card" data-index="${idx}">
+    const favClass = isFav(c.n) ? 'active' : '';
+    const compClass = compareList.includes(c.n) ? 'active' : '';
+    const safeName = c.n.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+    return `<div class="card" data-index="${idx}" data-type="${c.t||''}" data-name="${safeName}">
+      <button class="fav-btn ${favClass}" data-name="${safeName}"><i class="fas fa-heart"></i></button>
+      <div class="compare-check ${compClass}" data-name="${safeName}">${compClass ? '<i class="fas fa-check"></i>' : ''}</div>
       <div class="card-top"><div class="card-name">${c.n}</div>${ratingHTML}</div>
       <div class="card-badges">
         ${c.r ? `<span class="badge badge-region">${c.r} ${c.c||''}</span>` : ''}
@@ -705,9 +985,26 @@ function renderResults() {
   }).join('');
 
   renderPagination();
+  // Delegated event handling for cards
   grid.querySelectorAll('.card').forEach(card => {
-    card.addEventListener('click', () => {
-      const pageIdx = parseInt(card.dataset.index); // this is start + i = absolute index in filtered[]
+    card.addEventListener('click', (e) => {
+      // Fav button
+      if (e.target.closest('.fav-btn')) {
+        e.stopPropagation();
+        const btn = e.target.closest('.fav-btn');
+        toggleFav(btn.dataset.name);
+        btn.classList.toggle('active');
+        return;
+      }
+      // Compare checkbox
+      if (e.target.closest('.compare-check')) {
+        e.stopPropagation();
+        const chk = e.target.closest('.compare-check');
+        toggleCompare(chk.dataset.name);
+        updateCompareBar();
+        return;
+      }
+      const pageIdx = parseInt(card.dataset.index);
       if (filtered[pageIdx]) showDetail(filtered[pageIdx]);
     });
   });
@@ -900,7 +1197,7 @@ document.querySelectorAll('.sort-btn').forEach(btn => {
 ['typeFilter','holesFilter','ratingFilter','grassFilter'].forEach(id => {
   document.getElementById(id).addEventListener('change', applyFilters);
 });
-document.getElementById('nameSearch').addEventListener('input', applyFilters);
+document.getElementById('nameSearch').addEventListener('input', debounce(applyFilters, 300));
 document.getElementById('addressInput').addEventListener('keypress', e => {
   if (e.key === 'Enter') { userCoords = null; doSearch(); }
 });
@@ -914,9 +1211,172 @@ if ('serviceWorker' in navigator) {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     document.getElementById('modalOverlay').classList.remove('active');
+    document.getElementById('compareOverlay').classList.remove('active');
     if (modalMap) { modalMap.remove(); modalMap = null; }
   }
 });
+
+// Dark mode toggle
+document.getElementById('darkToggle').addEventListener('click', () => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
+  localStorage.setItem('sg_dark', !isDark);
+  document.getElementById('darkToggle').innerHTML = isDark ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+  showToast(isDark ? '라이트 모드' : '다크 모드', 'info');
+});
+// Init dark toggle icon
+if (document.documentElement.getAttribute('data-theme') === 'dark') {
+  document.getElementById('darkToggle').innerHTML = '<i class="fas fa-sun"></i>';
+}
+
+// Favorites filter toggle
+document.getElementById('favFilter').addEventListener('click', () => {
+  showFavsOnly = !showFavsOnly;
+  document.getElementById('favFilter').classList.toggle('active', showFavsOnly);
+  applyFilters();
+  if (showFavsOnly) showToast(`즐겨찾기 ${favorites.length}개 표시`, 'info');
+});
+
+// Quick filters
+document.querySelectorAll('.quick-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const q = btn.dataset.quick;
+    btn.classList.toggle('active');
+    if (btn.classList.contains('active')) activeQuickFilters.add(q); else activeQuickFilters.delete(q);
+    // Apply quick filters
+    if (activeQuickFilters.has('time60')) {
+      document.getElementById('timeSlider').value = 60;
+      document.getElementById('timeDisplay').textContent = '1시간';
+    }
+    if (activeQuickFilters.has('price10')) {
+      document.getElementById('priceSlider').value = 100000;
+      document.getElementById('priceDisplay').textContent = '100,000원';
+    }
+    if (activeQuickFilters.has('holes27')) {
+      document.getElementById('holesFilter').value = '27';
+    }
+    if (activeQuickFilters.has('rating9')) {
+      document.getElementById('ratingFilter').value = '9';
+    }
+    if (activeQuickFilters.has('public')) {
+      document.getElementById('typeFilter').value = '대중제';
+    }
+    // Remove quick filter resets
+    if (!activeQuickFilters.has('time60') && !btn.classList.contains('active') && q === 'time60') {
+      document.getElementById('timeSlider').value = 300;
+      document.getElementById('timeDisplay').textContent = '전체';
+    }
+    if (!activeQuickFilters.has('price10') && !btn.classList.contains('active') && q === 'price10') {
+      document.getElementById('priceSlider').value = 400000;
+      document.getElementById('priceDisplay').textContent = '전체';
+    }
+    if (!activeQuickFilters.has('holes27') && !btn.classList.contains('active') && q === 'holes27') {
+      document.getElementById('holesFilter').value = '0';
+    }
+    if (!activeQuickFilters.has('rating9') && !btn.classList.contains('active') && q === 'rating9') {
+      document.getElementById('ratingFilter').value = '0';
+    }
+    if (!activeQuickFilters.has('public') && !btn.classList.contains('active') && q === 'public') {
+      document.getElementById('typeFilter').value = '';
+    }
+    applyFilters();
+  });
+});
+
+// Compare: go button
+document.getElementById('compareGo').addEventListener('click', () => {
+  if (compareList.length < 2) return;
+  const courses = compareList.map(name => allCourses.find(c => c.n === name)).filter(Boolean);
+  const rows = [
+    ['지역', c => `${c.r} ${c.c||''}`],
+    ['종류', c => c.t || '-'],
+    ['홀수', c => c.h ? c.h + '홀' : '-'],
+    ['잔디', c => c.g || '-'],
+    ['평점', c => c.rt ? c.rt.toFixed(1) : '-'],
+    ['주중 그린피', c => fmtPriceFull(c.weekday)],
+    ['주말 그린피', c => fmtPriceFull(c.weekend)],
+    ['카트비', c => fmtPriceFull(c.cart)],
+    ['캐디비', c => fmtPriceFull(c.caddie)],
+    ['주소', c => c.a || '-'],
+    ['전화', c => c.p || '-']
+  ];
+  if (userCoords) {
+    rows.push(['거리', c => c._calcDist ? Math.round(c._calcDist) + 'km' : '-']);
+    rows.push(['시간', c => { if (!c._calcTime) return '-'; const h=Math.floor(c._calcTime),m=Math.round((c._calcTime-h)*60); return (h>0?h+'시간 ':'')+(m>0?m+'분':''); }]);
+  }
+  let html = '<table class="compare-table"><thead><tr><th>항목</th>';
+  courses.forEach(c => html += `<th>${c.n}</th>`);
+  html += '</tr></thead><tbody>';
+  rows.forEach(([label, fn]) => {
+    html += `<tr><td><strong>${label}</strong></td>`;
+    courses.forEach(c => html += `<td>${fn(c)}</td>`);
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  document.getElementById('compareBody').innerHTML = html;
+  document.getElementById('compareOverlay').classList.add('active');
+});
+
+// Compare: clear
+document.getElementById('compareClear').addEventListener('click', () => {
+  compareList = [];
+  updateCompareBar();
+  renderResults();
+});
+
+// Compare modal close
+document.getElementById('compareClose').addEventListener('click', () => {
+  document.getElementById('compareOverlay').classList.remove('active');
+});
+document.getElementById('compareOverlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+});
+
+// Wrap doSearch to save recent searches
+(function() {
+  const origDoSearch = doSearch;
+  doSearch = async function() {
+    const addr = document.getElementById('addressInput').value.trim();
+    await origDoSearch();
+    if (addr) addRecentSearch(addr);
+  };
+})();
+
+// FAB GPS button (mobile)
+document.getElementById('fabGps').addEventListener('click', () => {
+  document.getElementById('gpsBtn').click();
+});
+
+// Mobile bottom nav
+document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const nav = btn.dataset.nav;
+    if (nav === 'home') {
+      document.getElementById('map-section').style.display = 'none';
+      document.getElementById('viewGrid').classList.add('active');
+      document.getElementById('viewMap').classList.remove('active');
+      showFavsOnly = false;
+      document.getElementById('favFilter').classList.remove('active');
+      applyFilters();
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    } else if (nav === 'search') {
+      document.querySelector('.search-section').scrollIntoView({behavior: 'smooth'});
+      document.getElementById('addressInput').focus();
+    } else if (nav === 'map') {
+      document.getElementById('viewMap').click();
+      document.getElementById('map-section').scrollIntoView({behavior: 'smooth'});
+    } else if (nav === 'favs') {
+      showFavsOnly = true;
+      document.getElementById('favFilter').classList.add('active');
+      applyFilters();
+      window.scrollTo({top: 300, behavior: 'smooth'});
+    }
+  });
+});
+
+// Name search is already debounced above
 </script>
 </body>
 </html>
