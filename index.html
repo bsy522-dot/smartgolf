@@ -14,7 +14,8 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 :root {
   --primary: #1a7a3a; --primary-dark: #0f5a28; --primary-light: #e8f5e9;
   --accent: #ff6b35; --bg: #f5f7f5; --card-bg: #fff; --text: #1a1a1a;
@@ -333,7 +334,175 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
   .card-btn { padding: 10px; font-size: 12px; min-height: 44px; }
   .tag { padding: 8px 14px; font-size: 13px; }
   .sort-btn { padding: 8px 12px; font-size: 12px; }
+  .site-footer { padding: 20px 16px; }
+  .footer-inner { flex-direction: column; text-align: center; }
 }
+
+/* Card visual header - gradient bar based on rating */
+.card-visual {
+  height: 5px; border-radius: var(--radius) var(--radius) 0 0;
+  background: linear-gradient(90deg, var(--primary), #4caf50);
+}
+.card-visual.rating-high { background: linear-gradient(90deg, #1a7a3a, #43a047, #66bb6a); }
+.card-visual.rating-mid { background: linear-gradient(90deg, #1565c0, #42a5f5); }
+.card-visual.rating-low { background: linear-gradient(90deg, #ff9800, #ffa726); }
+
+/* Autocomplete dropdown */
+.autocomplete-wrap { position: relative; flex: 1; }
+.autocomplete-dropdown {
+  position: absolute; top: 100%; left: 0; right: 0; background: var(--card-bg);
+  border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px;
+  max-height: 240px; overflow-y: auto; z-index: 50; box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  display: none;
+}
+.autocomplete-dropdown.show { display: block; }
+.ac-item {
+  padding: 10px 14px; cursor: pointer; font-size: 13px; display: flex;
+  justify-content: space-between; align-items: center; transition: background 0.15s;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+.ac-item:hover, .ac-item.ac-active { background: var(--primary-light); }
+.ac-item .ac-name { font-weight: 600; }
+.ac-item .ac-meta { font-size: 11px; color: var(--text-muted); }
+[data-theme="dark"] .autocomplete-dropdown { border-color: #444; }
+[data-theme="dark"] .ac-item:hover { background: #2a3a2a; }
+
+/* Active filter chips */
+.active-filters {
+  max-width: 1400px; margin: 0 auto; padding: 4px 20px; display: flex;
+  gap: 6px; flex-wrap: wrap; align-items: center;
+}
+.active-filters:empty { display: none; }
+.filter-chip {
+  display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px;
+  background: var(--primary); color: white; border-radius: 16px; font-size: 11px;
+  font-weight: 600; animation: cardFadeIn 0.2s ease;
+}
+.filter-chip button {
+  background: none; border: none; color: white; cursor: pointer; font-size: 13px;
+  line-height: 1; padding: 0 0 0 2px; opacity: 0.8;
+}
+.filter-chip button:hover { opacity: 1; }
+
+/* Scroll to top button */
+.scroll-top {
+  position: fixed; bottom: 80px; right: 20px; width: 44px; height: 44px;
+  border-radius: 50%; background: var(--primary); color: white; border: none;
+  box-shadow: 0 4px 12px rgba(26,122,58,0.35); cursor: pointer; font-size: 18px;
+  z-index: 90; opacity: 0; pointer-events: none; transition: all 0.3s;
+  display: flex; align-items: center; justify-content: center;
+}
+.scroll-top.visible { opacity: 1; pointer-events: auto; }
+.scroll-top:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(26,122,58,0.45); }
+@media (max-width: 768px) { .scroll-top { bottom: 130px; } }
+
+/* Recently viewed section */
+.recent-viewed {
+  max-width: 1400px; margin: 0 auto; padding: 8px 20px;
+}
+.recent-viewed-title { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; }
+.recent-viewed-list {
+  display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px;
+  scrollbar-width: thin;
+}
+.rv-card {
+  flex-shrink: 0; width: 180px; padding: 10px 12px; background: var(--card-bg);
+  border-radius: 8px; box-shadow: var(--shadow); cursor: pointer; transition: all 0.2s;
+  border-left: 3px solid var(--primary);
+}
+.rv-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-hover); }
+.rv-card .rv-name { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rv-card .rv-info { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* Footer */
+.site-footer {
+  max-width: 1400px; margin: 30px auto 0; padding: 24px 20px;
+  border-top: 1px solid var(--border);
+}
+.footer-inner {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 12px;
+}
+.footer-brand { font-size: 14px; font-weight: 700; color: var(--primary); }
+.footer-brand span { color: var(--text-muted); font-weight: 400; font-size: 12px; }
+.footer-links { display: flex; gap: 16px; font-size: 12px; }
+.footer-links a { color: var(--text-muted); text-decoration: none; }
+.footer-links a:hover { color: var(--primary); }
+.footer-info { font-size: 11px; color: var(--text-muted); line-height: 1.5; text-align: right; }
+
+/* List view */
+.card-grid.list-view { grid-template-columns: 1fr; gap: 8px; }
+.card-grid.list-view .card {
+  display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: auto;
+  align-items: center; padding: 12px 16px;
+}
+.card-grid.list-view .card-visual { display: none; }
+.card-grid.list-view .card-top { padding: 0; }
+.card-grid.list-view .card-badges { padding: 0; display: none; }
+.card-grid.list-view .card-info { padding: 0; display: none; }
+.card-grid.list-view .fav-btn { position: static; width: 28px; height: 28px; font-size: 14px; }
+.card-grid.list-view .compare-check { display: none; }
+
+/* View button for list */
+.view-btn-list { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+.view-btn-list.active { background: rgba(255,255,255,0.4); }
+
+/* Share button in modal */
+.share-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2); color: white;
+}
+.share-btn:hover { filter: brightness(1.1); }
+
+/* Value badge */
+.badge-value { background: #fff3e0; color: #e65100; font-weight: 700; }
+[data-theme="dark"] .badge-value { background: #3a2a1a; color: #ffab40; }
+
+/* Loading progress bar */
+.progress-bar-wrap {
+  position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 999;
+  background: transparent; pointer-events: none;
+}
+.progress-bar {
+  height: 100%; width: 0; background: linear-gradient(90deg, #4caf50, #8bc34a, #cddc39);
+  transition: width 0.3s ease;
+  border-radius: 0 2px 2px 0;
+}
+
+/* Keyboard focus ring */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .header, .search-section, .stats-bar, .mobile-nav, .fab-gps,
+  .compare-bar, .toast-container, .scroll-top, .card-actions,
+  .fav-btn, .compare-check, .active-filters, .quick-filters,
+  .recent-searches, .recent-viewed, .pagination, .site-footer { display: none !important; }
+  .card-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .card { break-inside: avoid; box-shadow: none !important; border: 1px solid #ddd; }
+  body { background: white; color: black; }
+}
+
+/* Pulse animation for GPS */
+@keyframes radarPulse {
+  0% { box-shadow: 0 0 0 0 rgba(26,122,58,0.5); }
+  70% { box-shadow: 0 0 0 12px rgba(26,122,58,0); }
+  100% { box-shadow: 0 0 0 0 rgba(26,122,58,0); }
+}
+.gps-active { animation: radarPulse 1.5s ease infinite; }
+
+/* Stat card hover */
+.stat-card { transition: transform 0.2s; }
+.stat-card:hover { transform: translateY(-1px); }
+
+/* Price highlight in cards */
+.price-highlight {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  padding: 8px 16px; margin: 4px 0; border-radius: 0;
+}
+[data-theme="dark"] .price-highlight { background: linear-gradient(135deg, #1a3a25, #1b3a25); }
 </style>
 </head>
 <body>
@@ -349,6 +518,7 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
     <button class="fav-filter" id="favFilter" title="즐겨찾기만"><i class="fas fa-heart"></i> <span id="favCount">0</span></button>
     <div class="view-toggle">
       <button class="view-btn active" id="viewGrid" title="카드뷰"><i class="fas fa-th-large"></i></button>
+      <button class="view-btn" id="viewList" title="리스트뷰"><i class="fas fa-list"></i></button>
       <button class="view-btn" id="viewMap" title="지도뷰"><i class="fas fa-map"></i></button>
       <button class="dark-toggle" id="darkToggle" title="다크모드"><i class="fas fa-moon"></i></button>
     </div>
@@ -366,7 +536,10 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
     </div>
     <div class="search-group sg-name">
       <label><i class="fas fa-search"></i> 골프장 검색</label>
-      <input type="text" id="nameSearch" placeholder="골프장 이름..." />
+      <div class="autocomplete-wrap">
+        <input type="text" id="nameSearch" placeholder="골프장 이름..." autocomplete="off" role="combobox" aria-expanded="false" aria-controls="acDropdown" />
+        <div class="autocomplete-dropdown" id="acDropdown" role="listbox"></div>
+      </div>
     </div>
     <div class="search-group sg-sm">
       <label><i class="fas fa-filter"></i> 종류</label>
@@ -456,11 +629,19 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
   <div id="map"></div>
 </div>
 
+<div class="active-filters" id="activeFilters" aria-live="polite"></div>
+
+<div class="recent-viewed" id="recentViewed" style="display:none">
+  <div class="recent-viewed-title"><i class="fas fa-history"></i> 최근 본 골프장</div>
+  <div class="recent-viewed-list" id="recentViewedList"></div>
+</div>
+
 <div class="results-section">
   <div class="results-header">
     <div class="results-count" id="resultsCount"></div>
     <div class="sort-btns">
       <button class="sort-btn active" data-sort="rating">평점순</button>
+      <button class="sort-btn" data-sort="value">가성비</button>
       <button class="sort-btn" data-sort="distance">거리순</button>
       <button class="sort-btn" data-sort="price">가격순</button>
       <button class="sort-btn" data-sort="name">이름순</button>
@@ -517,6 +698,30 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
 <!-- FAB GPS button for mobile -->
 <button class="fab-gps" id="fabGps" title="내 위치"><i class="fas fa-crosshairs"></i></button>
 
+<!-- Scroll to top -->
+<button class="scroll-top" id="scrollTop" aria-label="맨 위로"><i class="fas fa-chevron-up"></i></button>
+
+<!-- Progress bar for OSRM loading -->
+<div class="progress-bar-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <i class="fas fa-golf-ball-tee"></i> SmartGolf
+      <span>v3.0 &mdash; 전국 골프장 파인더</span>
+    </div>
+    <div class="footer-links">
+      <a href="#" onclick="window.scrollTo({top:0,behavior:&quot;smooth&quot;});return false">맨 위로</a>
+      <a href="#" onclick="document.getElementById(&quot;resetBtn&quot;).click();return false">필터 초기화</a>
+    </div>
+    <div class="footer-info">
+      590개 골프장 데이터 (2026 업데이트)<br>
+      GPS 거리: OSRM | 지도: OpenStreetMap
+    </div>
+  </div>
+</footer>
+
 <script>
 let allCourses = [], filtered = [], currentSort = 'rating', currentRegion = '', currentPage = 1;
 const PAGE_SIZE = 24;
@@ -525,7 +730,10 @@ let favorites = JSON.parse(localStorage.getItem('sg_favs') || '[]');
 let compareList = [];
 let showFavsOnly = false;
 let recentSearches = JSON.parse(localStorage.getItem('sg_recent') || '[]');
+let recentlyViewed = JSON.parse(localStorage.getItem('sg_viewed') || '[]');
 let activeQuickFilters = new Set();
+let currentView = 'grid';
+let acIndex = -1;
 
 // Dark mode init
 if (localStorage.getItem('sg_dark') === 'true' || (!localStorage.getItem('sg_dark') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -705,8 +913,14 @@ async function calcRealDrivingTimes(origin, courses) {
     }
 
     const pct = Math.min(100, Math.round((i + chunk.length) / validCourses.length * 100));
+    setProgress(pct);
     document.getElementById('searchBtn').innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${pct}%`;
   }
+}
+
+function setProgress(pct) {
+  const bar = document.getElementById('progressBar');
+  if (bar) { bar.style.width = pct + '%'; if (pct >= 100) setTimeout(() => { bar.style.width = '0'; }, 500); }
 }
 
 // GPS 현재위치 버튼
@@ -870,12 +1084,19 @@ function applyFilters() {
   });
   sortResults();
   updateStats();
+  renderActiveFilters();
+}
+
+function valueScore(c) {
+  if (!c.rt || !c.weekday || c.weekday <= 0) return 0;
+  return (c.rt / (c.weekday / 100000)) * 10;
 }
 
 function sortResults() {
   filtered.sort((a, b) => {
     switch(currentSort) {
       case 'rating': return (b.rt||0) - (a.rt||0);
+      case 'value': return valueScore(b) - valueScore(a);
       case 'distance':
         if (userCoords) return (a._calcDist||9999) - (b._calcDist||9999);
         return (a.d||9999) - (b.d||9999);
@@ -886,6 +1107,7 @@ function sortResults() {
   });
   currentPage = 1;
   renderResults();
+  renderActiveFilters();
   if (map) updateMapMarkers();
 }
 
@@ -959,15 +1181,20 @@ function renderResults() {
     const favClass = isFav(c.n) ? 'active' : '';
     const compClass = compareList.includes(c.n) ? 'active' : '';
     const safeName = c.n.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+    const ratingClass = c.rt >= 9 ? 'rating-high' : c.rt >= 7.5 ? 'rating-mid' : 'rating-low';
+    const vs = valueScore(c);
+    const valueBadge = vs > 0 ? `<span class="badge badge-value">가성비 ${vs.toFixed(1)}</span>` : '';
     return `<div class="card" data-index="${idx}" data-type="${c.t||''}" data-name="${safeName}">
-      <button class="fav-btn ${favClass}" data-name="${safeName}"><i class="fas fa-heart"></i></button>
-      <div class="compare-check ${compClass}" data-name="${safeName}">${compClass ? '<i class="fas fa-check"></i>' : ''}</div>
+      <div class="card-visual ${ratingClass}"></div>
+      <button class="fav-btn ${favClass}" data-name="${safeName}" aria-label="즐겨찾기"><i class="fas fa-heart"></i></button>
+      <div class="compare-check ${compClass}" data-name="${safeName}" aria-label="비교 선택">${compClass ? '<i class="fas fa-check"></i>' : ''}</div>
       <div class="card-top"><div class="card-name">${c.n}</div>${ratingHTML}</div>
       <div class="card-badges">
         ${c.r ? `<span class="badge badge-region">${c.r} ${c.c||''}</span>` : ''}
         ${c.t ? `<span class="badge badge-type">${c.t}</span>` : ''}
         ${c.g ? `<span class="badge badge-grass">${c.g}</span>` : ''}
         ${c.h ? `<span class="badge badge-holes">${c.h}홀</span>` : ''}
+        ${valueBadge}
       </div>
       ${priceHTML}
       ${travelHTML}
@@ -1072,15 +1299,21 @@ function updateMapMarkers() {
 
 // View toggle
 document.getElementById('viewMap').addEventListener('click', () => {
+  currentView = 'map';
   document.getElementById('map-section').style.display = 'block';
+  document.getElementById('cardGrid').classList.remove('list-view');
   document.getElementById('viewMap').classList.add('active');
   document.getElementById('viewGrid').classList.remove('active');
+  document.getElementById('viewList').classList.remove('active');
   initMap();
   setTimeout(() => map.invalidateSize(), 100);
 });
 document.getElementById('viewGrid').addEventListener('click', () => {
+  currentView = 'grid';
   document.getElementById('map-section').style.display = 'none';
+  document.getElementById('cardGrid').classList.remove('list-view');
   document.getElementById('viewGrid').classList.add('active');
+  document.getElementById('viewList').classList.remove('active');
   document.getElementById('viewMap').classList.remove('active');
 });
 
@@ -1089,6 +1322,7 @@ function showDetail(c) {
   document.getElementById('modalTitle').textContent = c.n;
   const sq = encodeURIComponent(c.n + ' 골프장');
   const bq = encodeURIComponent(c.n + ' 골프장 예약');
+  const safeName = c.n.replace(/'/g, "\\'");
 
   let priceSection = '';
   if (c.weekday > 0 || c.weekend > 0 || c.holiday > 0) {
@@ -1156,8 +1390,10 @@ function showDetail(c) {
     <a class="modal-btn" style="background:#e3f2fd;color:#1565c0" href="https://www.google.com/maps/search/${sq}" target="_blank"><i class="fab fa-google"></i> 구글맵</a>
     <a class="modal-btn" style="background:#f3e5f5;color:#7b1fa2" href="https://kimcaddie.com/golfcourse?search=${encodeURIComponent(c.n)}" target="_blank"><i class="fas fa-chart-line"></i> 김캐디</a>
     ${c.p ? `<a class="modal-btn" style="background:#fce4ec;color:#c62828" href="tel:${c.p.replace(/[^0-9-]/g,'')}"><i class="fas fa-phone"></i> 전화</a>` : ''}
+    <button class="modal-btn share-btn" onclick="shareCourse('${safeName}')"><i class="fas fa-share-alt"></i> 공유</button>
   `;
 
+  addToRecentlyViewed(c);
   document.getElementById('modalOverlay').classList.add('active');
 }
 
@@ -1375,6 +1611,174 @@ document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
     }
   });
 });
+
+// ===== NEW FEATURES v3.0 =====
+
+// Autocomplete for course name search
+const nameInput = document.getElementById('nameSearch');
+const acDropdown = document.getElementById('acDropdown');
+
+nameInput.addEventListener('input', debounce(function() {
+  const q = this.value.trim().toLowerCase();
+  if (q.length < 1) { hideAC(); return; }
+  const matches = allCourses.filter(c => c.n.toLowerCase().includes(q)).slice(0, 8);
+  if (!matches.length) { hideAC(); return; }
+  acIndex = -1;
+  acDropdown.innerHTML = matches.map((c, i) =>
+    `<div class="ac-item" role="option" data-idx="${i}" data-name="${c.n.replace(/"/g,'&quot;')}">
+      <span class="ac-name">${highlightMatch(c.n, q)}</span>
+      <span class="ac-meta">${c.r||''} | ${c.t||''} | ${c.rt ? c.rt.toFixed(1)+'점' : ''}</span>
+    </div>`
+  ).join('');
+  acDropdown.classList.add('show');
+  nameInput.setAttribute('aria-expanded', 'true');
+  acDropdown.querySelectorAll('.ac-item').forEach(item => {
+    item.addEventListener('click', () => {
+      nameInput.value = item.dataset.name;
+      hideAC();
+      applyFilters();
+    });
+  });
+}, 150));
+
+nameInput.addEventListener('keydown', function(e) {
+  if (!acDropdown.classList.contains('show')) return;
+  const items = acDropdown.querySelectorAll('.ac-item');
+  if (e.key === 'ArrowDown') { e.preventDefault(); acIndex = Math.min(acIndex+1, items.length-1); updateACActive(items); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); acIndex = Math.max(acIndex-1, -1); updateACActive(items); }
+  else if (e.key === 'Enter' && acIndex >= 0) { e.preventDefault(); items[acIndex].click(); }
+  else if (e.key === 'Escape') { hideAC(); }
+});
+
+function updateACActive(items) {
+  items.forEach((it, i) => it.classList.toggle('ac-active', i === acIndex));
+  if (acIndex >= 0) items[acIndex].scrollIntoView({ block: 'nearest' });
+}
+function hideAC() { acDropdown.classList.remove('show'); nameInput.setAttribute('aria-expanded', 'false'); acIndex = -1; }
+function highlightMatch(text, q) {
+  const idx = text.toLowerCase().indexOf(q);
+  if (idx < 0) return text;
+  return text.slice(0, idx) + '<strong style="color:var(--primary)">' + text.slice(idx, idx+q.length) + '</strong>' + text.slice(idx+q.length);
+}
+document.addEventListener('click', (e) => { if (!e.target.closest('.autocomplete-wrap')) hideAC(); });
+
+// Active filter chips
+function renderActiveFilters() {
+  const el = document.getElementById('activeFilters');
+  const chips = [];
+  if (currentRegion) chips.push({ label: `지역: ${currentRegion}`, action: () => { document.querySelector('.tag[data-region=""]').click(); } });
+  const typeVal = document.getElementById('typeFilter').value;
+  if (typeVal) chips.push({ label: `종류: ${typeVal}`, action: () => { document.getElementById('typeFilter').value = ''; applyFilters(); } });
+  const holesMin = parseInt(document.getElementById('holesFilter').value);
+  if (holesMin) chips.push({ label: `${holesMin}홀+`, action: () => { document.getElementById('holesFilter').value = '0'; applyFilters(); } });
+  const ratingMin = parseFloat(document.getElementById('ratingFilter').value);
+  if (ratingMin) chips.push({ label: `평점 ${ratingMin}+`, action: () => { document.getElementById('ratingFilter').value = '0'; applyFilters(); } });
+  const grassVal = document.getElementById('grassFilter').value;
+  if (grassVal) chips.push({ label: `잔디: ${grassVal}`, action: () => { document.getElementById('grassFilter').value = ''; applyFilters(); } });
+  const priceMax = parseInt(document.getElementById('priceSlider').value);
+  if (priceMax < 400000) chips.push({ label: `${fmtPriceFull(priceMax)} 이하`, action: () => { document.getElementById('priceSlider').value = 400000; document.getElementById('priceDisplay').textContent = '전체'; applyFilters(); } });
+  const timeMin = parseInt(document.getElementById('timeSlider').value);
+  if (timeMin < 300) { const h=Math.floor(timeMin/60),m=timeMin%60; chips.push({ label: `${h?h+'시간':''}${m?m+'분':''}이내`, action: () => { document.getElementById('timeSlider').value = 300; document.getElementById('timeDisplay').textContent = '전체'; applyFilters(); } }); }
+  if (showFavsOnly) chips.push({ label: '즐겨찾기만', action: () => { document.getElementById('favFilter').click(); } });
+
+  if (!chips.length) { el.innerHTML = ''; return; }
+  el.innerHTML = chips.map((ch, i) =>
+    `<span class="filter-chip">${ch.label}<button data-chip="${i}" aria-label="${ch.label} 해제">&times;</button></span>`
+  ).join('');
+  el.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => { chips[parseInt(btn.dataset.chip)].action(); renderActiveFilters(); });
+  });
+}
+
+// Recently viewed courses
+function addToRecentlyViewed(c) {
+  recentlyViewed = recentlyViewed.filter(v => v.n !== c.n);
+  recentlyViewed.unshift({ n: c.n, r: c.r, rt: c.rt, t: c.t });
+  if (recentlyViewed.length > 8) recentlyViewed.pop();
+  localStorage.setItem('sg_viewed', JSON.stringify(recentlyViewed));
+  renderRecentlyViewed();
+}
+function renderRecentlyViewed() {
+  const section = document.getElementById('recentViewed');
+  const list = document.getElementById('recentViewedList');
+  if (!recentlyViewed.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  list.innerHTML = recentlyViewed.map(v =>
+    `<div class="rv-card" data-name="${v.n.replace(/"/g,'&quot;')}">
+      <div class="rv-name">${v.n}</div>
+      <div class="rv-info">${v.r||''} | ${v.rt ? v.rt.toFixed(1)+'점' : ''} | ${v.t||''}</div>
+    </div>`
+  ).join('');
+  list.querySelectorAll('.rv-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const c = allCourses.find(x => x.n === card.dataset.name);
+      if (c) showDetail(c);
+    });
+  });
+}
+renderRecentlyViewed();
+
+// Share feature (Web Share API)
+function shareCourse(name) {
+  const c = allCourses.find(x => x.n === name);
+  if (!c) return;
+  const text = `${c.n} - ${c.r} ${c.c||''} | ${c.rt ? c.rt.toFixed(1)+'점' : ''} | ${c.weekday ? '주중 '+fmtPrice(c.weekday) : ''}`;
+  if (navigator.share) {
+    navigator.share({ title: c.n + ' - SmartGolf', text: text }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text).then(() => showToast('클립보드에 복사됨', 'success'));
+  }
+}
+
+// Scroll to top button
+const scrollTopBtn = document.getElementById('scrollTop');
+window.addEventListener('scroll', () => {
+  scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
+}, { passive: true });
+scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+// Progress bar already defined above (setProgress)
+
+// List view toggle
+document.getElementById('viewList').addEventListener('click', () => {
+  currentView = 'list';
+  document.getElementById('cardGrid').classList.add('list-view');
+  document.getElementById('map-section').style.display = 'none';
+  document.getElementById('viewList').classList.add('active');
+  document.getElementById('viewGrid').classList.remove('active');
+  document.getElementById('viewMap').classList.remove('active');
+});
+document.getElementById('viewGrid').addEventListener('click', () => {
+  currentView = 'grid';
+  document.getElementById('cardGrid').classList.remove('list-view');
+});
+
+// Enhanced keyboard navigation
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && !e.target.closest('input,select,textarea')) {
+    e.preventDefault();
+    document.getElementById('nameSearch').focus();
+  }
+});
+
+// Intersection Observer for card animations (lazy)
+const cardObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+      cardObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+// Override renderResults to add observer
+const originalRenderResults = renderResults;
+
+// OSRM progress is handled via setProgress() in the main calcRealDrivingTimes
+
+// Initial render of active filters
+renderActiveFilters();
 
 // Name search is already debounced above
 </script>
