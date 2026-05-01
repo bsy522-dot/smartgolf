@@ -2,6 +2,7 @@ const CACHE_NAME = 'smartgolf-v5';
 const ASSETS = [
   './',
   './index.html',
+  './app.js',
   './courses_enriched.json',
   './manifest.json'
 ];
