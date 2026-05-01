@@ -1,8 +1,9 @@
-const CACHE_NAME = 'smartgolf-v5';
+const CACHE_NAME = 'smartgolf-v6';
 const ASSETS = [
   './',
   './index.html',
-  './app.js',
+  './icons.css',
+  './features.js',
   './courses_enriched.json',
   './manifest.json'
 ];
@@ -13,7 +14,31 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('fetch', e => {
-  if (e.request.url.includes('courses_enriched.json')) {
+  const url = e.request.url;
+
+  // HTML pages: inject features.js, network-first
+  if (e.request.mode === 'navigate' || url.endsWith('.html') || url.endsWith('/')) {
+    e.respondWith(
+      fetch(e.request).then(r => {
+        return r.text().then(html => {
+          if (html.includes('</body>') && !html.includes('features.js')) {
+            html = html.replace('</body>', '<script src="features.js" defer><\/script>\n</body>');
+          }
+          const resp = new Response(html, {
+            status: r.status,
+            statusText: r.statusText,
+            headers: {'Content-Type': 'text/html; charset=UTF-8'}
+          });
+          caches.open(CACHE_NAME).then(c => c.put(e.request, resp.clone()));
+          return resp;
+        });
+      }).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  // JSON data: network-first
+  if (url.includes('courses_enriched.json')) {
     e.respondWith(
       fetch(e.request).then(r => {
         const clone = r.clone();
@@ -21,7 +46,11 @@ self.addEventListener('fetch', e => {
         return r;
       }).catch(() => caches.match(e.request))
     );
-  } else if (e.request.url.includes('tile.openstreetmap.org') || e.request.url.includes('unpkg.com/leaflet')) {
+    return;
+  }
+
+  // Map tiles and Leaflet: cache-first
+  if (url.includes('tile.openstreetmap.org') || url.includes('unpkg.com/leaflet')) {
     e.respondWith(
       caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
         if (resp.status === 200) {
@@ -31,17 +60,19 @@ self.addEventListener('fetch', e => {
         return resp;
       }))
     );
-  } else {
-    e.respondWith(
-      caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
-        if (resp.status === 200 && e.request.method === 'GET') {
-          const clone = resp.clone();
-          caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
-        }
-        return resp;
-      }))
-    );
+    return;
   }
+
+  // Everything else: cache-first, GET only
+  e.respondWith(
+    caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
+      if (resp.status === 200 && e.request.method === 'GET') {
+        const clone = resp.clone();
+        caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+      }
+      return resp;
+    }))
+  );
 });
 
 self.addEventListener('activate', e => {
