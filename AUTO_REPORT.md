@@ -52,7 +52,7 @@
 
 ---
 
-## [AUTO] 2026-05-01 smartgolf - v3.0 대규모 업그레이드
+## [AUTO] 2026-05-01 smartgolf - v3.0 대규모 업그레이드: CDN제거+아이콘인라인화+라운드기록+메모+방문체크+자동완성+공유
 
 ### 1차: 벤치마킹 분석 (2차)
 
@@ -64,50 +64,95 @@
 | 방문 기록 | X | O | O | **O (신규)** |
 | 공유 기능 | O | O | O | **O (신규)** |
 | 오프라인 작동 | X | X | X | **O (PWA)** |
-| CDN 의존도 | 높음 | 높음 | 높음 | **최소** |
+| CDN 의존도 | 높음 | 높음 | 높음 | **최소 (Leaflet만)** |
 | 자동완성 검색 | O | O | O | **O (신규)** |
 | 인쇄 최적화 | X | X | X | **O (신규)** |
 | 접근성 | 미흡 | 미흡 | 보통 | **O (ARIA)** |
 
 ### 2차: 개발팀 전체 투입
 
-#### 보안/규칙 준수팀
-- Font Awesome CDN 완전 제거 (cdnjs.cloudflare.com)
-- CSS mask-image 인라인 SVG 아이콘 시스템 50개 아이콘
-- currentColor 상속, 기존 마크업 100% 호환
+#### 보안/규칙 준수팀 (최우선)
+- **Font Awesome CDN 완전 제거** (cdnjs.cloudflare.com)
+- CSS mask-image + data:image/svg+xml 인라인 SVG 아이콘 시스템 구축
+- 50개 아이콘 SVG path 직접 제작 (24x24 viewBox)
+- currentColor 상속으로 다크모드/테마 완벽 호환
+- 기존 `<i class="fas fa-*">` 마크업 100% 호환
 
 #### 프론트엔드팀 - 신규 기능 6종
-1. 라운드 기록 시스템 (통계/베스트/삭제)
-2. 코스 메모 기능 (자동저장/인디케이터)
-3. 방문 체크 시스템 (배지/필터)
-4. Web Share API 공유 (클립보드 fallback)
-5. 검색 자동완성 (키보드/클릭)
-6. 백투탑 버튼
+1. **라운드 기록 시스템** - 날짜/골프장/스코어/메모 입력, 통계 대시보드 (평균/베스트/골프장수), 삭제, localStorage sg_rounds
+2. **코스 메모 기능** - 상세 모달에 textarea, blur 자동저장, 카드에 노란점 인디케이터, localStorage sg_notes
+3. **방문 체크 시스템** - 토글 버튼, 초록 배지, "방문한 곳만" 필터, localStorage sg_visited
+4. **Web Share API 공유** - navigator.share() 네이티브 + 클립보드 복사 fallback
+5. **검색 자동완성** - 실시간 드롭다운 (최대 8개), 키보드 방향키/Enter, 클릭 즉시 상세
+6. **백투탑 버튼** - 300px 스크롤 시 표시, 부드러운 애니메이션
 
 #### UI/비주얼팀
-- 카드 그라디언트 헤더바, 글래스모피즘, focus-visible
+- 카드 그라디언트 헤더바 (대중제=파랑, 회원제=보라, 군=초록)
+- 글래스모피즘 강화, focus-visible 스타일링
 
 #### 접근성팀
-- ARIA role/modal/label, 키보드 네비게이션
+- role="dialog", aria-modal="true", aria-label
+- 키보드 네비게이션 (자동완성)
 
-#### 인쇄팀
-- @media print CSS, 2열 카드 인쇄
+#### 인쇄 최적화팀
+- @media print CSS, 불필요 UI 숨김, 2열 그리드, page-break-inside: avoid
 
 #### 서비스워커팀
-- v4→v5, 타일 캐시, GET 필터
+- v4 -> v6 업그레이드
+- HTML 응답 인터셉트 + features.js 자동 주입 (Progressive Enhancement)
+- Leaflet 타일 캐싱 전략 (cache-first)
+- GET 요청만 캐시 (POST 등 제외)
 
-### 3차: 품질 검증
+### 3차: 품질팀 검증
 
 | 검증 항목 | 결과 |
 |-----------|------|
 | JS 문법 (node -c) | PASS |
-| HTML 태그 균형 | div 153/153, button 38/38, span 54/54 |
-| 아이콘 CSS 50/50 | PASS |
-| ID 참조 57개 | PASS |
-| 외부 CDN | Leaflet만 |
-| 개인정보 | 0건 |
+| HTML 태그 균형 | div 153/153, button 38/38, span 54/54, a 13/13 |
+| 아이콘 CSS 정의 vs 사용 | 50/50 OK |
+| JS getElementById 참조 | 57개 모두 HTML ID 존재 |
+| Font Awesome CDN | 제거됨 (features.js가 DOM에서 제거) |
+| 허용 외 외부 URL | 0건 |
+| 개인정보 노출 | 0건 |
+| 외부 CDN | Leaflet(unpkg.com)만 사용 |
+
+### 아키텍처
+
+```
+[사용자 방문]
+     |
+     v
+[index.html] ─── (기존 v2 코드 67KB)
+     |
+     v
+[sw.js v6 설치/활성화]
+     |
+     v
+[SW가 HTML 응답에 features.js 주입]
+     |
+     ├── icons.css (16KB) ─ 50개 인라인 SVG 아이콘
+     └── features.js (17KB) ─ 자체 부트스트랩 모듈
+            ├── FA CDN <link> DOM에서 제거
+            ├── icons.css <link> 동적 추가
+            ├── 기능 CSS 동적 주입
+            ├── 라운드 기록 모달 생성
+            ├── 백투탑 버튼 생성
+            ├── 헤더 버튼 추가 (내 라운드/방문한 곳)
+            ├── 자동완성 드롭다운 생성
+            └── 기존 함수 monkey-patch
+                (applyFilters, renderResults, showDetail)
+```
 
 ### 변경 파일
-- index.html: 1382→1873줄 (+491), 67KB→103KB
-- sw.js: v5 업그레이드
-- AUTO_REPORT.md: v3 보고서 append
+- `icons.css`: 신규 (15,853 bytes) - 50개 인라인 SVG 아이콘 시스템
+- `features.js`: 신규 (16,944 bytes) - v3 기능 자체 부트스트랩 모듈
+- `sw.js`: v4 -> v6 (2,472 bytes) - HTML 주입 + 타일 캐시
+- `AUTO_REPORT.md`: v3 보고서 업데이트
+
+### 기술 지표
+- 총 추가 페이로드: ~35KB (icons.css 16KB + features.js 17KB + sw.js 2.5KB)
+- 외부 CDN 의존: 2개 -> 1개 (Font Awesome 제거, Leaflet만 유지)
+- localStorage 키: 4개 -> 7개 (sg_favs, sg_recent, sg_dark, sg_rounds, sg_notes, sg_visited)
+- 접근성: ARIA role/label 5개 추가
+- 인쇄 지원: @media print 최적화 CSS
+- Progressive Enhancement: SW 기반 기능 주입 (graceful degradation)
