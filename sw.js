@@ -1,12 +1,9 @@
-const CACHE_NAME = 'smartgolf-v4';
+const CACHE_NAME = 'smartgolf-v5';
 const ASSETS = [
   './',
   './index.html',
   './courses_enriched.json',
-  './manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+  './manifest.json'
 ];
 
 self.addEventListener('install', e => {
@@ -15,7 +12,6 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Network-first for JSON data, cache-first for static assets
   if (e.request.url.includes('courses_enriched.json')) {
     e.respondWith(
       fetch(e.request).then(r => {
@@ -24,10 +20,20 @@ self.addEventListener('fetch', e => {
         return r;
       }).catch(() => caches.match(e.request))
     );
-  } else {
+  } else if (e.request.url.includes('tile.openstreetmap.org') || e.request.url.includes('unpkg.com/leaflet')) {
     e.respondWith(
       caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
         if (resp.status === 200) {
+          const clone = resp.clone();
+          caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+        }
+        return resp;
+      }))
+    );
+  } else {
+    e.respondWith(
+      caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
+        if (resp.status === 200 && e.request.method === 'GET') {
           const clone = resp.clone();
           caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
         }
