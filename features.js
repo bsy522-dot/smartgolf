@@ -1,11 +1,14 @@
 (function(){
 "use strict";
-// Remove Font Awesome CDN and load local icons.css
-document.querySelectorAll('link[href*="font-awesome"],link[href*="fontawesome"]').forEach(function(l){l.remove()});
+// Ensure icons.css is loaded (fallback if not in HTML)
+if(!document.querySelector('link[href*="icons.css"]')){
 var iconLink=document.createElement('link');
 iconLink.rel='stylesheet';
 iconLink.href='icons.css';
 document.head.appendChild(iconLink);
+}
+// Remove any remaining Font Awesome CDN links
+document.querySelectorAll('link[href*="font-awesome"],link[href*="fontawesome"]').forEach(function(l){l.remove()});
 
 var CSS=`
 .round-modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:10000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
@@ -75,7 +78,7 @@ overlay.setAttribute('aria-label','라운드 기록');
 overlay.innerHTML=`<div class="round-modal">
 <div style="display:flex;justify-content:space-between;align-items:center"><h2><i class="fas fa-trophy"></i> 내 라운드</h2><button onclick="this.closest('.round-modal-overlay').classList.remove('active')" style="background:none;border:none;font-size:1.5em;cursor:pointer;color:var(--text,#333)">&times;</button></div>
 <div class="round-tabs"><button class="round-tab active" data-tab="list"><i class="fas fa-list"></i> 목록</button><button class="round-tab" data-tab="add"><i class="fas fa-plus"></i> 추가</button></div>
-<div id="roundListView"><div class="round-stats"><div class="round-stat"><div class="val" id="rsTotalRounds">0</div><div class="lbl">총 라운드</div></div><div class="round-stat"><div class="val" id="rsAvgScore">-</div><div class="lbl">평균 스코어</div></div><div class="round-stat"><div class="val" id="rsBestScore">-</div><div class="lbl">베스트</div></div><div class="round-stat"><div class="val" id="rsCourses">0</div><div class="lbl">골프장 수</div></div></div><div id="roundsList"></div></div>
+<div id="roundListView"><div class="round-stats"><div class="round-stat"><div class="val" id="rsTotalRounds">0</div><div class="lbl">총 라운드</div></div><div class="round-stat"><div class="val" id="rsAvgScore">-</div><div class="lbl">평균 스코어</div></div><div class="round-stat"><div class="val" id="rsBestScore">-</div><div class="lbl">베스트</div></div><div class="round-stat"><div class="val" id="rsCourses">0</div><div class="lbl">골프장 수</div></div></div><div id="rsHandicap" style="text-align:center;margin-bottom:12px"></div><div id="roundsList"></div></div>
 <div id="roundAddView" style="display:none"><form class="round-form" id="roundForm"><label>날짜<input type="date" id="rfDate" required></label><label>골프장<input type="text" id="rfCourse" placeholder="골프장명 입력" required></label><label>스코어(타수)<input type="number" id="rfScore" min="50" max="200" placeholder="72" required></label><label>메모<textarea id="rfMemo" rows="2" placeholder="간단 메모"></textarea></label><button type="submit"><i class="fas fa-save"></i> 저장</button></form></div>
 </div>`;
 document.body.appendChild(overlay);
@@ -99,6 +102,12 @@ document.getElementById('roundForm').addEventListener('submit',function(e){
   if(window.showToast)window.showToast('라운드 기록 저장!','success');
 });
 
+function calcHandicapLocal(rds){
+  if(rds.length<3)return null;
+  var diffs=rds.map(function(r){return r.score-72}).sort(function(a,b){return a-b});
+  var best=diffs.slice(0,Math.max(1,Math.ceil(diffs.length*0.4)));
+  return Math.round(best.reduce(function(s,d){return s+d},0)/best.length*0.96*10)/10;
+}
 function updateRoundUI(){
   var el=document.getElementById('rsTotalRounds');if(!el)return;
   el.textContent=rounds.length;
@@ -108,6 +117,14 @@ function updateRoundUI(){
     document.getElementById('rsBestScore').textContent=Math.min.apply(null,scores);
     var cs=new Set(rounds.map(function(r){return r.course}));
     document.getElementById('rsCourses').textContent=cs.size;
+    var hc=calcHandicapLocal(rounds);
+    var hcEl=document.getElementById('rsHandicap');
+    if(hcEl&&hc!==null){
+      var cls=hc<10?'hc-single':hc<20?'hc-mid':'hc-high';
+      hcEl.innerHTML='<span class="handicap-badge '+cls+'">HC '+hc+'</span><div style="font-size:.7em;opacity:.6;margin-top:4px">추정 핸디캡 (상위 40% 평균)</div>';
+    }else if(hcEl){
+      hcEl.innerHTML=rounds.length>0?'<div style="font-size:.75em;opacity:.5">3라운드 이상 기록하면 핸디캡이 표시됩니다</div>':'';
+    }
   }
   var list=document.getElementById('roundsList');
   list.innerHTML=rounds.slice(0,20).map(function(r){return '<div class="round-item"><span class="ri-score">'+r.score+'</span><div class="ri-info"><div style="font-weight:600">'+r.course+'</div><div style="font-size:.8em;opacity:.7">'+r.date+(r.memo?' - '+r.memo:'')+'</div></div><button class="ri-del" data-id="'+r.id+'">&times;</button></div>'}).join('');
@@ -144,7 +161,7 @@ btt.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'
 document.body.appendChild(btt);
 window.addEventListener('scroll',function(){btt.classList.toggle('show',window.scrollY>300)});
 
-var searchInput=document.getElementById('searchInput');
+var searchInput=document.getElementById('nameSearch')||document.getElementById('searchInput');
 if(searchInput){
   var acWrap=searchInput.parentElement;
   acWrap.classList.add('autocomplete-wrap');

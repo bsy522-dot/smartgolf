@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smartgolf-v6';
+const CACHE_NAME = 'smartgolf-v7';
 const ASSETS = [
   './',
   './index.html',
