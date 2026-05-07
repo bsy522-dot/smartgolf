@@ -503,9 +503,180 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
   padding: 8px 16px; margin: 4px 0; border-radius: 0;
 }
 [data-theme="dark"] .price-highlight { background: linear-gradient(135deg, #1a3a25, #1b3a25); }
+
+/* === v4.0 NEW === */
+
+/* Skip Navigation */
+.skip-link {
+  position: absolute; top: -100px; left: 0; background: var(--primary); color: white;
+  padding: 10px 20px; z-index: 1000; font-weight: 700; border-radius: 0 0 8px 0;
+  transition: top 0.2s; text-decoration: none;
+}
+.skip-link:focus { top: 0; }
+
+/* Recommendation carousel */
+.recommend-section { max-width: 1400px; margin: 0 auto; padding: 8px 20px 12px; }
+.recommend-title {
+  font-size: 15px; font-weight: 800; color: var(--primary); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.recommend-scroll {
+  display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px;
+  scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: thin;
+}
+.rec-card {
+  flex-shrink: 0; width: 260px; background: var(--card-bg); border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow: hidden; cursor: pointer; scroll-snap-align: start;
+  transition: all 0.3s; position: relative; border: 2px solid transparent;
+}
+.rec-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--primary); }
+.rec-header {
+  padding: 12px 14px; background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  color: white; display: flex; align-items: center; gap: 8px;
+}
+.rec-rank {
+  width: 28px; height: 28px; background: rgba(255,255,255,0.25); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px;
+}
+.rec-name { font-weight: 700; font-size: 14px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rec-score { font-size: 11px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px; }
+.rec-body { padding: 10px 14px; }
+.rec-meta { font-size: 12px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 6px; }
+.rec-meta span { display: flex; align-items: center; gap: 3px; }
+.rec-reason {
+  margin-top: 6px; font-size: 11px; color: var(--primary); background: var(--primary-light);
+  padding: 4px 8px; border-radius: 6px; display: inline-block;
+}
+[data-theme="dark"] .rec-reason { background: #1a3a25; }
+
+/* Stats Dashboard Modal */
+.stats-dashboard { max-width: 850px; }
+.stats-summary-row {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 16px 20px;
+}
+.ss-card {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white; border-radius: var(--radius); padding: 12px; text-align: center;
+}
+.ss-card .ss-num { font-size: 22px; font-weight: 800; }
+.ss-card .ss-label { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+.stats-charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 0 20px 20px; }
+.chart-box {
+  background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px;
+}
+.chart-box h3 { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; text-align: center; }
+.chart-box canvas { width: 100%; height: 160px; display: block; }
+.chart-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+.chart-bar-label { width: 50px; text-align: right; color: var(--text-muted); font-weight: 600; }
+.chart-bar-track { flex: 1; height: 20px; background: var(--primary-light); border-radius: 4px; overflow: hidden; }
+.chart-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #4caf50); border-radius: 4px; transition: width 0.6s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; color: white; font-size: 10px; font-weight: 700; }
+[data-theme="dark"] .chart-bar-track { background: #1a3a25; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; justify-content: center; }
+.chart-legend span { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-muted); }
+.chart-legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+@media (max-width: 768px) {
+  .stats-summary-row { grid-template-columns: repeat(2, 1fr); }
+  .stats-charts { grid-template-columns: 1fr; }
+}
+
+/* Course Notes */
+.note-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.note-section label { font-size: 12px; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+.note-input {
+  width: 100%; margin-top: 6px; padding: 8px 12px; border: 2px solid var(--border);
+  border-radius: 8px; font-size: 13px; resize: vertical; min-height: 60px; max-height: 120px;
+  font-family: inherit; outline: none; transition: border-color 0.2s;
+  background: var(--card-bg); color: var(--text);
+}
+.note-input:focus { border-color: var(--primary); }
+.note-actions { display: flex; gap: 6px; margin-top: 6px; }
+.note-save {
+  padding: 6px 14px; background: var(--primary); color: white; border: none;
+  border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+}
+.note-save:hover { background: var(--primary-dark); }
+.note-del {
+  padding: 6px 14px; background: #fce4ec; color: #c62828; border: none;
+  border-radius: 6px; font-size: 12px; cursor: pointer;
+}
+
+/* Round Planner */
+.planner-form { display: flex; flex-direction: column; gap: 14px; padding: 16px 20px; }
+.planner-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.planner-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px; }
+.planner-group label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.planner-group input, .planner-group select {
+  padding: 10px 12px; border: 2px solid var(--border); border-radius: 8px;
+  font-size: 14px; outline: none; background: var(--card-bg); color: var(--text);
+}
+.planner-group input:focus, .planner-group select:focus { border-color: var(--primary); }
+.planner-btn {
+  padding: 12px 24px; background: var(--primary); color: white; border: none;
+  border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; align-self: flex-start;
+}
+.planner-btn:hover { background: var(--primary-dark); }
+.planner-results { padding: 0 20px 16px; }
+.pr-card {
+  display: flex; align-items: center; gap: 14px; padding: 12px 16px;
+  background: var(--card-bg); border-radius: var(--radius); border: 1px solid var(--border);
+  margin-bottom: 8px; cursor: pointer; transition: all 0.2s;
+}
+.pr-card:hover { border-color: var(--primary); transform: translateX(4px); }
+.pr-rank {
+  width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;
+}
+.pr-info { flex: 1; }
+.pr-name { font-weight: 700; font-size: 14px; }
+.pr-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.pr-cost { text-align: right; }
+.pr-total { font-weight: 800; font-size: 16px; color: var(--primary); }
+.pr-per { font-size: 11px; color: var(--text-muted); }
+
+/* Golf Tips */
+.tips-section { max-width: 1400px; margin: 0 auto; padding: 4px 20px 8px; }
+.tips-title { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.tips-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+.tip-card {
+  flex-shrink: 0; width: 200px; padding: 12px; background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  border-radius: var(--radius); font-size: 12px; line-height: 1.5; color: #1a3a25;
+}
+[data-theme="dark"] .tip-card { background: linear-gradient(135deg, #1a3a25, #0f2a18); color: #a5d6a7; }
+.tip-card .tip-icon { font-size: 20px; margin-bottom: 6px; display: block; }
+.tip-card .tip-title { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+
+/* Ranking Table */
+.ranking-section { max-width: 1400px; margin: 0 auto; padding: 4px 20px 12px; }
+.ranking-title { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.ranking-table { width: 100%; border-collapse: collapse; font-size: 12px; background: var(--card-bg); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+.ranking-table th { background: var(--primary); color: white; padding: 8px 10px; text-align: left; font-size: 11px; }
+.ranking-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); }
+.ranking-table tr:hover td { background: var(--primary-light); }
+.ranking-table .rank-num { font-weight: 800; color: var(--primary); width: 30px; text-align: center; }
+.ranking-table .rank-gold { color: #f59e0b; }
+.ranking-table .rank-silver { color: #9e9e9e; }
+.ranking-table .rank-bronze { color: #cd7f32; }
+
+/* Enhanced card shine */
+.card { overflow: hidden; }
+.card::after {
+  content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  transition: left 0.6s; pointer-events: none;
+}
+.card:hover::after { left: 100%; }
+
+/* Header tool buttons */
+.header-tools { display: flex; gap: 4px; align-items: center; }
+
+/* Badge for notes indicator */
+.badge-note { background: #fff3e0; color: #e65100; }
+[data-theme="dark"] .badge-note { background: #3a2a1a; color: #ffab40; }
 </style>
 </head>
 <body>
+<a class="skip-link" href="#cardGrid">본문으로 건너뛰기</a>
 
 <div class="header">
   <div class="header-inner">
@@ -516,10 +687,14 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
       <div class="header-stat"><i class="fas fa-map-marker-alt"></i> GPS 거리계산</div>
     </div>
     <button class="fav-filter" id="favFilter" title="즐겨찾기만"><i class="fas fa-heart"></i> <span id="favCount">0</span></button>
-    <div class="view-toggle">
-      <button class="view-btn active" id="viewGrid" title="카드뷰"><i class="fas fa-th-large"></i></button>
-      <button class="view-btn" id="viewList" title="리스트뷰"><i class="fas fa-list"></i></button>
-      <button class="view-btn" id="viewMap" title="지도뷰"><i class="fas fa-map"></i></button>
+    <div class="header-tools">
+      <div class="view-toggle">
+        <button class="view-btn active" id="viewGrid" title="카드뷰"><i class="fas fa-th-large"></i></button>
+        <button class="view-btn" id="viewList" title="리스트뷰"><i class="fas fa-list"></i></button>
+        <button class="view-btn" id="viewMap" title="지도뷰"><i class="fas fa-map"></i></button>
+      </div>
+      <button class="dark-toggle" id="statsBtn" title="통계 대시보드"><i class="fas fa-chart-pie"></i></button>
+      <button class="dark-toggle" id="plannerBtn" title="라운드 플래너"><i class="fas fa-calendar-alt"></i></button>
       <button class="dark-toggle" id="darkToggle" title="다크모드"><i class="fas fa-moon"></i></button>
     </div>
   </div>
@@ -625,6 +800,24 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
 
 <div class="stats-bar" id="statsBar"></div>
 
+<!-- Recommendation Carousel -->
+<div class="recommend-section" id="recommendSection" style="display:none">
+  <div class="recommend-title"><i class="fas fa-trophy"></i> <span id="recTitle">오늘의 추천 TOP 5</span></div>
+  <div class="recommend-scroll" id="recScroll"></div>
+</div>
+
+<!-- Golf Tips -->
+<div class="tips-section" id="tipsSection">
+  <div class="tips-title"><i class="fas fa-lightbulb"></i> 골프 팁</div>
+  <div class="tips-scroll" id="tipsScroll"></div>
+</div>
+
+<!-- Top 10 Ranking -->
+<div class="ranking-section" id="rankingSection" style="display:none">
+  <div class="ranking-title"><i class="fas fa-medal"></i> 평점 TOP 10</div>
+  <table class="ranking-table" id="rankingTable"></table>
+</div>
+
 <div id="map-section">
   <div id="map"></div>
 </div>
@@ -682,6 +875,90 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
   <button class="compare-btn-clear" id="compareClear"><i class="fas fa-times"></i> 초기화</button>
 </div>
 
+<!-- Stats Dashboard Modal -->
+<div class="modal-overlay" id="statsOverlay">
+  <div class="modal stats-dashboard">
+    <div class="modal-header">
+      <h2><i class="fas fa-chart-pie"></i> 통계 대시보드</h2>
+      <button class="modal-close" id="statsClose">&times;</button>
+    </div>
+    <div class="stats-summary-row" id="statsSummary"></div>
+    <div class="stats-charts" id="statsCharts"></div>
+  </div>
+</div>
+
+<!-- Round Planner Modal -->
+<div class="modal-overlay" id="plannerOverlay">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-header">
+      <h2><i class="fas fa-calendar-alt"></i> 라운드 플래너</h2>
+      <button class="modal-close" id="plannerClose">&times;</button>
+    </div>
+    <div class="planner-form" id="plannerForm">
+      <div class="planner-row">
+        <div class="planner-group">
+          <label><i class="fas fa-users"></i> 인원</label>
+          <select id="planPeople">
+            <option value="2">2명</option>
+            <option value="3">3명</option>
+            <option value="4" selected>4명 (1팀)</option>
+            <option value="8">8명 (2팀)</option>
+          </select>
+        </div>
+        <div class="planner-group">
+          <label><i class="fas fa-won-sign"></i> 1인 예산 (만원)</label>
+          <input type="number" id="planBudget" min="5" max="50" value="15" step="1">
+        </div>
+        <div class="planner-group">
+          <label><i class="fas fa-calendar"></i> 요일</label>
+          <select id="planDay">
+            <option value="weekday">주중 (월~금)</option>
+            <option value="weekend">주말 (토~일)</option>
+          </select>
+        </div>
+      </div>
+      <div class="planner-row">
+        <div class="planner-group">
+          <label><i class="fas fa-flag"></i> 최소 홀수</label>
+          <select id="planHoles">
+            <option value="0">상관없음</option>
+            <option value="18" selected>18홀+</option>
+            <option value="27">27홀+</option>
+          </select>
+        </div>
+        <div class="planner-group">
+          <label><i class="fas fa-map-marker-alt"></i> 지역</label>
+          <select id="planRegion">
+            <option value="">전체</option>
+            <option value="서울">서울</option>
+            <option value="경기">경기</option>
+            <option value="인천">인천</option>
+            <option value="강원">강원</option>
+            <option value="충북">충북</option>
+            <option value="충남">충남</option>
+            <option value="전북">전북</option>
+            <option value="전남">전남</option>
+            <option value="경북">경북</option>
+            <option value="경남">경남</option>
+            <option value="제주">제주</option>
+          </select>
+        </div>
+        <div class="planner-group">
+          <label><i class="fas fa-star"></i> 최소 평점</label>
+          <select id="planRating">
+            <option value="0">상관없음</option>
+            <option value="7">7.0+</option>
+            <option value="8" selected>8.0+</option>
+            <option value="9">9.0+</option>
+          </select>
+        </div>
+      </div>
+      <button class="planner-btn" id="planSearch"><i class="fas fa-search"></i> 최적 골프장 찾기</button>
+    </div>
+    <div class="planner-results" id="plannerResults"></div>
+  </div>
+</div>
+
 <!-- Toast container -->
 <div class="toast-container" id="toastContainer"></div>
 
@@ -709,15 +986,15 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
   <div class="footer-inner">
     <div class="footer-brand">
       <i class="fas fa-golf-ball-tee"></i> SmartGolf
-      <span>v3.0 &mdash; 전국 골프장 파인더</span>
+      <span>v4.0 &mdash; 전국 골프장 파인더</span>
     </div>
     <div class="footer-links">
       <a href="#" onclick="window.scrollTo({top:0,behavior:&quot;smooth&quot;});return false">맨 위로</a>
       <a href="#" onclick="document.getElementById(&quot;resetBtn&quot;).click();return false">필터 초기화</a>
     </div>
     <div class="footer-info">
-      590개 골프장 데이터 (2026 업데이트)<br>
-      GPS 거리: OSRM | 지도: OpenStreetMap
+      590개 골프장 데이터 (2026.05 업데이트)<br>
+      GPS 거리: OSRM | 지도: OpenStreetMap | v4.0
     </div>
   </div>
 </footer>
@@ -1781,6 +2058,398 @@ const originalRenderResults = renderResults;
 renderActiveFilters();
 
 // Name search is already debounced above
+
+// ===== v4.0 NEW FEATURES =====
+
+// Course Notes (localStorage)
+let courseNotes = JSON.parse(localStorage.getItem('sg_notes') || '{}');
+
+function getCourseNote(name) { return courseNotes[name] || ''; }
+function saveCourseNote(name, text) {
+  if (text.trim()) { courseNotes[name] = text.trim(); }
+  else { delete courseNotes[name]; }
+  localStorage.setItem('sg_notes', JSON.stringify(courseNotes));
+}
+
+// Patch showDetail to include notes
+const _origShowDetail = showDetail;
+showDetail = function(c) {
+  _origShowDetail(c);
+  const mb = document.getElementById('modalBody');
+  const note = getCourseNote(c.n);
+  const safeName = c.n.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  mb.insertAdjacentHTML('beforeend', `
+    <div class="note-section">
+      <label><i class="fas fa-sticky-note"></i> 내 메모</label>
+      <textarea class="note-input" id="noteInput" placeholder="이 골프장에 대한 메모를 남겨보세요...">${note.replace(/</g,'&lt;')}</textarea>
+      <div class="note-actions">
+        <button class="note-save" onclick="saveCourseNote('${safeName}', document.getElementById('noteInput').value); showToast('메모 저장됨', 'success')"><i class="fas fa-save"></i> 저장</button>
+        ${note ? '<button class="note-del" onclick="saveCourseNote(\'' + safeName + '\', \'\'); document.getElementById(\'noteInput\').value=\'\'; showToast(\'메모 삭제됨\', \'info\')"><i class="fas fa-trash"></i> 삭제</button>' : ''}
+      </div>
+    </div>
+  `);
+};
+
+// Season helper
+function getCurrentSeason() {
+  const m = new Date().getMonth() + 1;
+  if (m >= 3 && m <= 5) return { name: '봄', icon: 'fa-seedling', color: '#66bb6a', tip: '봄 라운드는 아침 이슬에 주의하세요' };
+  if (m >= 6 && m <= 8) return { name: '여름', icon: 'fa-sun', color: '#ff9800', tip: '자외선 차단과 수분 보충 필수!' };
+  if (m >= 9 && m <= 11) return { name: '가을', icon: 'fa-leaf', color: '#e65100', tip: '가을 단풍 코스를 즐겨보세요' };
+  return { name: '겨울', icon: 'fa-snowflake', color: '#42a5f5', tip: '방한 장비와 워밍업이 중요합니다' };
+}
+
+// Golf Tips
+function renderGolfTips() {
+  const season = getCurrentSeason();
+  const tips = [
+    { icon: 'fa-bullseye', title: '그립 체크', text: '라운드 전 그립 상태를 확인하세요. 마모된 그립은 스윙 정확도를 떨어뜨립니다.' },
+    { icon: season.icon, title: `${season.name}철 팁`, text: season.tip },
+    { icon: 'fa-clock', title: '예약 꿀팁', text: '주중 오후 라운드는 가격이 저렴하고 여유로운 플레이가 가능합니다.' },
+    { icon: 'fa-road', title: '이동 팁', text: 'GPS로 거리를 계산하면 정확한 이동시간을 확인할 수 있습니다.' },
+    { icon: 'fa-chart-line', title: '가성비 팁', text: '가성비 정렬을 활용하면 평점 대비 가격이 합리적인 골프장을 찾을 수 있습니다.' },
+    { icon: 'fa-heart', title: '즐겨찾기 팁', text: '자주 가는 골프장은 즐겨찾기에 추가하고 비교 기능을 활용하세요.' },
+    { icon: 'fa-golf-ball-tee', title: '초보 가이드', text: '대중제 골프장은 부킹이 쉽고 가격이 합리적이어서 초보에게 추천됩니다.' },
+    { icon: 'fa-map-marker-alt', title: '지역 선택', text: '경기/강원 지역이 골프장 밀집도가 높아 선택지가 다양합니다.' }
+  ];
+  const el = document.getElementById('tipsScroll');
+  el.innerHTML = tips.map(t => `
+    <div class="tip-card">
+      <span class="tip-icon"><i class="fas ${t.icon}"></i></span>
+      <div class="tip-title">${t.title}</div>
+      ${t.text}
+    </div>
+  `).join('');
+}
+renderGolfTips();
+
+// Recommendation engine
+function generateRecommendations() {
+  if (!allCourses.length) return;
+  const season = getCurrentSeason();
+  const scored = allCourses.filter(c => c.rt && c.rt > 0 && c.weekday > 0).map(c => {
+    let score = 0;
+    score += (c.rt || 0) * 10;
+    score += valueScore(c) * 0.5;
+    if (c.h >= 27) score += 5;
+    if (c.h >= 36) score += 5;
+    if (userCoords && c._calcTime) {
+      if (c._calcTime <= 1) score += 15;
+      else if (c._calcTime <= 1.5) score += 10;
+      else if (c._calcTime <= 2) score += 5;
+    }
+    if (courseNotes[c.n]) score += 3;
+    return { ...c, _recScore: score };
+  });
+  scored.sort((a, b) => b._recScore - a._recScore);
+  const top5 = scored.slice(0, 5);
+  const el = document.getElementById('recScroll');
+  const section = document.getElementById('recommendSection');
+
+  if (!top5.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  document.getElementById('recTitle').innerHTML =
+    `<i class="fas ${season.icon}" style="color:${season.color}"></i> ${season.name}철 추천 TOP 5`;
+
+  el.innerHTML = top5.map((c, i) => {
+    const safeName = c.n.replace(/"/g, '&quot;');
+    let reason = '';
+    if (userCoords && c._calcTime && c._calcTime <= 1) reason = '1시간 이내 가까운 코스';
+    else if (c.rt >= 9) reason = '최고 평점 프리미엄 코스';
+    else if (valueScore(c) > 20) reason = '뛰어난 가성비';
+    else if (c.h >= 27) reason = c.h + '홀 대규모 코스';
+    else reason = '종합 추천';
+
+    return `<div class="rec-card" data-name="${safeName}">
+      <div class="rec-header">
+        <div class="rec-rank">${i + 1}</div>
+        <div class="rec-name">${c.n}</div>
+        <div class="rec-score">${c.rt.toFixed(1)}점</div>
+      </div>
+      <div class="rec-body">
+        <div class="rec-meta">
+          <span><i class="fas fa-map-marker-alt"></i> ${c.r}</span>
+          <span><i class="fas fa-won-sign"></i> ${fmtPrice(c.weekday)}</span>
+          ${c.h ? '<span><i class="fas fa-flag"></i> ' + c.h + '홀</span>' : ''}
+          ${userCoords && c._calcTime ? '<span><i class="fas fa-car"></i> ' + (c._calcTime < 1 ? Math.round(c._calcTime*60)+'분' : c._calcTime.toFixed(1)+'h') + '</span>' : ''}
+        </div>
+        <div class="rec-reason"><i class="fas fa-thumbs-up"></i> ${reason}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.querySelectorAll('.rec-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const c = allCourses.find(x => x.n === card.dataset.name);
+      if (c) showDetail(c);
+    });
+  });
+}
+
+// Patch applyFilters to regenerate recommendations
+const _origApplyFilters = applyFilters;
+applyFilters = function() {
+  _origApplyFilters();
+  generateRecommendations();
+  renderRankingTable();
+};
+
+// Ranking Table - Top 10 by rating
+function renderRankingTable() {
+  if (!allCourses.length) return;
+  const top10 = allCourses.filter(c => c.rt > 0).sort((a, b) => b.rt - a.rt).slice(0, 10);
+  const section = document.getElementById('rankingSection');
+  if (!top10.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  const tbl = document.getElementById('rankingTable');
+  tbl.innerHTML = `
+    <thead><tr>
+      <th style="width:30px">#</th><th>골프장</th><th>지역</th><th>평점</th><th>주중</th><th>홀</th>
+    </tr></thead>
+    <tbody>
+    ${top10.map((c, i) => {
+      const rankCls = i === 0 ? 'rank-gold' : i === 1 ? 'rank-silver' : i === 2 ? 'rank-bronze' : '';
+      const safeName = c.n.replace(/"/g, '&quot;');
+      return `<tr style="cursor:pointer" data-name="${safeName}">
+        <td class="rank-num ${rankCls}">${i+1}</td>
+        <td><strong>${c.n}</strong>${courseNotes[c.n] ? ' <i class="fas fa-sticky-note" style="color:#ff9800;font-size:10px"></i>' : ''}</td>
+        <td>${c.r} ${c.c||''}</td>
+        <td><strong style="color:#f59e0b">${c.rt.toFixed(1)}</strong></td>
+        <td>${fmtPrice(c.weekday)}</td>
+        <td>${c.h||'-'}홀</td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  `;
+  tbl.querySelectorAll('tbody tr').forEach(row => {
+    row.addEventListener('click', () => {
+      const c = allCourses.find(x => x.n === row.dataset.name);
+      if (c) showDetail(c);
+    });
+  });
+}
+
+// Stats Dashboard
+document.getElementById('statsBtn').addEventListener('click', showStatsDashboard);
+document.getElementById('statsClose').addEventListener('click', () => {
+  document.getElementById('statsOverlay').classList.remove('active');
+});
+document.getElementById('statsOverlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+});
+
+function showStatsDashboard() {
+  const data = allCourses;
+  const withPrice = data.filter(c => c.weekday > 0);
+  const withRating = data.filter(c => c.rt > 0);
+  const avgPrice = withPrice.length ? Math.round(withPrice.reduce((s,c) => s+c.weekday, 0)/withPrice.length) : 0;
+  const avgRating = withRating.length ? (withRating.reduce((s,c) => s+c.rt, 0)/withRating.length).toFixed(1) : '-';
+  const totalHoles = data.reduce((s,c) => s + (c.h||0), 0);
+  const regions = {};
+  data.forEach(c => { regions[c.r] = (regions[c.r]||0)+1; });
+  const regionCount = Object.keys(regions).length;
+
+  document.getElementById('statsSummary').innerHTML = `
+    <div class="ss-card"><div class="ss-num">${data.length}</div><div class="ss-label">전체 골프장</div></div>
+    <div class="ss-card" style="background:linear-gradient(135deg,#1565c0,#0d47a1)"><div class="ss-num">${avgPrice > 0 ? fmtPrice(avgPrice) : '-'}</div><div class="ss-label">평균 그린피</div></div>
+    <div class="ss-card" style="background:linear-gradient(135deg,#f59e0b,#e65100)"><div class="ss-num">${avgRating}</div><div class="ss-label">평균 평점</div></div>
+    <div class="ss-card" style="background:linear-gradient(135deg,#7b1fa2,#4a148c)"><div class="ss-num">${regionCount}</div><div class="ss-label">지역 수</div></div>
+  `;
+
+  // Region distribution chart (horizontal bars)
+  const regionSorted = Object.entries(regions).sort((a,b) => b[1]-a[1]);
+  const maxCount = regionSorted[0] ? regionSorted[0][1] : 1;
+
+  // Type distribution
+  const types = {};
+  data.forEach(c => { types[c.t||'기타'] = (types[c.t||'기타']||0)+1; });
+  const typeColors = { '대중제': '#2196f3', '회원제': '#9c27b0', '군골프장': '#ff9800', '공공대중제': '#4caf50', '기타': '#9e9e9e' };
+
+  // Price distribution
+  const priceBuckets = { '~5만': 0, '5~10만': 0, '10~15만': 0, '15~20만': 0, '20만+': 0 };
+  withPrice.forEach(c => {
+    const p = c.weekday;
+    if (p <= 50000) priceBuckets['~5만']++;
+    else if (p <= 100000) priceBuckets['5~10만']++;
+    else if (p <= 150000) priceBuckets['10~15만']++;
+    else if (p <= 200000) priceBuckets['15~20만']++;
+    else priceBuckets['20만+']++;
+  });
+  const maxPrice = Math.max(...Object.values(priceBuckets), 1);
+
+  // Rating distribution
+  const ratingBuckets = { '~6.0': 0, '6~7': 0, '7~8': 0, '8~9': 0, '9~10': 0 };
+  withRating.forEach(c => {
+    if (c.rt < 6) ratingBuckets['~6.0']++;
+    else if (c.rt < 7) ratingBuckets['6~7']++;
+    else if (c.rt < 8) ratingBuckets['7~8']++;
+    else if (c.rt < 9) ratingBuckets['8~9']++;
+    else ratingBuckets['9~10']++;
+  });
+  const maxRating = Math.max(...Object.values(ratingBuckets), 1);
+
+  // Holes distribution
+  const holesBuckets = { '9홀': 0, '18홀': 0, '27홀': 0, '36홀+': 0 };
+  data.forEach(c => {
+    if (!c.h) return;
+    if (c.h < 18) holesBuckets['9홀']++;
+    else if (c.h < 27) holesBuckets['18홀']++;
+    else if (c.h < 36) holesBuckets['27홀']++;
+    else holesBuckets['36홀+']++;
+  });
+  const maxHoles = Math.max(...Object.values(holesBuckets), 1);
+
+  document.getElementById('statsCharts').innerHTML = `
+    <div class="chart-box">
+      <h3><i class="fas fa-map-marker-alt"></i> 지역별 골프장 수</h3>
+      ${regionSorted.slice(0, 12).map(([r, cnt]) => `
+        <div class="chart-bar-row">
+          <div class="chart-bar-label">${r}</div>
+          <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${(cnt/maxCount*100).toFixed(1)}%">${cnt}</div></div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="chart-box">
+      <h3><i class="fas fa-won-sign"></i> 가격대별 분포</h3>
+      ${Object.entries(priceBuckets).map(([label, cnt]) => `
+        <div class="chart-bar-row">
+          <div class="chart-bar-label">${label}</div>
+          <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${(cnt/maxPrice*100).toFixed(1)}%;background:linear-gradient(90deg,#1565c0,#42a5f5)">${cnt}</div></div>
+        </div>
+      `).join('')}
+      <div class="chart-legend">
+        ${Object.entries(types).map(([t, n]) => `<span><span class="chart-legend-dot" style="background:${typeColors[t]||'#999'}"></span>${t} ${n}개</span>`).join('')}
+      </div>
+    </div>
+    <div class="chart-box">
+      <h3><i class="fas fa-star"></i> 평점대별 분포</h3>
+      ${Object.entries(ratingBuckets).map(([label, cnt]) => `
+        <div class="chart-bar-row">
+          <div class="chart-bar-label">${label}</div>
+          <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${(cnt/maxRating*100).toFixed(1)}%;background:linear-gradient(90deg,#f59e0b,#ff6b35)">${cnt}</div></div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="chart-box">
+      <h3><i class="fas fa-flag"></i> 홀수별 분포</h3>
+      ${Object.entries(holesBuckets).map(([label, cnt]) => `
+        <div class="chart-bar-row">
+          <div class="chart-bar-label">${label}</div>
+          <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${(cnt/maxHoles*100).toFixed(1)}%;background:linear-gradient(90deg,#7b1fa2,#ce93d8)">${cnt}</div></div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  document.getElementById('statsOverlay').classList.add('active');
+}
+
+// Round Planner
+document.getElementById('plannerBtn').addEventListener('click', () => {
+  document.getElementById('plannerOverlay').classList.add('active');
+});
+document.getElementById('plannerClose').addEventListener('click', () => {
+  document.getElementById('plannerOverlay').classList.remove('active');
+});
+document.getElementById('plannerOverlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+});
+
+document.getElementById('planSearch').addEventListener('click', () => {
+  const people = parseInt(document.getElementById('planPeople').value);
+  const budget = parseInt(document.getElementById('planBudget').value) * 10000;
+  const day = document.getElementById('planDay').value;
+  const minHoles = parseInt(document.getElementById('planHoles').value);
+  const region = document.getElementById('planRegion').value;
+  const minRating = parseFloat(document.getElementById('planRating').value);
+
+  const priceField = day === 'weekday' ? 'weekday' : 'weekend';
+  const candidates = allCourses.filter(c => {
+    if (!c[priceField] || c[priceField] <= 0) return false;
+    const totalPerPerson = c[priceField] + (c.cart || 0) / (people > 4 ? 4 : people > 1 ? people : 4);
+    if (totalPerPerson > budget) return false;
+    if (minHoles && (!c.h || c.h < minHoles)) return false;
+    if (region && c.r !== region) return false;
+    if (minRating && (!c.rt || c.rt < minRating)) return false;
+    return true;
+  });
+
+  candidates.sort((a, b) => {
+    let scoreA = (a.rt || 0) * 5 + valueScore(a) * 0.3;
+    let scoreB = (b.rt || 0) * 5 + valueScore(b) * 0.3;
+    if (userCoords) {
+      if (a._calcTime) scoreA += (3 - Math.min(3, a._calcTime)) * 5;
+      if (b._calcTime) scoreB += (3 - Math.min(3, b._calcTime)) * 5;
+    }
+    return scoreB - scoreA;
+  });
+
+  const results = candidates.slice(0, 8);
+  const el = document.getElementById('plannerResults');
+  if (!results.length) {
+    el.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>조건에 맞는 골프장이 없습니다. 예산이나 조건을 조정해 보세요.</p></div>';
+    return;
+  }
+
+  el.innerHTML = '<h3 style="font-size:14px;margin-bottom:10px;color:var(--text-muted)"><i class="fas fa-check-circle" style="color:var(--primary)"></i> 추천 결과 ' + results.length + '개</h3>' +
+    results.map((c, i) => {
+      const price = c[priceField];
+      const cartPerPerson = Math.round((c.cart || 0) / (people > 4 ? 4 : people > 1 ? people : 4));
+      const totalPer = price + cartPerPerson;
+      const totalAll = totalPer * people;
+      const safeName = c.n.replace(/"/g, '&quot;');
+      let distInfo = '';
+      if (userCoords && c._calcTime) {
+        const t = c._calcTime, h = Math.floor(t), m = Math.round((t-h)*60);
+        distInfo = ` | <i class="fas fa-car"></i> ${h>0?h+'h':''}${m>0?m+'m':''}`;
+      }
+      return `<div class="pr-card" data-name="${safeName}">
+        <div class="pr-rank">${i+1}</div>
+        <div class="pr-info">
+          <div class="pr-name">${c.n}</div>
+          <div class="pr-meta">${c.r} | ${c.rt ? c.rt.toFixed(1)+'점' : ''} | ${c.h||'?'}홀${distInfo}</div>
+        </div>
+        <div class="pr-cost">
+          <div class="pr-total">${fmtPrice(totalAll)}</div>
+          <div class="pr-per">1인 ${fmtPrice(totalPer)} (${people}명)</div>
+        </div>
+      </div>`;
+    }).join('');
+
+  el.querySelectorAll('.pr-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const c = allCourses.find(x => x.n === card.dataset.name);
+      if (c) {
+        document.getElementById('plannerOverlay').classList.remove('active');
+        showDetail(c);
+      }
+    });
+  });
+});
+
+// Keyboard: Escape closes all modals
+const _origKeydown = null;
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('statsOverlay').classList.remove('active');
+    document.getElementById('plannerOverlay').classList.remove('active');
+  }
+});
+
+// Note indicator in card badges
+const _origRenderResults = renderResults;
+renderResults = function() {
+  _origRenderResults();
+  document.querySelectorAll('.card').forEach(card => {
+    const name = card.dataset.name;
+    if (name && courseNotes[name]) {
+      const badges = card.querySelector('.card-badges');
+      if (badges && !badges.querySelector('.badge-note')) {
+        badges.insertAdjacentHTML('beforeend', '<span class="badge badge-note"><i class="fas fa-sticky-note"></i> 메모</span>');
+      }
+    }
+  });
+};
 </script>
 </body>
 </html>
