@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smartgolf-v5';
+const CACHE_NAME = 'smartgolf-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -15,7 +15,6 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Network-first for JSON data, cache-first for static assets
   if (e.request.url.includes('courses_enriched.json')) {
     e.respondWith(
       fetch(e.request).then(r => {
