@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, 가성비 분석, GPS 거리계산, 라운드 기록",
+  "description": "전국 590개 골프장 검색, 가성비 분석, GPS 거리계산, 라운드 기록, 3일 날씨예보, 예산계산기, 코스리뷰",
   "lang": "ko",
   "categories": ["sports", "lifestyle"],
   "start_url": "./index.html",

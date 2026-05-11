@@ -131,6 +131,17 @@ function updateRoundUI(){
   list.querySelectorAll('.ri-del').forEach(function(btn){
     btn.addEventListener('click',function(){rounds=rounds.filter(function(r){return r.id!=btn.dataset.id});saveRounds();updateRoundUI()});
   });
+  // v5.0: Score chart in round modal
+  var chartWrap=document.getElementById('roundChartWrap');
+  if(!chartWrap){
+    chartWrap=document.createElement('div');
+    chartWrap.id='roundChartWrap';
+    chartWrap.className='score-chart-wrap';
+    chartWrap.innerHTML='<canvas id="roundScoreChart"></canvas>';
+    var listView=document.getElementById('roundListView');
+    if(listView)listView.appendChild(chartWrap);
+  }
+  if(window.drawScoreChart)setTimeout(function(){window.drawScoreChart('roundScoreChart',rounds)},150);
 }
 updateRoundUI();
 
@@ -238,13 +249,13 @@ window.showDetail=function(course){
     var actions=document.createElement('div');
     actions.className='detail-actions';
     var isV=visited.includes(name);
-    actions.innerHTML='<button class="btn-visit'+(isV?' visited':'')+'"><i class="fas fa-check"></i> '+(isV?'방문완료':'방문 체크')+'</button><button class="btn-share"><i class="fas fa-share-alt"></i> 공유</button>';
+    actions.innerHTML='<button class="btn-visit'+(isV?' visited':'')+'">&check; '+(isV?'방문완료':'방문 체크')+'</button><button class="btn-share">공유</button>';
     actions.querySelector('.btn-visit').addEventListener('click',function(){
       if(visited.includes(name)){visited=visited.filter(function(v){return v!==name})}
       else{visited.push(name)}
       saveVisited();
       this.classList.toggle('visited');
-      this.innerHTML='<i class="fas fa-check"></i> '+(visited.includes(name)?'방문완료':'방문 체크');
+      this.innerHTML='&check; '+(visited.includes(name)?'방문완료':'방문 체크');
       if(window.showToast)window.showToast(visited.includes(name)?'방문 체크!':'방문 해제','info');
     });
     actions.querySelector('.btn-share').addEventListener('click',function(){
@@ -253,7 +264,7 @@ window.showDetail=function(course){
       else{navigator.clipboard.writeText(text).then(function(){if(window.showToast)window.showToast('클립보드에 복사됨','success')})}
     });
     var noteArea=document.createElement('div');
-    noteArea.innerHTML='<label style="font-weight:600;font-size:.85em;margin-top:12px;display:block"><i class="fas fa-sticky-note"></i> 코스 메모</label><textarea class="course-note" placeholder="이 골프장에 대한 메모...">'+(notes[name]||'')+'</textarea>';
+    noteArea.innerHTML='<label style="font-weight:600;font-size:.85em;margin-top:12px;display:block">코스 메모</label><textarea class="course-note" placeholder="이 골프장에 대한 메모...">'+(notes[name]||'')+'</textarea>';
     noteArea.querySelector('textarea').addEventListener('blur',function(){
       if(this.value.trim()){notes[name]=this.value.trim()}else{delete notes[name]}
       saveNotes();
