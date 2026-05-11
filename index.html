@@ -409,19 +409,139 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
 @media (max-width: 480px) {
   .footer-grid { grid-template-columns: 1fr; }
 }
+
+/* === v5.0 NEW FEATURES === */
+
+/* Skip link */
+.skip-link { position:absolute;top:-60px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:8px 20px;border-radius:0 0 8px 8px;z-index:9999;font-weight:700;transition:top 0.3s;text-decoration:none; }
+.skip-link:focus { top:0; }
+
+/* Weather widget */
+.weather-widget { display:flex;gap:8px;margin:10px 0; }
+.weather-day { flex:1;background:var(--bg);border-radius:10px;padding:10px;text-align:center;transition:transform 0.2s; }
+.weather-day:hover { transform:translateY(-2px); }
+.weather-day .wd-icon { font-size:24px; }
+.weather-day .wd-date { font-size:10px;color:var(--text-muted); }
+.weather-day .wd-temp { font-size:13px;font-weight:700;margin-top:4px; }
+.weather-day .wd-temp .hi { color:#c62828; }
+.weather-day .wd-temp .lo { color:#1565c0; }
+.weather-day .wd-rain { font-size:10px;color:#2196f3;margin-top:2px; }
+.weather-good { border:2px solid #4caf50; }
+.weather-bad { border:2px solid #ff9800; }
+.weather-loading { text-align:center;padding:16px;font-size:12px;color:var(--text-muted); }
+
+/* Budget calculator */
+.budget-modal { max-width:480px; }
+.budget-form { display:grid;gap:12px; }
+.budget-row { display:flex;justify-content:space-between;align-items:center;gap:12px; }
+.budget-row label { font-size:13px;font-weight:600;min-width:80px; }
+.budget-row input,.budget-row select { flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--card-bg);color:var(--text); }
+.budget-total { background:linear-gradient(135deg,var(--primary-dark),var(--primary));color:#fff;padding:16px;border-radius:12px;text-align:center;margin-top:12px; }
+.budget-total .bt-label { font-size:12px;opacity:0.8; }
+.budget-total .bt-amount { font-size:28px;font-weight:800; }
+.budget-total .bt-per { font-size:12px;opacity:0.8;margin-top:4px; }
+.budget-breakdown { display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px; }
+.budget-item { background:var(--bg);padding:8px 12px;border-radius:8px;display:flex;justify-content:space-between;font-size:12px; }
+.budget-item .bi-val { font-weight:700; }
+
+/* Dashboard */
+.dash-modal { max-width:600px; }
+.dash-stats { display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px; }
+.dash-stat { background:var(--bg);border-radius:10px;padding:12px;text-align:center; }
+.dash-stat .ds-val { font-size:1.5em;font-weight:800;color:var(--primary); }
+.dash-stat .ds-lbl { font-size:0.7em;color:var(--text-muted);margin-top:4px; }
+.dash-section { margin-top:16px; }
+.dash-section h3 { font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px; }
+.dash-chart { width:100%;height:140px; }
+.dash-pref-grid { display:grid;grid-template-columns:1fr 1fr;gap:8px; }
+.dash-pref { background:var(--bg);border-radius:8px;padding:10px; }
+.dash-pref .dp-label { font-size:11px;color:var(--text-muted); }
+.dash-pref .dp-value { font-size:14px;font-weight:700;margin-top:2px; }
+.dash-export-btn { display:inline-flex;align-items:center;gap:4px;padding:8px 14px;background:var(--primary);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;margin-top:8px; }
+
+/* Course reviews */
+.review-section { margin-top:16px;padding-top:12px;border-top:1px solid var(--border); }
+.review-title { font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px; }
+.review-form { display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap; }
+.review-stars { display:flex;gap:2px;align-items:center; }
+.review-star { cursor:pointer;font-size:20px;color:#ddd;transition:color 0.15s;background:none;border:none;padding:0; }
+.review-star.active,.review-star:hover { color:#f59e0b; }
+.review-input { flex:1;min-width:120px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--card-bg);color:var(--text); }
+.review-submit { padding:8px 14px;background:var(--primary);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap; }
+.review-list { max-height:200px;overflow-y:auto; }
+.review-item { padding:8px 0;border-bottom:1px solid rgba(128,128,128,0.1);font-size:12px; }
+.review-item .ri-head { display:flex;justify-content:space-between;margin-bottom:2px; }
+.review-item .ri-stars { color:#f59e0b; }
+.review-item .ri-date { color:var(--text-muted);font-size:10px; }
+.review-item .ri-text { line-height:1.4; }
+.review-avg { display:inline-flex;align-items:center;gap:4px;background:#fff8e1;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;color:#f59e0b; }
+[data-theme="dark"] .review-avg { background:#3a3000; }
+
+/* Onboarding */
+.onboarding-overlay { position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:9000;display:none;backdrop-filter:blur(4px); }
+.onboarding-overlay.active { display:flex;align-items:center;justify-content:center; }
+.onboarding-card { background:var(--card-bg);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;animation:cardFadeIn 0.5s ease; }
+.onboarding-card h2 { font-size:22px;margin-bottom:8px;color:var(--primary); }
+.onboarding-card p { font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:20px; }
+.onboarding-steps { display:flex;gap:6px;justify-content:center;margin-bottom:20px; }
+.onboarding-dot { width:8px;height:8px;border-radius:50%;background:#ddd;transition:all 0.3s; }
+.onboarding-dot.active { background:var(--primary);width:24px;border-radius:4px; }
+.onboarding-icon { font-size:48px;margin-bottom:12px; }
+.onboarding-btn { padding:12px 32px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer; }
+.onboarding-skip { background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;margin-top:12px; }
+
+/* Install banner */
+.install-banner { position:fixed;bottom:60px;left:16px;right:16px;background:linear-gradient(135deg,var(--primary-dark),var(--primary));color:#fff;padding:14px 16px;border-radius:12px;display:none;align-items:center;gap:12px;z-index:200;box-shadow:0 4px 20px rgba(0,0,0,0.3);animation:floatUp 0.4s ease; }
+.install-banner.show { display:flex; }
+.install-banner .ib-icon { font-size:28px; }
+.install-banner .ib-text { flex:1; }
+.install-banner .ib-text strong { display:block;font-size:14px; }
+.install-banner .ib-text span { font-size:11px;opacity:0.85; }
+.install-banner .ib-btn { padding:8px 18px;background:#fff;color:var(--primary-dark);border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px; }
+.install-banner .ib-close { background:none;border:none;color:#fff;opacity:0.7;cursor:pointer;font-size:18px;padding:4px; }
+
+/* Recently viewed */
+.recently-viewed { margin-top:12px; }
+.rv-title { font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px;display:flex;align-items:center;gap:4px; }
+.rv-items { display:flex;gap:8px;overflow-x:auto;padding-bottom:4px; }
+.rv-item { min-width:140px;background:var(--card-bg);border-radius:8px;padding:10px;cursor:pointer;flex-shrink:0;box-shadow:var(--shadow);font-size:12px;transition:transform 0.2s; }
+.rv-item:hover { transform:translateY(-2px); }
+.rv-item .rv-name { font-weight:700;margin-bottom:2px; }
+.rv-item .rv-meta { color:var(--text-muted);font-size:10px; }
+
+/* Score chart canvas */
+.score-chart-wrap { margin:12px 0; }
+.score-chart-wrap canvas { width:100%;height:120px;border-radius:8px;background:var(--bg); }
+
+/* Header dashboard btn */
+.header-btn-dash { background:rgba(255,255,255,0.2);border:none;color:#fff;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:4px; }
+.header-btn-dash:hover { background:rgba(255,255,255,0.3); }
+
+@media (max-width:768px) {
+  .weather-widget { flex-wrap:wrap; }
+  .weather-day { min-width:calc(33% - 6px); }
+  .budget-breakdown { grid-template-columns:1fr; }
+  .dash-stats { grid-template-columns:repeat(2,1fr); }
+  .dash-pref-grid { grid-template-columns:1fr; }
+  .install-banner { bottom:70px;left:10px;right:10px; }
+  .review-form { flex-direction:column; }
+}
 </style>
 </head>
 <body>
+<a href="#cardGrid" class="skip-link">본문 바로가기</a>
 
 <div class="scroll-progress" id="scrollProgress"></div>
 <div class="header">
   <div class="header-inner">
-    <div class="logo"><i class="fas fa-golf-ball-tee"></i> Smart<span>Golf</span> <span style="font-size:10px;opacity:0.7;font-weight:400">v4.0</span></div>
+    <div class="logo"><i class="fas fa-golf-ball-tee"></i> Smart<span>Golf</span> <span style="font-size:10px;opacity:0.7;font-weight:400">v5.0</span></div>
     <div class="header-stats">
       <div class="header-stat"><i class="fas fa-flag"></i> <span id="total-count">590</span>개 골프장</div>
       <div class="header-stat"><i class="fas fa-won-sign"></i> 실시간 가격</div>
       <div class="header-stat"><i class="fas fa-map-marker-alt"></i> GPS 거리계산</div>
     </div>
+    <button class="header-btn-dash" id="dashBtn" title="마이 골프"><i class="fas fa-chart-pie"></i> 내정보</button>
+    <button class="header-btn-dash" id="budgetBtn" title="예산 계산"><i class="fas fa-calculator"></i> 예산</button>
     <button class="fav-filter" id="favFilter" title="즐겨찾기만"><i class="fas fa-heart"></i> <span id="favCount">0</span></button>
     <div class="view-toggle">
       <button class="view-btn active" id="viewGrid" title="카드뷰"><i class="fas fa-th-large"></i></button>
@@ -604,8 +724,116 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
         <span class="shortcut-key">Esc</span><span>모달 닫기</span>
         <span class="shortcut-key">&larr;</span><span>이전 페이지</span>
         <span class="shortcut-key">&rarr;</span><span>다음 페이지</span>
+        <span class="shortcut-key">B</span><span>예산 계산기</span>
+        <span class="shortcut-key">I</span><span>마이 골프 대시보드</span>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Budget Calculator Modal -->
+<div class="modal-overlay" id="budgetOverlay">
+  <div class="modal budget-modal">
+    <div class="modal-header">
+      <h2><i class="fas fa-calculator"></i> 라운드 예산 계산기</h2>
+      <button class="modal-close" id="budgetClose">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="budget-form">
+        <div class="budget-row">
+          <label><i class="fas fa-users"></i> 인원</label>
+          <select id="budgetPeople"><option value="1">1명</option><option value="2">2명</option><option value="3">3명</option><option value="4" selected>4명 (1팀)</option></select>
+        </div>
+        <div class="budget-row">
+          <label><i class="fas fa-calendar"></i> 요일</label>
+          <select id="budgetDay"><option value="weekday">주중</option><option value="weekend">주말</option></select>
+        </div>
+        <div class="budget-row">
+          <label><i class="fas fa-flag"></i> 골프장</label>
+          <select id="budgetCourse"><option value="0">직접입력</option></select>
+        </div>
+        <div class="budget-row">
+          <label><i class="fas fa-won-sign"></i> 그린피 (1인)</label>
+          <input type="number" id="budgetGreen" value="120000" step="10000" />
+        </div>
+        <div class="budget-row">
+          <label><i class="fas fa-car-side"></i> 카트비 (팀)</label>
+          <input type="number" id="budgetCart" value="90000" step="10000" />
+        </div>
+        <div class="budget-row">
+          <label><i class="fas fa-person"></i> 캐디비 (팀)</label>
+          <input type="number" id="budgetCaddie" value="130000" step="10000" />
+        </div>
+        <div class="budget-row">
+          <label><i class="fas fa-utensils"></i> 식사 (1인)</label>
+          <input type="number" id="budgetFood" value="30000" step="5000" />
+        </div>
+        <div class="budget-row">
+          <label><i class="fas fa-gas-pump"></i> 교통비 (왕복)</label>
+          <input type="number" id="budgetTransport" value="40000" step="5000" />
+        </div>
+      </div>
+      <div class="budget-total">
+        <div class="bt-label">예상 총 비용</div>
+        <div class="bt-amount" id="budgetTotalAmount">0원</div>
+        <div class="bt-per" id="budgetPerPerson">1인당 0원</div>
+      </div>
+      <div class="budget-breakdown" id="budgetBreakdown"></div>
+    </div>
+  </div>
+</div>
+
+<!-- My Golf Dashboard Modal -->
+<div class="modal-overlay" id="dashOverlay">
+  <div class="modal dash-modal">
+    <div class="modal-header">
+      <h2><i class="fas fa-chart-pie"></i> 마이 골프 대시보드</h2>
+      <button class="modal-close" id="dashClose">&times;</button>
+    </div>
+    <div class="modal-body" id="dashBody">
+      <div class="dash-stats" id="dashStats"></div>
+      <div class="dash-section">
+        <h3><i class="fas fa-chart-line"></i> 스코어 추이</h3>
+        <div class="score-chart-wrap"><canvas id="dashScoreChart"></canvas></div>
+      </div>
+      <div class="dash-section">
+        <h3><i class="fas fa-th"></i> 선호 분석</h3>
+        <div class="dash-pref-grid" id="dashPrefs"></div>
+      </div>
+      <div class="dash-section">
+        <h3><i class="fas fa-won-sign"></i> 소비 요약</h3>
+        <div class="dash-pref-grid" id="dashSpending"></div>
+      </div>
+      <div class="dash-section">
+        <h3><i class="fas fa-download"></i> 데이터 관리</h3>
+        <button class="dash-export-btn" id="exportRounds"><i class="fas fa-file-export"></i> 라운드 기록 내보내기 (CSV)</button>
+        <button class="dash-export-btn" id="exportText" style="background:#2196f3;margin-left:6px"><i class="fas fa-share-alt"></i> 텍스트 공유</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Onboarding -->
+<div class="onboarding-overlay" id="onboardingOverlay">
+  <div class="onboarding-card" id="onboardingCard"></div>
+</div>
+
+<!-- Install Banner -->
+<div class="install-banner" id="installBanner">
+  <div class="ib-icon"><i class="fas fa-golf-ball-tee"></i></div>
+  <div class="ib-text">
+    <strong>SmartGolf 설치하기</strong>
+    <span>홈 화면에 추가하면 오프라인에서도 사용 가능!</span>
+  </div>
+  <button class="ib-btn" id="installBtn"><i class="fas fa-download"></i> 설치</button>
+  <button class="ib-close" id="installClose">&times;</button>
+</div>
+
+<!-- Recently Viewed Section -->
+<div style="max-width:1400px;margin:0 auto;padding:0 20px">
+  <div class="recently-viewed" id="recentlyViewed" style="display:none">
+    <div class="rv-title"><i class="fas fa-history"></i> 최근 본 골프장</div>
+    <div class="rv-items" id="rvItems"></div>
   </div>
 </div>
 
@@ -613,7 +841,7 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
 <footer class="site-footer" id="siteFooter">
   <div class="footer-grid">
     <div class="footer-col">
-      <h4><i class="fas fa-golf-ball-tee"></i> SmartGolf v4.0</h4>
+      <h4><i class="fas fa-golf-ball-tee"></i> SmartGolf v5.0</h4>
       <p>전국 590개 골프장을 한눈에.<br>GPS 거리계산, 가성비 분석,<br>라운드 기록까지.</p>
     </div>
     <div class="footer-col">
@@ -628,6 +856,10 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
         가성비 점수 분석<br>
         골프장 비교 (최대 3개)<br>
         라운드 기록 &amp; 핸디캡<br>
+        3일 날씨 예보<br>
+        예산 계산기<br>
+        코스 리뷰 시스템<br>
+        마이 골프 대시보드<br>
         PWA 오프라인 지원
       </div>
     </div>
@@ -639,12 +871,14 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
         <span class="shortcut-key" style="font-size:10px;padding:1px 6px">G</span> GPS &nbsp;
         <span class="shortcut-key" style="font-size:10px;padding:1px 6px">D</span> 다크모드<br>
         <span class="shortcut-key" style="font-size:10px;padding:1px 6px">M</span> 지도 &nbsp;
-        <span class="shortcut-key" style="font-size:10px;padding:1px 6px">R</span> 라운드
+        <span class="shortcut-key" style="font-size:10px;padding:1px 6px">R</span> 라운드<br>
+        <span class="shortcut-key" style="font-size:10px;padding:1px 6px">B</span> 예산 &nbsp;
+        <span class="shortcut-key" style="font-size:10px;padding:1px 6px">I</span> 대시보드
       </div>
     </div>
   </div>
   <div class="footer-bottom">
-    PRIME Holdings &middot; NEXTERA &middot; SmartGolf v4.0 &middot; PWA
+    PRIME Holdings &middot; NEXTERA &middot; SmartGolf v5.0 &middot; PWA &middot; 590+ 골프장
   </div>
 </footer>
 
@@ -654,6 +888,7 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
     <button class="mobile-nav-btn active" data-nav="home"><i class="fas fa-home"></i> 홈</button>
     <button class="mobile-nav-btn" data-nav="search"><i class="fas fa-search"></i> 검색</button>
     <button class="mobile-nav-btn" data-nav="map"><i class="fas fa-map"></i> 지도</button>
+    <button class="mobile-nav-btn" data-nav="dash"><i class="fas fa-chart-pie"></i> 내정보</button>
     <button class="mobile-nav-btn" data-nav="favs"><i class="fas fa-heart"></i> 찜</button>
   </div>
 </div>
@@ -1695,6 +1930,510 @@ function updateFooterStats() {
 
 // Seasonal tip
 updateSeasonalTip();
+
+// ===== v5.0 NEW FEATURES =====
+
+// --- Weather Forecast (Open-Meteo, free, no API key) ---
+async function fetchWeather(lat, lng) {
+  try {
+    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=3`);
+    const d = await r.json();
+    return d.daily;
+  } catch(e) { return null; }
+}
+function weatherIcon(code) {
+  if (code <= 1) return '&#9728;&#65039;';
+  if (code <= 3) return '&#9925;';
+  if (code <= 48) return '&#127787;&#65039;';
+  if (code <= 67) return '&#127783;&#65039;';
+  if (code <= 77) return '&#127784;&#65039;';
+  if (code <= 82) return '&#127783;&#65039;';
+  return '&#9928;&#65039;';
+}
+function weatherLabel(code) {
+  if (code <= 1) return '맑음';
+  if (code <= 3) return '구름';
+  if (code <= 48) return '안개';
+  if (code <= 67) return '비';
+  if (code <= 77) return '눈';
+  if (code <= 82) return '소나기';
+  return '뇌우';
+}
+function golfWeatherScore(maxTemp, rain) {
+  if (rain > 60 || maxTemp < 5 || maxTemp > 38) return 'bad';
+  return 'good';
+}
+function renderWeather(containerId, data) {
+  const el = document.getElementById(containerId);
+  if (!el || !data) { if(el) el.innerHTML = ''; return; }
+  const days = ['일','월','화','수','목','금','토'];
+  el.innerHTML = '<div class="weather-widget">' + data.time.map((d, i) => {
+    const dt = new Date(d);
+    const dayName = days[dt.getDay()];
+    const cls = golfWeatherScore(data.temperature_2m_max[i], data.precipitation_probability_max[i]);
+    return `<div class="weather-day weather-${cls}">
+      <div class="wd-date">${(dt.getMonth()+1)}/${dt.getDate()} (${dayName})</div>
+      <div class="wd-icon">${weatherIcon(data.weathercode[i])}</div>
+      <div class="wd-temp"><span class="hi">${Math.round(data.temperature_2m_max[i])}&deg;</span> / <span class="lo">${Math.round(data.temperature_2m_min[i])}&deg;</span></div>
+      <div class="wd-rain"><i class="fas fa-droplet"></i> ${data.precipitation_probability_max[i]}%</div>
+      <div style="font-size:9px;margin-top:2px;color:${cls==='good'?'#4caf50':'#ff9800'};font-weight:700">${cls==='good'?'&#9971; 라운딩 적합':'&#9888;&#65039; 주의'}</div>
+    </div>`;
+  }).join('') + '</div>';
+}
+
+// --- Score Chart (Canvas) ---
+function drawScoreChart(canvasId, roundData) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas || roundData.length < 2) {
+    if (canvas) { const ctx = canvas.getContext('2d'); canvas.width = canvas.offsetWidth || 300; canvas.height = 120; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle='rgba(128,128,128,0.4)'; ctx.font='12px sans-serif'; ctx.textAlign='center'; ctx.fillText('2개 이상 라운드 기록 시 차트가 표시됩니다', canvas.width/2, 65); }
+    return;
+  }
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = canvas.offsetWidth || 300;
+  const H = canvas.height = 140;
+  const scores = roundData.slice(0, 20).reverse().map(r => r.score);
+  const mn = Math.min(...scores) - 5;
+  const mx = Math.max(...scores) + 5;
+  const padL = 32, padR = 10, padT = 12, padB = 22;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + (plotH / 4) * i;
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+    ctx.fillStyle = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
+    ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText(Math.round(mx - (mx - mn) * i / 4), padL - 4, y + 3);
+  }
+
+  // Par 72 line
+  if (mn < 72 && mx > 72) {
+    const parY = padT + plotH - ((72 - mn) / (mx - mn)) * plotH;
+    ctx.beginPath(); ctx.setLineDash([4,4]); ctx.strokeStyle = 'rgba(255,107,53,0.5)'; ctx.lineWidth = 1;
+    ctx.moveTo(padL, parY); ctx.lineTo(W - padR, parY); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(255,107,53,0.7)'; ctx.font = '8px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('PAR 72', padL + 2, parY - 4);
+  }
+
+  // Line + fill
+  ctx.beginPath(); ctx.strokeStyle = '#1a7a3a'; ctx.lineWidth = 2.5;
+  const pts = scores.map((s, i) => ({
+    x: scores.length === 1 ? padL + plotW / 2 : padL + (plotW / (scores.length - 1)) * i,
+    y: padT + plotH - ((s - mn) / (mx - mn)) * plotH
+  }));
+  pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.stroke();
+
+  // Fill
+  ctx.lineTo(pts[pts.length-1].x, padT + plotH); ctx.lineTo(pts[0].x, padT + plotH); ctx.closePath();
+  const grad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
+  grad.addColorStop(0, 'rgba(26,122,58,0.25)'); grad.addColorStop(1, 'rgba(26,122,58,0.02)');
+  ctx.fillStyle = grad; ctx.fill();
+
+  // Dots + labels
+  pts.forEach((p, i) => {
+    ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = scores[i] <= 72 ? '#ff6b35' : '#1a7a3a'; ctx.fill();
+    ctx.strokeStyle = isDark ? '#1e1e1e' : '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+    if (scores.length <= 10) {
+      ctx.fillStyle = isDark ? '#ccc' : '#333'; ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(scores[i], p.x, p.y - 8);
+    }
+  });
+
+  // X-axis labels
+  if (roundData.length <= 10) {
+    const revRounds = roundData.slice(0, 20).reverse();
+    ctx.fillStyle = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
+    ctx.font = '8px sans-serif'; ctx.textAlign = 'center';
+    pts.forEach((p, i) => { if (revRounds[i] && revRounds[i].date) ctx.fillText(revRounds[i].date.slice(5), p.x, H - 4); });
+  }
+}
+
+// --- Course Reviews (localStorage) ---
+let courseReviews = JSON.parse(localStorage.getItem('sg_reviews') || '{}');
+function saveReviews() { localStorage.setItem('sg_reviews', JSON.stringify(courseReviews)); }
+function getReviewAvg(name) {
+  const revs = courseReviews[name] || [];
+  if (!revs.length) return null;
+  return (revs.reduce((s, r) => s + r.stars, 0) / revs.length).toFixed(1);
+}
+function renderReviewSection(containerId, courseName) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const revs = courseReviews[courseName] || [];
+  const avg = getReviewAvg(courseName);
+  let html = '<div class="review-section">';
+  html += '<div class="review-title"><i class="fas fa-comments"></i> 코스 리뷰 (' + revs.length + '개)';
+  if (avg) html += ' <span class="review-avg"><i class="fas fa-star"></i> ' + avg + '</span>';
+  html += '</div>';
+  html += '<div class="review-form" id="reviewForm">';
+  html += '<div class="review-stars" id="reviewStars">';
+  for (let i = 1; i <= 5; i++) html += '<button class="review-star" data-star="' + i + '">&#9733;</button>';
+  html += '</div>';
+  html += '<input class="review-input" id="reviewText" placeholder="한줄 리뷰를 남겨주세요..." maxlength="100" />';
+  html += '<button class="review-submit" id="reviewSubmit"><i class="fas fa-paper-plane"></i></button>';
+  html += '</div>';
+  html += '<div class="review-list">';
+  revs.slice(0, 10).forEach((r, i) => {
+    html += '<div class="review-item"><div class="ri-head"><span class="ri-stars">' + '&#9733;'.repeat(r.stars) + '&#9734;'.repeat(5 - r.stars) + '</span><span class="ri-date">' + r.date + '<button class="ri-del-btn" data-idx="' + i + '" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:10px;margin-left:6px">&times;</button></span></div><div class="ri-text">' + r.text + '</div></div>';
+  });
+  html += '</div></div>';
+  container.innerHTML = html;
+
+  let selectedStars = 0;
+  container.querySelectorAll('.review-star').forEach(star => {
+    star.addEventListener('click', () => {
+      selectedStars = parseInt(star.dataset.star);
+      container.querySelectorAll('.review-star').forEach((s, i) => s.classList.toggle('active', i < selectedStars));
+    });
+    star.addEventListener('mouseenter', () => {
+      const val = parseInt(star.dataset.star);
+      container.querySelectorAll('.review-star').forEach((s, i) => s.classList.toggle('active', i < val));
+    });
+  });
+  const starsEl = container.querySelector('.review-stars');
+  if (starsEl) starsEl.addEventListener('mouseleave', () => {
+    container.querySelectorAll('.review-star').forEach((s, i) => s.classList.toggle('active', i < selectedStars));
+  });
+
+  const submitBtn = container.querySelector('#reviewSubmit');
+  if (submitBtn) submitBtn.addEventListener('click', () => {
+    const text = container.querySelector('#reviewText').value.trim();
+    if (!selectedStars) { showToast('별점을 선택해주세요', 'warning'); return; }
+    if (!text) { showToast('리뷰를 입력해주세요', 'warning'); return; }
+    if (!courseReviews[courseName]) courseReviews[courseName] = [];
+    courseReviews[courseName].unshift({ stars: selectedStars, text: text, date: new Date().toLocaleDateString('ko-KR') });
+    saveReviews();
+    renderReviewSection(containerId, courseName);
+    showToast('리뷰가 등록되었습니다!', 'success');
+  });
+
+  container.querySelectorAll('.ri-del-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.idx);
+      courseReviews[courseName].splice(idx, 1);
+      if (courseReviews[courseName].length === 0) delete courseReviews[courseName];
+      saveReviews();
+      renderReviewSection(containerId, courseName);
+    });
+  });
+}
+
+// --- Recently Viewed ---
+let recentlyViewedCourses = JSON.parse(localStorage.getItem('sg_rv') || '[]');
+function addRecentlyViewed(course) {
+  recentlyViewedCourses = recentlyViewedCourses.filter(c => c.n !== course.n);
+  recentlyViewedCourses.unshift({ n: course.n, r: course.r, rt: course.rt, weekday: course.weekday });
+  if (recentlyViewedCourses.length > 8) recentlyViewedCourses.pop();
+  localStorage.setItem('sg_rv', JSON.stringify(recentlyViewedCourses));
+  renderRecentlyViewed();
+}
+function renderRecentlyViewed() {
+  const wrap = document.getElementById('recentlyViewed');
+  const items = document.getElementById('rvItems');
+  if (!wrap || !items || recentlyViewedCourses.length === 0) { if(wrap) wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  items.innerHTML = recentlyViewedCourses.map(c =>
+    '<div class="rv-item" data-name="' + (c.n||'').replace(/"/g,'&quot;') + '">' +
+    '<div class="rv-name">' + (c.n||'') + '</div>' +
+    '<div class="rv-meta">' + (c.r||'') + (c.rt ? ' &middot; ' + c.rt.toFixed(1) + '점' : '') + (c.weekday ? ' &middot; ' + fmtPrice(c.weekday) : '') + '</div></div>'
+  ).join('');
+  items.querySelectorAll('.rv-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const found = allCourses.find(x => x.n === item.dataset.name);
+      if (found) showDetail(found);
+    });
+  });
+}
+
+// --- Budget Calculator ---
+function initBudgetCalc() {
+  const selCourse = document.getElementById('budgetCourse');
+  if (selCourse && allCourses.length > 0) {
+    selCourse.innerHTML = '<option value="0">직접입력</option>' +
+      allCourses.filter(c => c.weekday > 0).sort((a,b) => a.n.localeCompare(b.n,'ko')).slice(0,100)
+        .map(c => '<option value="' + c.n.replace(/"/g,'&quot;') + '">' + c.n + ' (' + fmtPrice(c.weekday) + ')</option>').join('');
+  }
+  calcBudget();
+}
+function calcBudget() {
+  const people = parseInt(document.getElementById('budgetPeople').value) || 4;
+  const green = parseInt(document.getElementById('budgetGreen').value) || 0;
+  const cart = parseInt(document.getElementById('budgetCart').value) || 0;
+  const caddie = parseInt(document.getElementById('budgetCaddie').value) || 0;
+  const food = parseInt(document.getElementById('budgetFood').value) || 0;
+  const transport = parseInt(document.getElementById('budgetTransport').value) || 0;
+  const totalGreen = green * people;
+  const totalFood = food * people;
+  const total = totalGreen + cart + caddie + totalFood + transport;
+  const perPerson = Math.round(total / people);
+  document.getElementById('budgetTotalAmount').textContent = total.toLocaleString() + '원';
+  document.getElementById('budgetPerPerson').textContent = '1인당 ' + perPerson.toLocaleString() + '원';
+  document.getElementById('budgetBreakdown').innerHTML =
+    '<div class="budget-item"><span>그린피 (' + people + '명)</span><span class="bi-val">' + totalGreen.toLocaleString() + '원</span></div>' +
+    '<div class="budget-item"><span>카트비</span><span class="bi-val">' + cart.toLocaleString() + '원</span></div>' +
+    '<div class="budget-item"><span>캐디비</span><span class="bi-val">' + caddie.toLocaleString() + '원</span></div>' +
+    '<div class="budget-item"><span>식사 (' + people + '명)</span><span class="bi-val">' + totalFood.toLocaleString() + '원</span></div>' +
+    '<div class="budget-item"><span>교통비</span><span class="bi-val">' + transport.toLocaleString() + '원</span></div>';
+}
+document.getElementById('budgetCourse').addEventListener('change', function() {
+  const c = allCourses.find(x => x.n === this.value);
+  if (c) {
+    const day = document.getElementById('budgetDay').value;
+    document.getElementById('budgetGreen').value = day === 'weekend' ? (c.weekend || c.weekday || 0) : (c.weekday || 0);
+    if (c.cart) document.getElementById('budgetCart').value = c.cart;
+    if (c.caddie) document.getElementById('budgetCaddie').value = c.caddie;
+    calcBudget();
+  }
+});
+document.getElementById('budgetDay').addEventListener('change', function() {
+  const name = document.getElementById('budgetCourse').value;
+  if (name !== '0') {
+    const c = allCourses.find(x => x.n === name);
+    if (c) document.getElementById('budgetGreen').value = this.value === 'weekend' ? (c.weekend || c.weekday || 0) : (c.weekday || 0);
+  }
+  calcBudget();
+});
+['budgetPeople','budgetGreen','budgetCart','budgetCaddie','budgetFood','budgetTransport'].forEach(id => {
+  document.getElementById(id).addEventListener('input', calcBudget);
+});
+document.getElementById('budgetBtn').addEventListener('click', () => {
+  initBudgetCalc();
+  document.getElementById('budgetOverlay').classList.add('active');
+});
+document.getElementById('budgetClose').addEventListener('click', () => {
+  document.getElementById('budgetOverlay').classList.remove('active');
+});
+document.getElementById('budgetOverlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+});
+
+// --- My Golf Dashboard ---
+function renderDashboard() {
+  const rounds = JSON.parse(localStorage.getItem('sg_rounds') || '[]');
+  const visited = JSON.parse(localStorage.getItem('sg_visited') || '[]');
+  const statsEl = document.getElementById('dashStats');
+  const prefsEl = document.getElementById('dashPrefs');
+  const spendEl = document.getElementById('dashSpending');
+
+  const totalRounds = rounds.length;
+  const scores = rounds.map(r => r.score);
+  const avgScore = totalRounds ? Math.round(scores.reduce((a, b) => a + b, 0) / totalRounds) : '-';
+  const bestScore = totalRounds ? Math.min(...scores) : '-';
+  const totalVisited = visited.length;
+  const favCount = favorites.length;
+  const reviewCount = Object.values(courseReviews).reduce((s, arr) => s + arr.length, 0);
+
+  statsEl.innerHTML =
+    '<div class="dash-stat"><div class="ds-val">' + totalRounds + '</div><div class="ds-lbl">총 라운드</div></div>' +
+    '<div class="dash-stat"><div class="ds-val">' + avgScore + '</div><div class="ds-lbl">평균 스코어</div></div>' +
+    '<div class="dash-stat"><div class="ds-val">' + bestScore + '</div><div class="ds-lbl">베스트</div></div>' +
+    '<div class="dash-stat"><div class="ds-val">' + totalVisited + '</div><div class="ds-lbl">방문 골프장</div></div>' +
+    '<div class="dash-stat"><div class="ds-val">' + favCount + '</div><div class="ds-lbl">즐겨찾기</div></div>' +
+    '<div class="dash-stat"><div class="ds-val">' + reviewCount + '</div><div class="ds-lbl">리뷰</div></div>';
+
+  // Score chart
+  setTimeout(() => drawScoreChart('dashScoreChart', rounds), 100);
+
+  // Preference analysis
+  const regions = {}, types = {};
+  favorites.forEach(name => {
+    const c = allCourses.find(x => x.n === name);
+    if (c) { regions[c.r] = (regions[c.r]||0)+1; types[c.t||'기타'] = (types[c.t||'기타']||0)+1; }
+  });
+  visited.forEach(name => {
+    const c = allCourses.find(x => x.n === name);
+    if (c) { regions[c.r] = (regions[c.r]||0)+1; types[c.t||'기타'] = (types[c.t||'기타']||0)+1; }
+  });
+  const topRegion = Object.entries(regions).sort((a,b) => b[1]-a[1])[0];
+  const topType = Object.entries(types).sort((a,b) => b[1]-a[1])[0];
+  const favPrices = favorites.map(name => allCourses.find(x => x.n === name)).filter(c => c && c.weekday > 0).map(c => c.weekday);
+  const avgFavPrice = favPrices.length ? Math.round(favPrices.reduce((a,b) => a+b,0)/favPrices.length) : 0;
+  prefsEl.innerHTML =
+    '<div class="dash-pref"><div class="dp-label">선호 지역</div><div class="dp-value">' + (topRegion ? topRegion[0] + ' (' + topRegion[1] + '회)' : '데이터 없음') + '</div></div>' +
+    '<div class="dash-pref"><div class="dp-label">선호 종류</div><div class="dp-value">' + (topType ? topType[0] + ' (' + topType[1] + '회)' : '데이터 없음') + '</div></div>' +
+    '<div class="dash-pref"><div class="dp-label">평균 즐겨찾기 가격</div><div class="dp-value">' + (avgFavPrice > 0 ? fmtPrice(avgFavPrice) : '데이터 없음') + '</div></div>' +
+    '<div class="dash-pref"><div class="dp-label">데이터 기반 추천</div><div class="dp-value">' + (topRegion && topType ? topRegion[0] + ' ' + topType[0] : '더 많은 활동이 필요합니다') + '</div></div>';
+
+  // Spending summary
+  const totalGreenSpent = rounds.reduce((s, r) => {
+    const c = allCourses.find(x => x.n === r.course);
+    return s + (c && c.weekday > 0 ? c.weekday : 120000);
+  }, 0);
+  spendEl.innerHTML =
+    '<div class="dash-pref"><div class="dp-label">추정 총 그린피</div><div class="dp-value">' + (totalRounds > 0 ? (totalGreenSpent/10000).toFixed(0) + '만원' : '-') + '</div></div>' +
+    '<div class="dash-pref"><div class="dp-label">라운드당 평균</div><div class="dp-value">' + (totalRounds > 0 ? fmtPrice(Math.round(totalGreenSpent/totalRounds)) : '-') + '</div></div>';
+}
+
+// Export rounds CSV
+document.getElementById('exportRounds').addEventListener('click', () => {
+  const rounds = JSON.parse(localStorage.getItem('sg_rounds') || '[]');
+  if (!rounds.length) { showToast('내보낼 라운드가 없습니다', 'warning'); return; }
+  let csv = '﻿날짜,골프장,스코어,메모\n';
+  rounds.forEach(r => { csv += r.date + ',' + r.course + ',' + r.score + ',' + (r.memo||'').replace(/,/g,' ') + '\n'; });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'smartgolf_rounds_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click(); URL.revokeObjectURL(url);
+  showToast('CSV 파일이 다운로드됩니다', 'success');
+});
+
+// Export text share
+document.getElementById('exportText').addEventListener('click', () => {
+  const rounds = JSON.parse(localStorage.getItem('sg_rounds') || '[]');
+  if (!rounds.length) { showToast('공유할 라운드가 없습니다', 'warning'); return; }
+  const scores = rounds.map(r => r.score);
+  const text = '&#9971; SmartGolf 라운드 기록\n' +
+    '총 ' + rounds.length + '라운드 | 평균 ' + Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) + '타 | 베스트 ' + Math.min(...scores) + '타\n\n' +
+    rounds.slice(0,5).map(r => r.date + ' ' + r.course + ' ' + r.score + '타').join('\n');
+  if (navigator.share) {
+    navigator.share({ title: 'SmartGolf 라운드 기록', text: text });
+  } else {
+    navigator.clipboard.writeText(text).then(() => showToast('클립보드에 복사됨', 'success'));
+  }
+});
+
+// Dashboard open/close
+document.getElementById('dashBtn').addEventListener('click', () => {
+  renderDashboard();
+  document.getElementById('dashOverlay').classList.add('active');
+});
+document.getElementById('dashClose').addEventListener('click', () => {
+  document.getElementById('dashOverlay').classList.remove('active');
+});
+document.getElementById('dashOverlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+});
+
+// --- Onboarding (first visit) ---
+function showOnboarding() {
+  if (localStorage.getItem('sg_onboarded')) return;
+  const steps = [
+    { icon: '&#9971;', title: 'SmartGolf에 오신 것을 환영합니다!', text: '전국 590개 골프장의 가격, 거리, 평점을 한눈에 비교하세요.' },
+    { icon: '&#128205;', title: 'GPS 거리 계산', text: '출발지를 입력하거나 GPS 버튼을 눌러 모든 골프장까지의 실제 운전시간을 확인하세요.' },
+    { icon: '&#128200;', title: '가성비 분석', text: '평점 대비 가격을 분석해 S/A/B/C 등급으로 가성비를 보여줍니다.' },
+    { icon: '&#127783;&#65039;', title: '날씨 예보', text: '골프장 상세 페이지에서 3일 날씨를 확인하고 라운딩 적합 여부를 판단하세요.' },
+    { icon: '&#128176;', title: '예산 계산기', text: '상단 예산 버튼으로 그린피, 카트, 캐디, 식사, 교통비를 한 번에 계산하세요.' }
+  ];
+  let step = 0;
+  const overlay = document.getElementById('onboardingOverlay');
+  const card = document.getElementById('onboardingCard');
+  function renderStep() {
+    const s = steps[step];
+    const dots = steps.map((_, i) => '<div class="onboarding-dot' + (i === step ? ' active' : '') + '"></div>').join('');
+    card.innerHTML = '<div class="onboarding-icon">' + s.icon + '</div>' +
+      '<h2>' + s.title + '</h2><p>' + s.text + '</p>' +
+      '<div class="onboarding-steps">' + dots + '</div>' +
+      '<button class="onboarding-btn" id="onbNext">' + (step < steps.length - 1 ? '다음' : '시작하기!') + '</button>' +
+      '<button class="onboarding-skip" id="onbSkip">건너뛰기</button>';
+    document.getElementById('onbNext').addEventListener('click', () => {
+      if (step < steps.length - 1) { step++; renderStep(); }
+      else { overlay.classList.remove('active'); localStorage.setItem('sg_onboarded', '1'); }
+    });
+    document.getElementById('onbSkip').addEventListener('click', () => {
+      overlay.classList.remove('active'); localStorage.setItem('sg_onboarded', '1');
+    });
+  }
+  overlay.classList.add('active');
+  renderStep();
+}
+
+// --- PWA Install Prompt ---
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!localStorage.getItem('sg_install_dismissed')) {
+    setTimeout(() => { document.getElementById('installBanner').classList.add('show'); }, 3000);
+  }
+});
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const result = await deferredPrompt.userChoice;
+    if (result.outcome === 'accepted') showToast('SmartGolf가 설치되었습니다!', 'success');
+    deferredPrompt = null;
+  }
+  document.getElementById('installBanner').classList.remove('show');
+});
+document.getElementById('installClose').addEventListener('click', () => {
+  document.getElementById('installBanner').classList.remove('show');
+  localStorage.setItem('sg_install_dismissed', '1');
+});
+
+// --- Enhance showDetail with weather + reviews ---
+const _origShowDetail = showDetail;
+showDetail = function(c) {
+  _origShowDetail(c);
+  addRecentlyViewed(c);
+  // Add weather section
+  const body = document.getElementById('modalBody');
+  if (body && c.lat && c.lng) {
+    const weatherDiv = document.createElement('div');
+    weatherDiv.id = 'detailWeather';
+    weatherDiv.innerHTML = '<div class="weather-loading"><i class="fas fa-cloud-sun"></i> 날씨 정보 로딩중...</div>';
+    const recSection = body.querySelector('.recommend-section');
+    if (recSection) body.insertBefore(weatherDiv, recSection);
+    else body.appendChild(weatherDiv);
+    fetchWeather(c.lat, c.lng).then(data => {
+      if (data) {
+        renderWeather('detailWeather', data);
+      } else {
+        weatherDiv.innerHTML = '<div class="weather-loading">날씨 정보를 불러올 수 없습니다</div>';
+      }
+    });
+  }
+  // Add review section
+  if (body) {
+    const reviewDiv = document.createElement('div');
+    reviewDiv.id = 'detailReviews';
+    body.appendChild(reviewDiv);
+    renderReviewSection('detailReviews', c.n);
+  }
+};
+
+// --- Enhance mobile nav with dashboard ---
+document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+  if (btn.dataset.nav === 'dash') {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderDashboard();
+      document.getElementById('dashOverlay').classList.add('active');
+    });
+  }
+});
+
+// --- Keyboard shortcut additions ---
+const _origKeyHandler = document.onkeydown;
+document.addEventListener('keydown', e => {
+  const t = e.target.tagName;
+  if (t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT') return;
+  if (e.key === 'b' || e.key === 'B') { document.getElementById('budgetBtn').click(); }
+  if (e.key === 'i' || e.key === 'I') { document.getElementById('dashBtn').click(); }
+});
+
+// --- Escape closes v5.0 modals ---
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('budgetOverlay').classList.remove('active');
+    document.getElementById('dashOverlay').classList.remove('active');
+    document.getElementById('onboardingOverlay').classList.remove('active');
+  }
+});
+
+// --- Init recently viewed on load ---
+renderRecentlyViewed();
+
+// --- Show onboarding after data loads ---
+setTimeout(showOnboarding, 1500);
 </script>
 <script src="features.js" defer></script>
 </body>
