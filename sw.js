@@ -1,9 +1,10 @@
-const CACHE_NAME = 'smartgolf-v8';
+const CACHE_NAME = 'smartgolf-v9';
 const ASSETS = [
   './',
   './index.html',
   './icons.css',
   './features.js',
+  './v6_patch.js',
   './courses_enriched.json',
   './manifest.json'
 ];
@@ -22,7 +23,9 @@ self.addEventListener('fetch', e => {
       fetch(e.request).then(r => {
         return r.text().then(html => {
           if (html.includes('</body>') && !html.includes('features.js')) {
-            html = html.replace('</body>', '<script src="features.js" defer><\/script>\n</body>');
+            html = html.replace('</body>', '<script src="features.js" defer><\/script>\n<script src="v6_patch.js" defer><\/script>\n</body>');
+          } else if (html.includes('</body>') && !html.includes('v6_patch.js')) {
+            html = html.replace('</body>', '<script src="v6_patch.js" defer><\/script>\n</body>');
           }
           const resp = new Response(html, {
             status: r.status,
