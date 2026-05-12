@@ -673,6 +673,116 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
 /* Badge for notes indicator */
 .badge-note { background: #fff3e0; color: #e65100; }
 [data-theme="dark"] .badge-note { background: #3a2a1a; color: #ffab40; }
+
+/* === v5.0 NEW === */
+
+/* User Review System */
+.review-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.review-section .section-label { font-size: 12px; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+.review-list { max-height: 200px; overflow-y: auto; margin: 8px 0; }
+.review-item { padding: 8px 10px; background: var(--primary-light); border-radius: 8px; margin-bottom: 6px; font-size: 12px; position: relative; }
+[data-theme="dark"] .review-item { background: #1a3a25; }
+.review-stars { color: #f59e0b; font-size: 13px; margin-bottom: 2px; }
+.review-text { color: var(--text); line-height: 1.4; }
+.review-date { color: var(--text-muted); font-size: 10px; margin-top: 2px; }
+.review-del { position: absolute; top: 6px; right: 8px; background: none; border: none; color: #c62828; cursor: pointer; font-size: 11px; opacity: 0.5; }
+.review-del:hover { opacity: 1; }
+.review-form { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.star-input { display: flex; gap: 4px; }
+.star-input i { font-size: 20px; color: #ccc; cursor: pointer; transition: color 0.15s; }
+.star-input i.active, .star-input i:hover { color: #f59e0b; }
+.review-textarea { width: 100%; padding: 8px 10px; border: 2px solid var(--border); border-radius: 8px; font-size: 13px; resize: vertical; min-height: 50px; font-family: inherit; outline: none; background: var(--card-bg); color: var(--text); }
+.review-textarea:focus { border-color: var(--primary); }
+.review-submit { padding: 7px 16px; background: var(--primary); color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; align-self: flex-start; }
+.review-submit:hover { background: var(--primary-dark); }
+.review-avg { display: flex; align-items: center; gap: 6px; font-size: 13px; margin-bottom: 8px; }
+.review-avg .big-score { font-size: 22px; font-weight: 800; color: #f59e0b; }
+
+/* Difficulty Badge */
+.badge-diff { font-weight: 700; font-size: 10px; }
+.badge-diff-easy { background: #e8f5e9; color: #2e7d32; }
+.badge-diff-mid { background: #fff3e0; color: #e65100; }
+.badge-diff-hard { background: #fce4ec; color: #c62828; }
+[data-theme="dark"] .badge-diff-easy { background: #1a3a25; color: #81c784; }
+[data-theme="dark"] .badge-diff-mid { background: #3a2a1a; color: #ffb74d; }
+[data-theme="dark"] .badge-diff-hard { background: #3a1a1a; color: #ef9a9a; }
+
+/* SVG Radar Chart */
+.radar-wrap { display: flex; justify-content: center; margin: 12px 0; }
+.radar-wrap svg { max-width: 240px; height: auto; }
+.radar-wrap svg text { font-size: 10px; fill: var(--text-muted); font-weight: 600; }
+.radar-wrap svg .radar-area { fill: rgba(26,122,58,0.2); stroke: var(--primary); stroke-width: 2; }
+.radar-wrap svg .radar-grid { fill: none; stroke: var(--border); stroke-width: 0.5; }
+.radar-wrap svg .radar-dot { fill: var(--primary); r: 3; }
+
+/* Round Log */
+.roundlog-section { max-width: 1400px; margin: 0 auto; padding: 4px 20px 8px; }
+.roundlog-title { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.roundlog-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+.rl-card { flex-shrink: 0; width: 210px; padding: 10px 12px; background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); border-left: 3px solid var(--primary); cursor: pointer; transition: all 0.2s; position: relative; }
+.rl-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+.rl-card .rl-name { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rl-card .rl-date { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.rl-card .rl-score { font-size: 18px; font-weight: 800; color: var(--primary); margin-top: 4px; }
+.rl-card .rl-del { position: absolute; top: 6px; right: 8px; background: none; border: none; color: #c62828; cursor: pointer; font-size: 11px; opacity: 0.4; }
+.rl-card .rl-del:hover { opacity: 1; }
+.roundlog-form { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; align-items: end; }
+.roundlog-form input, .roundlog-form select { padding: 7px 10px; border: 2px solid var(--border); border-radius: 6px; font-size: 12px; outline: none; background: var(--card-bg); color: var(--text); }
+.roundlog-form input:focus { border-color: var(--primary); }
+.rl-label { font-size: 10px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 2px; }
+.roundlog-add { padding: 7px 14px; background: var(--primary); color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.roundlog-add:hover { background: var(--primary-dark); }
+
+/* Share Card */
+.share-preview { text-align: center; margin: 12px 0; }
+.share-preview canvas { max-width: 100%; border-radius: 8px; box-shadow: var(--shadow); }
+.share-btns { display: flex; gap: 8px; justify-content: center; margin-top: 8px; }
+.share-btns button { padding: 8px 16px; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+.share-dl { background: var(--primary); color: white; }
+.share-dl:hover { background: var(--primary-dark); }
+
+/* Accessibility Controls */
+[data-contrast="high"] { --text: #000; --text-muted: #333; }
+[data-contrast="high"][data-theme="dark"] { --text: #fff; --text-muted: #ddd; }
+[data-fontsize="large"] { font-size: 17px; }
+[data-fontsize="large"] .card-name { font-size: 18px; }
+[data-fontsize="large"] .card-info-row, [data-fontsize="large"] .price-tag { font-size: 14px; }
+.a11y-btn { background: rgba(255,255,255,0.15); border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; transition: all 0.2s; }
+.a11y-btn:hover { background: rgba(255,255,255,0.3); }
+.a11y-btn.active { background: rgba(255,255,255,0.4); }
+
+/* Keyboard Shortcuts Modal */
+.shortcuts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px 20px; }
+.shortcut-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.shortcut-key { background: var(--primary-light); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 12px; font-family: monospace; min-width: 28px; text-align: center; border: 1px solid var(--border); }
+
+/* Review Badge in Card */
+.badge-reviews { background: #e8eaf6; color: #283593; }
+[data-theme="dark"] .badge-reviews { background: #1a1a3a; color: #9fa8da; }
+
+/* Season auto-theme */
+.season-spring .header { background: linear-gradient(135deg, #2e7d32, #43a047) !important; }
+.season-summer .header { background: linear-gradient(135deg, #00695c, #00897b) !important; }
+.season-autumn .header { background: linear-gradient(135deg, #bf360c, #e65100) !important; }
+.season-winter .header { background: linear-gradient(135deg, #37474f, #455a64) !important; }
+
+/* Swipe hint (mobile) */
+.swipe-hint { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; z-index: 99; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
+.swipe-hint.show { opacity: 1; }
+
+/* Weather Widget in Header */
+.weather-widget { display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 6px; font-size: 12px; color: white; }
+
+/* Round stats mini */
+.round-stats-mini { display: flex; gap: 6px; margin-top: 6px; }
+.rsm { padding: 3px 8px; background: var(--primary-light); border-radius: 4px; font-size: 11px; font-weight: 600; color: var(--primary); }
+[data-theme="dark"] .rsm { background: #1a3a25; }
+
+@media (max-width: 768px) {
+  .shortcuts-grid { grid-template-columns: 1fr; }
+  .roundlog-form { flex-direction: column; }
+  .roundlog-form input, .roundlog-form select { width: 100%; }
+}
 </style>
 </head>
 <body>
@@ -695,7 +805,11 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
       </div>
       <button class="dark-toggle" id="statsBtn" title="통계 대시보드"><i class="fas fa-chart-pie"></i></button>
       <button class="dark-toggle" id="plannerBtn" title="라운드 플래너"><i class="fas fa-calendar-alt"></i></button>
+      <button class="dark-toggle" id="roundLogBtn" title="라운드 기록"><i class="fas fa-clipboard-list"></i></button>
       <button class="dark-toggle" id="darkToggle" title="다크모드"><i class="fas fa-moon"></i></button>
+      <button class="a11y-btn" id="contrastBtn" title="고대비 모드"><i class="fas fa-adjust"></i></button>
+      <button class="a11y-btn" id="fontSizeBtn" title="글꼴 크기"><i class="fas fa-text-height"></i></button>
+      <button class="a11y-btn" id="shortcutsBtn" title="단축키 ?"><i class="fas fa-keyboard"></i></button>
     </div>
   </div>
 </div>
@@ -810,6 +924,12 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
 <div class="tips-section" id="tipsSection">
   <div class="tips-title"><i class="fas fa-lightbulb"></i> 골프 팁</div>
   <div class="tips-scroll" id="tipsScroll"></div>
+</div>
+
+<!-- Round Log -->
+<div class="roundlog-section" id="roundlogSection" style="display:none">
+  <div class="roundlog-title"><i class="fas fa-clipboard-list"></i> 내 라운드 기록</div>
+  <div class="roundlog-scroll" id="roundlogScroll"></div>
 </div>
 
 <!-- Top 10 Ranking -->
@@ -959,6 +1079,63 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
   </div>
 </div>
 
+<!-- Round Log Modal -->
+<div class="modal-overlay" id="roundLogOverlay">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-header">
+      <h2><i class="fas fa-clipboard-list"></i> 라운드 기록</h2>
+      <button class="modal-close" id="roundLogClose">&times;</button>
+    </div>
+    <div class="modal-body" id="roundLogBody">
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px">골프장 상세 화면에서 라운드 기록을 추가할 수 있습니다.</p>
+      <div id="roundLogList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Keyboard Shortcuts Modal -->
+<div class="modal-overlay" id="shortcutsOverlay">
+  <div class="modal" style="max-width:550px">
+    <div class="modal-header">
+      <h2><i class="fas fa-keyboard"></i> 키보드 단축키</h2>
+      <button class="modal-close" id="shortcutsClose">&times;</button>
+    </div>
+    <div class="shortcuts-grid">
+      <div class="shortcut-item"><span class="shortcut-key">/</span> 검색창 포커스</div>
+      <div class="shortcut-item"><span class="shortcut-key">?</span> 단축키 보기</div>
+      <div class="shortcut-item"><span class="shortcut-key">Esc</span> 모달 닫기</div>
+      <div class="shortcut-item"><span class="shortcut-key">D</span> 다크 모드 토글</div>
+      <div class="shortcut-item"><span class="shortcut-key">G</span> GPS 위치 가져오기</div>
+      <div class="shortcut-item"><span class="shortcut-key">M</span> 지도 뷰 전환</div>
+      <div class="shortcut-item"><span class="shortcut-key">S</span> 통계 대시보드</div>
+      <div class="shortcut-item"><span class="shortcut-key">P</span> 라운드 플래너</div>
+      <div class="shortcut-item"><span class="shortcut-key">F</span> 즐겨찾기 필터</div>
+      <div class="shortcut-item"><span class="shortcut-key">R</span> 필터 초기화</div>
+      <div class="shortcut-item"><span class="shortcut-key">T</span> 맨 위로 스크롤</div>
+      <div class="shortcut-item"><span class="shortcut-key">L</span> 라운드 기록</div>
+    </div>
+  </div>
+</div>
+
+<!-- Share Card Modal -->
+<div class="modal-overlay" id="shareCardOverlay">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <h2><i class="fas fa-share-alt"></i> 공유 카드</h2>
+      <button class="modal-close" id="shareCardClose">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="share-preview" id="sharePreview"></div>
+      <div class="share-btns">
+        <button class="share-dl" id="shareDownload"><i class="fas fa-download"></i> 이미지 저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Swipe Hint (mobile) -->
+<div class="swipe-hint" id="swipeHint"></div>
+
 <!-- Toast container -->
 <div class="toast-container" id="toastContainer"></div>
 
@@ -986,7 +1163,7 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
   <div class="footer-inner">
     <div class="footer-brand">
       <i class="fas fa-golf-ball-tee"></i> SmartGolf
-      <span>v4.0 &mdash; 전국 골프장 파인더</span>
+      <span>v5.0 &mdash; 전국 골프장 파인더</span>
     </div>
     <div class="footer-links">
       <a href="#" onclick="window.scrollTo({top:0,behavior:&quot;smooth&quot;});return false">맨 위로</a>
@@ -994,7 +1171,7 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
     </div>
     <div class="footer-info">
       590개 골프장 데이터 (2026.05 업데이트)<br>
-      GPS 거리: OSRM | 지도: OpenStreetMap | v4.0
+      GPS 거리: OSRM | 지도: OpenStreetMap | v5.0
     </div>
   </div>
 </footer>
@@ -2450,6 +2627,554 @@ renderResults = function() {
     }
   });
 };
+
+// ===== v5.0 NEW FEATURES =====
+
+// Season auto-theme
+(function() {
+  const s = getCurrentSeason();
+  const cls = { '봄': 'season-spring', '여름': 'season-summer', '가을': 'season-autumn', '겨울': 'season-winter' };
+  if (cls[s.name]) document.body.classList.add(cls[s.name]);
+})();
+
+// ---- User Review System ----
+let courseReviews = JSON.parse(localStorage.getItem('sg_reviews') || '{}');
+
+function getReviews(name) { return courseReviews[name] || []; }
+
+function addReview(name, stars, text) {
+  if (!courseReviews[name]) courseReviews[name] = [];
+  courseReviews[name].unshift({
+    s: stars,
+    t: text.trim(),
+    d: new Date().toISOString().slice(0, 10)
+  });
+  if (courseReviews[name].length > 20) courseReviews[name].pop();
+  localStorage.setItem('sg_reviews', JSON.stringify(courseReviews));
+}
+
+function deleteReview(name, idx) {
+  if (courseReviews[name]) {
+    courseReviews[name].splice(idx, 1);
+    if (!courseReviews[name].length) delete courseReviews[name];
+    localStorage.setItem('sg_reviews', JSON.stringify(courseReviews));
+  }
+}
+
+function getAvgReviewScore(name) {
+  const revs = getReviews(name);
+  if (!revs.length) return 0;
+  return revs.reduce((s, r) => s + r.s, 0) / revs.length;
+}
+
+function renderStars(n) {
+  let h = '';
+  for (let i = 1; i <= 5; i++) h += `<i class="fas fa-star" style="color:${i <= n ? '#f59e0b' : '#ccc'}"></i>`;
+  return h;
+}
+
+// ---- Course Difficulty System ----
+function calcDifficulty(c) {
+  let score = 0;
+  if (c.t === '회원제') score += 3;
+  else if (c.t === '군골프장') score += 1;
+  if (c.h >= 36) score += 2;
+  else if (c.h >= 27) score += 1;
+  if (c.weekday > 150000) score += 2;
+  else if (c.weekday > 100000) score += 1;
+  if (c.rt >= 9) score += 1;
+  if (score >= 5) return { label: '상급', cls: 'badge-diff-hard', icon: 'fa-mountain' };
+  if (score >= 3) return { label: '중급', cls: 'badge-diff-mid', icon: 'fa-hiking' };
+  return { label: '초급', cls: 'badge-diff-easy', icon: 'fa-seedling' };
+}
+
+// ---- SVG Radar Chart ----
+function makeRadarChart(c) {
+  const axes = [
+    { label: '평점', val: c.rt ? c.rt / 10 : 0 },
+    { label: '가성비', val: Math.min(1, valueScore(c) / 30) },
+    { label: '홀수', val: c.h ? Math.min(1, c.h / 36) : 0 },
+    { label: '접근성', val: (userCoords && c._calcTime) ? Math.max(0, 1 - c._calcTime / 4) : 0.5 },
+    { label: '시설', val: (c.cart > 0 && c.caddie > 0) ? 1 : c.cart > 0 ? 0.6 : 0.3 }
+  ];
+  const n = axes.length, cx = 120, cy = 110, R = 80;
+  const angleStep = (2 * Math.PI) / n;
+  const offsetAngle = -Math.PI / 2;
+  function pt(i, r) {
+    const a = offsetAngle + i * angleStep;
+    return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  }
+  let gridLines = '';
+  [0.25, 0.5, 0.75, 1].forEach(s => {
+    const pts = [];
+    for (let i = 0; i < n; i++) pts.push(pt(i, R * s).join(','));
+    gridLines += `<polygon points="${pts.join(' ')}" class="radar-grid"/>`;
+  });
+  for (let i = 0; i < n; i++) {
+    const [x, y] = pt(i, R);
+    gridLines += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" class="radar-grid"/>`;
+  }
+  const dataPts = [];
+  for (let i = 0; i < n; i++) {
+    const [x, y] = pt(i, R * Math.max(0.05, axes[i].val));
+    dataPts.push(`${x},${y}`);
+  }
+  let labels = '';
+  for (let i = 0; i < n; i++) {
+    const [x, y] = pt(i, R + 16);
+    labels += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central">${axes[i].label}</text>`;
+  }
+  let dots = '';
+  for (let i = 0; i < n; i++) {
+    const [x, y] = pt(i, R * Math.max(0.05, axes[i].val));
+    dots += `<circle cx="${x}" cy="${y}" class="radar-dot"/>`;
+  }
+  return `<div class="radar-wrap"><svg viewBox="0 0 240 230" xmlns="http://www.w3.org/2000/svg">
+    ${gridLines}
+    <polygon points="${dataPts.join(' ')}" class="radar-area"/>
+    ${dots}${labels}
+  </svg></div>`;
+}
+
+// ---- Round Log System ----
+let roundLogs = JSON.parse(localStorage.getItem('sg_rounds') || '[]');
+
+function addRoundLog(name, date, score, memo) {
+  roundLogs.unshift({ n: name, d: date, s: parseInt(score), m: memo || '' });
+  if (roundLogs.length > 50) roundLogs.pop();
+  localStorage.setItem('sg_rounds', JSON.stringify(roundLogs));
+}
+
+function deleteRoundLog(idx) {
+  roundLogs.splice(idx, 1);
+  localStorage.setItem('sg_rounds', JSON.stringify(roundLogs));
+}
+
+function renderRoundLogSection() {
+  const section = document.getElementById('roundlogSection');
+  const scroll = document.getElementById('roundlogScroll');
+  if (!roundLogs.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  scroll.innerHTML = roundLogs.slice(0, 10).map((r, i) =>
+    `<div class="rl-card" data-name="${r.n.replace(/"/g,'&quot;')}">
+      <button class="rl-del" data-idx="${i}" title="삭제"><i class="fas fa-times"></i></button>
+      <div class="rl-name">${r.n}</div>
+      <div class="rl-date"><i class="fas fa-calendar"></i> ${r.d}</div>
+      <div class="rl-score">${r.s}타</div>
+      ${r.m ? '<div style="font-size:11px;color:var(--text-muted);margin-top:2px">' + r.m.replace(/</g,'&lt;') + '</div>' : ''}
+    </div>`
+  ).join('');
+  scroll.querySelectorAll('.rl-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.rl-del')) {
+        e.stopPropagation();
+        deleteRoundLog(parseInt(e.target.closest('.rl-del').dataset.idx));
+        renderRoundLogSection();
+        showToast('라운드 기록 삭제됨', 'info');
+        return;
+      }
+      const c = allCourses.find(x => x.n === card.dataset.name);
+      if (c) showDetail(c);
+    });
+  });
+}
+renderRoundLogSection();
+
+function renderRoundLogModal() {
+  const el = document.getElementById('roundLogList');
+  if (!roundLogs.length) {
+    el.innerHTML = '<div class="empty-state"><i class="fas fa-clipboard-list"></i><p>아직 라운드 기록이 없습니다</p></div>';
+    return;
+  }
+  const totalRounds = roundLogs.length;
+  const avgScore = Math.round(roundLogs.reduce((s, r) => s + r.s, 0) / totalRounds);
+  const bestScore = Math.min(...roundLogs.map(r => r.s));
+  el.innerHTML = `
+    <div class="round-stats-mini">
+      <span class="rsm"><i class="fas fa-golf-ball-tee"></i> ${totalRounds}회</span>
+      <span class="rsm"><i class="fas fa-chart-line"></i> 평균 ${avgScore}타</span>
+      <span class="rsm"><i class="fas fa-trophy"></i> 베스트 ${bestScore}타</span>
+    </div>
+    ${roundLogs.map((r, i) => `
+      <div class="pr-card" style="cursor:default">
+        <div class="pr-rank" style="font-size:12px">${i + 1}</div>
+        <div class="pr-info">
+          <div class="pr-name">${r.n}</div>
+          <div class="pr-meta">${r.d}${r.m ? ' | ' + r.m.replace(/</g,'&lt;') : ''}</div>
+        </div>
+        <div class="pr-cost">
+          <div class="pr-total">${r.s}타</div>
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+// Round Log Modal handlers
+document.getElementById('roundLogBtn').addEventListener('click', () => {
+  renderRoundLogModal();
+  document.getElementById('roundLogOverlay').classList.add('active');
+});
+document.getElementById('roundLogClose').addEventListener('click', () => {
+  document.getElementById('roundLogOverlay').classList.remove('active');
+});
+document.getElementById('roundLogOverlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+});
+
+// ---- Canvas Share Card Generator ----
+function generateShareCard(c) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 600;
+  canvas.height = 400;
+  const ctx = canvas.getContext('2d');
+
+  const grad = ctx.createLinearGradient(0, 0, 600, 400);
+  grad.addColorStop(0, '#0f5a28');
+  grad.addColorStop(1, '#1a7a3a');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 600, 400);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.05)';
+  for (let i = 0; i < 6; i++) {
+    ctx.beginPath();
+    ctx.arc(100 + i * 100, 200, 60 + i * 15, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.fillRect(30, 30, 540, 340);
+  ctx.fillStyle = '#1a7a3a';
+  ctx.fillRect(30, 30, 540, 6);
+
+  ctx.fillStyle = '#1a1a1a';
+  ctx.font = 'bold 28px -apple-system, sans-serif';
+  ctx.fillText(c.n, 50, 80);
+
+  ctx.fillStyle = '#666';
+  ctx.font = '15px -apple-system, sans-serif';
+  ctx.fillText(`${c.r} ${c.c || ''} | ${c.t || ''} | ${c.h || '?'}홀`, 50, 110);
+
+  if (c.rt) {
+    ctx.fillStyle = '#f59e0b';
+    ctx.font = 'bold 42px -apple-system, sans-serif';
+    ctx.fillText(c.rt.toFixed(1), 50, 170);
+    ctx.fillStyle = '#999';
+    ctx.font = '18px -apple-system, sans-serif';
+    ctx.fillText('/ 10.0', 140, 170);
+  }
+
+  ctx.fillStyle = '#333';
+  ctx.font = '14px -apple-system, sans-serif';
+  let y = 210;
+  if (c.weekday > 0) { ctx.fillText(`주중: ${fmtPriceFull(c.weekday)}`, 50, y); y += 24; }
+  if (c.weekend > 0) { ctx.fillText(`주말: ${fmtPriceFull(c.weekend)}`, 50, y); y += 24; }
+  if (c.a) { ctx.fillText(c.a.length > 40 ? c.a.slice(0, 40) + '...' : c.a, 50, y); y += 24; }
+
+  const diff = calcDifficulty(c);
+  ctx.fillStyle = diff.cls.includes('hard') ? '#c62828' : diff.cls.includes('mid') ? '#e65100' : '#2e7d32';
+  ctx.font = 'bold 14px -apple-system, sans-serif';
+  ctx.fillText(`난이도: ${diff.label}`, 400, 110);
+
+  const vs = valueScore(c);
+  if (vs > 0) {
+    ctx.fillStyle = '#e65100';
+    ctx.fillText(`가성비: ${vs.toFixed(1)}`, 400, 134);
+  }
+
+  ctx.fillStyle = '#1a7a3a';
+  ctx.font = 'bold 14px -apple-system, sans-serif';
+  ctx.fillText('SmartGolf v5.0', 50, 350);
+  ctx.fillStyle = '#999';
+  ctx.font = '11px -apple-system, sans-serif';
+  ctx.fillText('전국 590개 골프장 파인더', 180, 350);
+
+  return canvas;
+}
+
+function showShareCard(name) {
+  const c = allCourses.find(x => x.n === name);
+  if (!c) return;
+  const canvas = generateShareCard(c);
+  const preview = document.getElementById('sharePreview');
+  preview.innerHTML = '';
+  preview.appendChild(canvas);
+  document.getElementById('shareCardOverlay').classList.add('active');
+}
+
+document.getElementById('shareDownload').addEventListener('click', () => {
+  const canvas = document.querySelector('#sharePreview canvas');
+  if (!canvas) return;
+  const a = document.createElement('a');
+  a.download = 'smartgolf-share.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+  showToast('이미지 저장 완료', 'success');
+});
+document.getElementById('shareCardClose').addEventListener('click', () => {
+  document.getElementById('shareCardOverlay').classList.remove('active');
+});
+document.getElementById('shareCardOverlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+});
+
+// ---- Patch showDetail for v5.0 (reviews, radar, difficulty, round log, share card) ----
+const _v5ShowDetail = showDetail;
+showDetail = function(c) {
+  _v5ShowDetail(c);
+  const mb = document.getElementById('modalBody');
+  const safeName = c.n.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+  // Difficulty badge
+  const diff = calcDifficulty(c);
+  const diffHTML = `<div class="modal-row"><div class="modal-label">난이도</div><div class="modal-value"><span class="badge badge-diff ${diff.cls}"><i class="fas ${diff.icon}"></i> ${diff.label}</span></div></div>`;
+
+  // Radar chart
+  const radarHTML = makeRadarChart(c);
+
+  // Round log form
+  const today = new Date().toISOString().slice(0, 10);
+  const roundLogHTML = `
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+      <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px"><i class="fas fa-clipboard-list"></i> 라운드 기록 추가</div>
+      <div class="roundlog-form">
+        <div><span class="rl-label">날짜</span><input type="date" id="rlDate" value="${today}"></div>
+        <div><span class="rl-label">스코어</span><input type="number" id="rlScore" min="50" max="150" value="90" style="width:70px"></div>
+        <div><span class="rl-label">메모</span><input type="text" id="rlMemo" placeholder="한줄 메모" style="width:140px"></div>
+        <button class="roundlog-add" onclick="addRoundLog('${safeName}', document.getElementById('rlDate').value, document.getElementById('rlScore').value, document.getElementById('rlMemo').value); renderRoundLogSection(); showToast('라운드 기록 저장됨', 'success')"><i class="fas fa-plus"></i> 저장</button>
+      </div>
+    </div>`;
+
+  // Reviews section
+  const reviews = getReviews(c.n);
+  const avgScore = getAvgReviewScore(c.n);
+  let reviewsHTML = `
+    <div class="review-section">
+      <div class="section-label"><i class="fas fa-comments"></i> 유저 리뷰 (${reviews.length}개)</div>`;
+  if (reviews.length > 0) {
+    reviewsHTML += `<div class="review-avg"><span class="big-score">${avgScore.toFixed(1)}</span> ${renderStars(Math.round(avgScore))}</div>`;
+    reviewsHTML += '<div class="review-list">';
+    reviews.forEach((r, i) => {
+      reviewsHTML += `<div class="review-item">
+        <button class="review-del" onclick="deleteReview('${safeName}', ${i}); showDetail(allCourses.find(x=>x.n==='${safeName}')); showToast('리뷰 삭제됨','info')" title="삭제"><i class="fas fa-times"></i></button>
+        <div class="review-stars">${renderStars(r.s)}</div>
+        <div class="review-text">${r.t.replace(/</g,'&lt;')}</div>
+        <div class="review-date">${r.d}</div>
+      </div>`;
+    });
+    reviewsHTML += '</div>';
+  }
+  reviewsHTML += `
+    <div class="review-form">
+      <div class="star-input" id="starInput">
+        ${[1,2,3,4,5].map(i => `<i class="fas fa-star" data-star="${i}"></i>`).join('')}
+      </div>
+      <textarea class="review-textarea" id="reviewText" placeholder="이 골프장에 대한 리뷰를 작성해보세요..."></textarea>
+      <button class="review-submit" id="reviewSubmitBtn"><i class="fas fa-paper-plane"></i> 리뷰 등록</button>
+    </div>
+  </div>`;
+
+  // Share card button in actions
+  const actionsEl = document.getElementById('modalActions');
+  actionsEl.insertAdjacentHTML('beforeend',
+    `<button class="modal-btn" style="background:#e8f5e9;color:#2e7d32" onclick="showShareCard('${safeName}')"><i class="fas fa-image"></i> 공유카드</button>`
+  );
+
+  // Insert difficulty after type row
+  const typeRow = mb.querySelector('.modal-row:nth-child(3)');
+  if (typeRow) typeRow.insertAdjacentHTML('afterend', diffHTML);
+
+  // Append radar, round log form, reviews
+  mb.insertAdjacentHTML('beforeend', radarHTML + roundLogHTML + reviewsHTML);
+
+  // Star input handler
+  let selectedStars = 0;
+  const starInput = document.getElementById('starInput');
+  if (starInput) {
+    starInput.querySelectorAll('i').forEach(star => {
+      star.addEventListener('click', () => {
+        selectedStars = parseInt(star.dataset.star);
+        starInput.querySelectorAll('i').forEach((s, j) => {
+          s.classList.toggle('active', j < selectedStars);
+        });
+      });
+      star.addEventListener('mouseenter', () => {
+        const hoverVal = parseInt(star.dataset.star);
+        starInput.querySelectorAll('i').forEach((s, j) => {
+          s.style.color = j < hoverVal ? '#f59e0b' : '#ccc';
+        });
+      });
+    });
+    starInput.addEventListener('mouseleave', () => {
+      starInput.querySelectorAll('i').forEach((s, j) => {
+        s.style.color = j < selectedStars ? '#f59e0b' : '#ccc';
+      });
+    });
+  }
+
+  const submitBtn = document.getElementById('reviewSubmitBtn');
+  if (submitBtn) {
+    submitBtn.addEventListener('click', () => {
+      const text = document.getElementById('reviewText').value.trim();
+      if (!selectedStars) { showToast('별점을 선택해주세요', 'warning'); return; }
+      if (!text) { showToast('리뷰 내용을 입력해주세요', 'warning'); return; }
+      addReview(c.n, selectedStars, text);
+      showDetail(c);
+      showToast('리뷰가 등록되었습니다', 'success');
+    });
+  }
+};
+
+// ---- Patch renderResults for v5.0 (difficulty badge, review count) ----
+const _v5RenderResults = renderResults;
+renderResults = function() {
+  _v5RenderResults();
+  document.querySelectorAll('.card').forEach(card => {
+    const name = card.dataset.name;
+    if (!name) return;
+    const c = allCourses.find(x => x.n === name);
+    if (!c) return;
+    const badges = card.querySelector('.card-badges');
+    if (!badges) return;
+
+    // Difficulty badge
+    const diff = calcDifficulty(c);
+    if (!badges.querySelector('.badge-diff')) {
+      badges.insertAdjacentHTML('beforeend', `<span class="badge badge-diff ${diff.cls}"><i class="fas ${diff.icon}"></i> ${diff.label}</span>`);
+    }
+
+    // Review count badge
+    const revs = getReviews(name);
+    if (revs.length > 0 && !badges.querySelector('.badge-reviews')) {
+      badges.insertAdjacentHTML('beforeend', `<span class="badge badge-reviews"><i class="fas fa-comments"></i> ${revs.length}</span>`);
+    }
+  });
+};
+
+// ---- Accessibility Controls ----
+document.getElementById('contrastBtn').addEventListener('click', () => {
+  const isHigh = document.documentElement.getAttribute('data-contrast') === 'high';
+  document.documentElement.setAttribute('data-contrast', isHigh ? '' : 'high');
+  localStorage.setItem('sg_contrast', !isHigh);
+  document.getElementById('contrastBtn').classList.toggle('active', !isHigh);
+  showToast(isHigh ? '기본 대비' : '고대비 모드', 'info');
+});
+if (localStorage.getItem('sg_contrast') === 'true') {
+  document.documentElement.setAttribute('data-contrast', 'high');
+  document.getElementById('contrastBtn').classList.add('active');
+}
+
+document.getElementById('fontSizeBtn').addEventListener('click', () => {
+  const isLarge = document.documentElement.getAttribute('data-fontsize') === 'large';
+  document.documentElement.setAttribute('data-fontsize', isLarge ? '' : 'large');
+  localStorage.setItem('sg_fontsize', !isLarge);
+  document.getElementById('fontSizeBtn').classList.toggle('active', !isLarge);
+  showToast(isLarge ? '기본 글꼴' : '큰 글꼴', 'info');
+});
+if (localStorage.getItem('sg_fontsize') === 'true') {
+  document.documentElement.setAttribute('data-fontsize', 'large');
+  document.getElementById('fontSizeBtn').classList.add('active');
+}
+
+// ---- Keyboard Shortcuts Modal ----
+document.getElementById('shortcutsBtn').addEventListener('click', () => {
+  document.getElementById('shortcutsOverlay').classList.add('active');
+});
+document.getElementById('shortcutsClose').addEventListener('click', () => {
+  document.getElementById('shortcutsOverlay').classList.remove('active');
+});
+document.getElementById('shortcutsOverlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+});
+
+// ---- Enhanced Keyboard Shortcuts ----
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input,select,textarea')) return;
+  switch (e.key) {
+    case '?': e.preventDefault(); document.getElementById('shortcutsBtn').click(); break;
+    case 'd': case 'D': e.preventDefault(); document.getElementById('darkToggle').click(); break;
+    case 'g': case 'G': e.preventDefault(); document.getElementById('gpsBtn').click(); break;
+    case 'm': case 'M': e.preventDefault(); document.getElementById('viewMap').click(); break;
+    case 's': case 'S': e.preventDefault(); document.getElementById('statsBtn').click(); break;
+    case 'p': case 'P': e.preventDefault(); document.getElementById('plannerBtn').click(); break;
+    case 'f': case 'F': e.preventDefault(); document.getElementById('favFilter').click(); break;
+    case 'r': case 'R': e.preventDefault(); document.getElementById('resetBtn').click(); break;
+    case 't': case 'T': e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); break;
+    case 'l': case 'L': e.preventDefault(); document.getElementById('roundLogBtn').click(); break;
+  }
+});
+
+// ---- Mobile Swipe Gestures ----
+(function() {
+  let touchStartX = 0, touchStartY = 0, swipeCard = null;
+  document.addEventListener('touchstart', (e) => {
+    const card = e.target.closest('.card');
+    if (!card) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    swipeCard = card;
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    if (!swipeCard) return;
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+    const diffX = endX - touchStartX;
+    const diffY = endY - touchStartY;
+    if (Math.abs(diffX) > 80 && Math.abs(diffX) > Math.abs(diffY) * 2) {
+      const name = swipeCard.dataset.name;
+      if (diffX > 0) {
+        if (name) { toggleFav(name); renderResults(); }
+        showSwipeHint('❤️ 즐겨찾기 토글');
+      } else {
+        if (name) { toggleCompare(name); updateCompareBar(); }
+        showSwipeHint('↔️ 비교 목록 추가');
+      }
+    }
+    swipeCard = null;
+  }, { passive: true });
+})();
+
+function showSwipeHint(text) {
+  const hint = document.getElementById('swipeHint');
+  hint.textContent = text;
+  hint.classList.add('show');
+  setTimeout(() => hint.classList.remove('show'), 1500);
+}
+
+// ---- Enhanced Recommendation Engine ----
+const _v5ApplyFilters = applyFilters;
+applyFilters = function() {
+  _v5ApplyFilters();
+  renderRoundLogSection();
+};
+
+// ---- Weather Widget (season-based, no external API) ----
+(function() {
+  const s = getCurrentSeason();
+  const weatherData = {
+    '봄': { icon: 'fa-cloud-sun', temp: '12~20°C', desc: '골프 좋은 날씨' },
+    '여름': { icon: 'fa-sun', temp: '25~33°C', desc: '자외선 주의' },
+    '가을': { icon: 'fa-cloud', temp: '10~22°C', desc: '단풍 라운드 추천' },
+    '겨울': { icon: 'fa-snowflake', temp: '-5~8°C', desc: '방한 필수' }
+  };
+  const w = weatherData[s.name];
+  const stats = document.querySelector('.header-stats');
+  if (stats) {
+    stats.insertAdjacentHTML('beforeend',
+      `<div class="weather-widget"><i class="fas ${w.icon} weather-icon"></i> ${s.name} ${w.temp} ${w.desc}</div>`
+    );
+  }
+})();
+
+// Close all v5 modals on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('roundLogOverlay').classList.remove('active');
+    document.getElementById('shortcutsOverlay').classList.remove('active');
+    document.getElementById('shareCardOverlay').classList.remove('active');
+  }
+});
 </script>
 </body>
 </html>
