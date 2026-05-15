@@ -1,10 +1,11 @@
-const CACHE_NAME = 'smartgolf-v9';
+const CACHE_NAME = 'smartgolf-v10';
 const ASSETS = [
   './',
   './index.html',
   './icons.css',
   './features.js',
   './v6_patch.js',
+  './v7_patch.js',
   './courses_enriched.json',
   './manifest.json'
 ];
@@ -17,16 +18,17 @@ self.addEventListener('install', e => {
 self.addEventListener('fetch', e => {
   const url = e.request.url;
 
-  // HTML pages: inject features.js, network-first
+  // HTML pages: inject features.js + patches, network-first
   if (e.request.mode === 'navigate' || url.endsWith('.html') || url.endsWith('/')) {
     e.respondWith(
       fetch(e.request).then(r => {
         return r.text().then(html => {
-          if (html.includes('</body>') && !html.includes('features.js')) {
-            html = html.replace('</body>', '<script src="features.js" defer><\/script>\n<script src="v6_patch.js" defer><\/script>\n</body>');
-          } else if (html.includes('</body>') && !html.includes('v6_patch.js')) {
-            html = html.replace('</body>', '<script src="v6_patch.js" defer><\/script>\n</body>');
-          }
+          const scripts = ['features.js', 'v6_patch.js', 'v7_patch.js'];
+          scripts.forEach(s => {
+            if (html.includes('</body>') && !html.includes(s)) {
+              html = html.replace('</body>', '<script src="' + s + '" defer><\/script>\n</body>');
+            }
+          });
           const resp = new Response(html, {
             status: r.status,
             statusText: r.statusText,
