@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, AI 추천, 리뷰, 난이도, 라운드 기록, 레이더 차트, 공유 카드",
+  "description": "전국 590개 골프장 검색, AI 추천, 리뷰, 스코어카드, 핸디캡 계산, 캘린더, 성적 추이, 용어 사전, 전략 가이드",
   "lang": "ko",
   "categories": ["sports", "travel"],
   "start_url": "./index.html",
