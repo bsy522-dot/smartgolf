@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smartgolf-v10';
+const CACHE_NAME = 'smartgolf-v11';
 const ASSETS = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const ASSETS = [
   './features.js',
   './v6_patch.js',
   './v7_patch.js',
+  './v8_patch.js',
   './courses_enriched.json',
   './manifest.json'
 ];
@@ -23,7 +24,7 @@ self.addEventListener('fetch', e => {
     e.respondWith(
       fetch(e.request).then(r => {
         return r.text().then(html => {
-          const scripts = ['features.js', 'v6_patch.js', 'v7_patch.js'];
+          const scripts = ['features.js', 'v6_patch.js', 'v7_patch.js', 'v8_patch.js'];
           scripts.forEach(s => {
             if (html.includes('</body>') && !html.includes(s)) {
               html = html.replace('</body>', '<script src="' + s + '" defer><\/script>\n</body>');
