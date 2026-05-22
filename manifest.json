@@ -1,9 +1,9 @@
 {
-  "name": "SmartGolf - 전국 골프장 AI 코치",
+  "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 AI추천, 스코어분석AI, 클럽피팅시뮬레이터, 라운드플래너, 골프용어퀴즈30문, 영양가이드, 코스난이도분석, 클럽관리다이어리, 포토갤러리, 연습장파인더, 통계대시보드, 골프룰25+, 코스공략18홀, 스윙다이어리, 그린리딩, 장비추천, 토너먼트, 멘탈코칭, 에티켓25, 계절컨디션, 타임라인, 효과음",
+  "description": "전국 590개 골프장 검색, AI맞춤추천, 핸디캡계산기(WHS/USGA), 퍼팅미니게임, 코스매니지먼트플래너, 피트니스v2(근력12+스트레칭8+쿨다운6), 골프커뮤니티(후기+TOP10+버킷리스트+뱃지), 라운드준비체크리스트v2, 통계대시보드, 골프룰가이드25+, 코스공략18홀, 스윙다이어리, 그린리딩, 장비추천, 토너먼트, 멘탈코칭, 에티켓25, 계절컨디션, 타임라인, 효과음11종",
   "lang": "ko",
-  "categories": ["sports", "lifestyle", "education"],
+  "categories": ["sports", "lifestyle"],
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f5f7f5",
@@ -14,17 +14,7 @@
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ],
   "shortcuts": [
-    {
-      "name": "라운드 플래너",
-      "short_name": "플래너",
-      "url": "./index.html?feature=planner",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "골프 용어 퀴즈",
-      "short_name": "퀴즈",
-      "url": "./index.html?feature=quiz",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
-    }
+    { "name": "핸디캡 계산기", "url": "./index.html#handicap", "description": "USGA/WHS 핸디캡 계산" },
+    { "name": "퍼팅 미니게임", "url": "./index.html#putting", "description": "5홀 퍼팅 시뮬레이터" }
   ]
 }
