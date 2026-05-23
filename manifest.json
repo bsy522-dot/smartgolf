@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, AI맞춤추천, 라운드라이브18홀(FIR/GIR/퍼팅추적), 코스리뷰5항목별점, 스윙셀프진단8포인트, 골프DNA프로파일러, 그린피시즌예측기, 투어프로8명스윙팁, 골프여행5지역, 워밍업v3(8단계타이머), 스트로크게인드분석, 코스홀레이아웃SVG, 그립가이드6종, 연습드릴12종, 스코어예측AI, 버디매칭, 장비비교, 골프히스토리20, 앰비언트사운드, 효과음29종",
+  "description": "전국 590개 골프장 검색, AI맞춤추천, 코스매니지먼트전략5카테고리, 핸디캡인덱스USGA계산기, 골프영양가이드, 퍼팅분석기9거리벤치마크, 골프챌린지14종, 라운드통계트렌드차트, 클럽사용분석14종, 골프명언50선, 코스난이도분석기(슬로프/레이팅), 월간골프체크업, 라운드라이브18홀, SG분석, 드릴12종, 효과음35종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -14,9 +14,9 @@
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ],
   "shortcuts": [
-    { "name": "라운드 라이브", "url": "./index.html#round-live", "description": "18홀 실시간 라운드 추적" },
-    { "name": "스윙 진단", "url": "./index.html#swing-diag", "description": "8포인트 스윙 셀프 진단" },
-    { "name": "골프 DNA", "url": "./index.html#golf-dna", "description": "플레이 성향 분석 프로파일러" },
-    { "name": "그린피 예측", "url": "./index.html#green-fee", "description": "시즌별 그린피 비교 예측기" }
+    { "name": "코스 전략", "url": "./index.html#course-strategy", "description": "상황별 코스 매니지먼트 가이드" },
+    { "name": "퍼팅 분석", "url": "./index.html#putting-analyzer", "description": "거리별 퍼팅 성공률 분석" },
+    { "name": "골프 챌린지", "url": "./index.html#golf-challenge", "description": "일일 미션 & XP 보상" },
+    { "name": "월간 체크업", "url": "./index.html#monthly-checkup", "description": "종합 골프 진단 리포트" }
   ]
 }
