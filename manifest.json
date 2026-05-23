@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, AI맞춤추천, 스윙템포메트로놈, 샷도감20종, 초보자아카데미6레슨, 골프캘린더, 라운드저널, 목표추적10종, 공유카드Canvas, 데일리퀴즈, 골프명언, 핸디캡계산기(WHS/USGA), 퍼팅미니게임, 코스매니지먼트플래너, 피트니스v2, 골프커뮤니티, 통계대시보드, 골프룰25+, 코스공략18홀, 스윙다이어리, 그린리딩, 장비추천, 토너먼트, 멘탈코칭, 에티켓25, 효과음17종",
+  "description": "전국 590개 골프장 검색, AI맞춤추천, 스트로크게인드(SG)분석, 코스홀레이아웃SVG9홀, 그립가이드6종, 연습드릴12종, 스코어예측AI, 버디매칭, 장비비교도구, 골프히스토리20, 라운드리포트Canvas, 앰비언트사운드, 스윙템포메트로놈, 샷도감20종, 초보자아카데미6레슨, 골프캘린더, 라운드저널, 목표추적10종, 핸디캡계산기, 퍼팅미니게임, 코스매니지먼트플래너, 피트니스v2, 골프커뮤니티, 효과음23종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -14,8 +14,9 @@
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ],
   "shortcuts": [
-    { "name": "스윙 템포 메트로놈", "url": "./index.html#metronome", "description": "BPM 40-160 스윙 리듬 트레이너" },
-    { "name": "초보자 아카데미", "url": "./index.html#academy", "description": "6레슨 골프 기초 학습" },
-    { "name": "골프 캘린더", "url": "./index.html#calendar", "description": "라운드/연습 일정 관리" }
+    { "name": "SG 분석", "url": "./index.html#sg-analysis", "description": "스트로크 게인드 분석기" },
+    { "name": "연습 드릴", "url": "./index.html#drills", "description": "12종 연습 드릴 라이브러리" },
+    { "name": "스코어 예측", "url": "./index.html#predict", "description": "AI 스코어 예측" },
+    { "name": "스윙 템포 메트로놈", "url": "./index.html#metronome", "description": "BPM 40-160 스윙 리듬 트레이너" }
   ]
 }
