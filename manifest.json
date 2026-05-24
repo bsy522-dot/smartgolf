@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, AI맞춤추천, 코스매니지먼트전략5카테고리, 핸디캡인덱스USGA계산기, 골프영양가이드, 퍼팅분석기9거리벤치마크, 골프챌린지14종, 라운드통계트렌드차트, 클럽사용분석14종, 골프명언50선, 코스난이도분석기(슬로프/레이팅), 월간골프체크업, 라운드라이브18홀, SG분석, 드릴12종, 효과음35종",
+  "description": "전국 590개 골프장 검색, AI맞춤추천, 라운드캘린더, 가상코스9홀시뮬레이터, 성장곡선분석, 안전가이드6카테고리, 코스공략노트CRUD, 골프버킷리스트12코스, 스윙메트로놈5프리셋, 볼포지션7클럽, 시즌목표8종, 멘탈다이어리, 업적10개, SFX10종, 코스전략, 핸디캡USGA, 퍼팅분석, 챌린지14종, 효과음45종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -14,9 +14,9 @@
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ],
   "shortcuts": [
-    { "name": "코스 전략", "url": "./index.html#course-strategy", "description": "상황별 코스 매니지먼트 가이드" },
-    { "name": "퍼팅 분석", "url": "./index.html#putting-analyzer", "description": "거리별 퍼팅 성공률 분석" },
-    { "name": "골프 챌린지", "url": "./index.html#golf-challenge", "description": "일일 미션 & XP 보상" },
-    { "name": "월간 체크업", "url": "./index.html#monthly-checkup", "description": "종합 골프 진단 리포트" }
+    { "name": "라운드 캘린더", "url": "./index.html#round-calendar", "description": "라운드 일정 관리 & 통계" },
+    { "name": "가상 코스 플레이", "url": "./index.html#course-sim", "description": "9홀 가상 코스 시뮬레이터" },
+    { "name": "시즌 목표", "url": "./index.html#season-goals", "description": "연간 골프 목표 추적" },
+    { "name": "멘탈 다이어리", "url": "./index.html#mental-diary", "description": "라운드별 멘탈 기록" }
   ]
 }
