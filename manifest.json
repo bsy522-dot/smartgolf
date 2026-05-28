@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, AI맞춤추천, 클럽매니저14종, 18홀스코어카드, 연습일지6카테고리, 리더보드, AI클럽추천4조건, 라운드리포트PNG, 골프피트니스3루틴21운동, 골프퀴즈v2 15문항, 라운드캘린더, 가상코스9홀, 성장곡선, 멘탈다이어리, 업적20개, SFX20종",
+  "description": "전국 590개 골프장 검색, AI맞춤추천, SG분석기, 라운드비교, 코스컨디션리포터, 코스플라이오버9홀, 그린리딩시뮬레이터, 장비비교15종, 월간서머리, 골프뉴스16기사, 전략퀴즈v3, 업적12개, SFX12종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -14,10 +14,10 @@
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ],
   "shortcuts": [
-    { "name": "라운드 캘린더", "url": "./index.html#round-calendar", "description": "라운드 일정 관리 & 통계" },
-    { "name": "가상 코스 플레이", "url": "./index.html#course-sim", "description": "9홀 가상 코스 시뮬레이터" },
-    { "name": "시즌 목표", "url": "./index.html#season-goals", "description": "연간 골프 목표 추적" },
-    { "name": "멘탈 다이어리", "url": "./index.html#mental-diary", "description": "라운드별 멘탈 기록" },
+    { "name": "SG 분석기", "url": "./index.html#sg-analyzer", "description": "Strokes Gained 4영역 분석" },
+    { "name": "그린 리딩", "url": "./index.html#green-reader", "description": "그린 경사도 퍼팅 시뮬레이터" },
+    { "name": "장비 비교", "url": "./index.html#equip-compare", "description": "드라이버/아이언/볼 비교" },
+    { "name": "코스 플라이오버", "url": "./index.html#flyover", "description": "9홀 탑다운 코스맵" },
     { "name": "클럽 매니저", "url": "./index.html#club-manager", "description": "14종 클럽 비거리 관리" },
     { "name": "스코어카드", "url": "./index.html#scorecard", "description": "18홀 상세 스코어카드" }
   ]
