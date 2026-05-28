@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, AI맞춤추천, 라운드캘린더, 가상코스9홀시뮬레이터, 성장곡선분석, 안전가이드6카테고리, 코스공략노트CRUD, 골프버킷리스트12코스, 스윙메트로놈5프리셋, 볼포지션7클럽, 시즌목표8종, 멘탈다이어리, 업적10개, SFX10종, 코스전략, 핸디캡USGA, 퍼팅분석, 챌린지14종, 효과음45종",
+  "description": "전국 590개 골프장 검색, AI맞춤추천, 클럽매니저14종, 18홀스코어카드, 연습일지6카테고리, 리더보드, AI클럽추천4조건, 라운드리포트PNG, 골프피트니스3루틴21운동, 골프퀴즈v2 15문항, 라운드캘린더, 가상코스9홀, 성장곡선, 멘탈다이어리, 업적20개, SFX20종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -17,6 +17,8 @@
     { "name": "라운드 캘린더", "url": "./index.html#round-calendar", "description": "라운드 일정 관리 & 통계" },
     { "name": "가상 코스 플레이", "url": "./index.html#course-sim", "description": "9홀 가상 코스 시뮬레이터" },
     { "name": "시즌 목표", "url": "./index.html#season-goals", "description": "연간 골프 목표 추적" },
-    { "name": "멘탈 다이어리", "url": "./index.html#mental-diary", "description": "라운드별 멘탈 기록" }
+    { "name": "멘탈 다이어리", "url": "./index.html#mental-diary", "description": "라운드별 멘탈 기록" },
+    { "name": "클럽 매니저", "url": "./index.html#club-manager", "description": "14종 클럽 비거리 관리" },
+    { "name": "스코어카드", "url": "./index.html#scorecard", "description": "18홀 상세 스코어카드" }
   ]
 }
