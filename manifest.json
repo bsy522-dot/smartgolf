@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, AI맞춤추천, 매치플레이18홀, 퍼포먼스레이더6축, 프리샷루틴12단계, 날씨전략6종, 골프여행6코스, 라운드비교, Golf IQ 20문항, 코스위키8곳, 클럽매니저14종, 18홀스코어카드, 연습일지, 리더보드, AI클럽추천, 라운드리포트PNG, 골프피트니스3루틴, 골프퀴즈, 업적32개, SFX32종",
+  "description": "전국 590개 골프장 검색, AI맞춤추천, 토너먼트매니저, 스윙분석노트북, 골프규칙백과20조, 장비백과15종, AI라운드코치, 그린리딩시뮬레이터, 핸디캡히스토리Canvas차트, 시즌리포트PNG, Golf IQ v2 15문항, 매치플레이18홀, 클럽매니저14종, 업적44개, SFX44종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -14,11 +14,11 @@
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ],
   "shortcuts": [
-    { "name": "Match Play", "url": "./index.html#match-play", "description": "18홀 매치플레이 스코어링" },
-    { "name": "Performance Radar", "url": "./index.html#performance-radar", "description": "6축 골프 역량 레이더 차트" },
-    { "name": "Golf IQ Test", "url": "./index.html#golf-iq", "description": "Golf IQ 20문항 테스트" },
-    { "name": "Course Wiki", "url": "./index.html#course-wiki", "description": "한국 명문 코스 백과" },
-    { "name": "클럽 매니저", "url": "./index.html#club-manager", "description": "14종 클럽 비거리 관리" },
-    { "name": "스코어카드", "url": "./index.html#scorecard", "description": "18홀 상세 스코어카드" }
+    { "name": "Tournament Manager", "url": "./index.html#tournament", "description": "토너먼트 브래킷 매니저" },
+    { "name": "Green Reading Sim", "url": "./index.html#green-sim", "description": "그린 리딩 시뮬레이터" },
+    { "name": "Golf Rules", "url": "./index.html#rules", "description": "골프 규칙 백과사전 20조" },
+    { "name": "Equipment Guide", "url": "./index.html#equipment", "description": "골프 장비 백과 15종" },
+    { "name": "Handicap History", "url": "./index.html#handicap", "description": "핸디캡 히스토리 추적" },
+    { "name": "Season Report", "url": "./index.html#season-report", "description": "시즌 종합 리포트" }
   ]
 }
