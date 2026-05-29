@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, AI맞춤추천, 클럽매니저14종, 18홀스코어카드, 연습일지6카테고리, 리더보드, AI클럽추천4조건, 라운드리포트PNG, 골프피트니스3루틴21운동, 골프퀴즈v2 15문항, 라운드캘린더, 가상코스9홀, 성장곡선, 멘탈다이어리, 업적20개, SFX20종",
+  "description": "전국 590개 골프장 검색, AI맞춤추천, 매치플레이18홀, 퍼포먼스레이더6축, 프리샷루틴12단계, 날씨전략6종, 골프여행6코스, 라운드비교, Golf IQ 20문항, 코스위키8곳, 클럽매니저14종, 18홀스코어카드, 연습일지, 리더보드, AI클럽추천, 라운드리포트PNG, 골프피트니스3루틴, 골프퀴즈, 업적32개, SFX32종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -14,10 +14,10 @@
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ],
   "shortcuts": [
-    { "name": "라운드 캘린더", "url": "./index.html#round-calendar", "description": "라운드 일정 관리 & 통계" },
-    { "name": "가상 코스 플레이", "url": "./index.html#course-sim", "description": "9홀 가상 코스 시뮬레이터" },
-    { "name": "시즌 목표", "url": "./index.html#season-goals", "description": "연간 골프 목표 추적" },
-    { "name": "멘탈 다이어리", "url": "./index.html#mental-diary", "description": "라운드별 멘탈 기록" },
+    { "name": "Match Play", "url": "./index.html#match-play", "description": "18홀 매치플레이 스코어링" },
+    { "name": "Performance Radar", "url": "./index.html#performance-radar", "description": "6축 골프 역량 레이더 차트" },
+    { "name": "Golf IQ Test", "url": "./index.html#golf-iq", "description": "Golf IQ 20문항 테스트" },
+    { "name": "Course Wiki", "url": "./index.html#course-wiki", "description": "한국 명문 코스 백과" },
     { "name": "클럽 매니저", "url": "./index.html#club-manager", "description": "14종 클럽 비거리 관리" },
     { "name": "스코어카드", "url": "./index.html#scorecard", "description": "18홀 상세 스코어카드" }
   ]
