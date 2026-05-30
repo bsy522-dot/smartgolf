@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, AI맞춤추천, 토너먼트매니저, 스윙분석노트북, 골프규칙백과20조, 장비백과15종, AI라운드코치, 그린리딩시뮬레이터, 핸디캡히스토리Canvas차트, 시즌리포트PNG, Golf IQ v2 15문항, 매치플레이18홀, 클럽매니저14종, 업적44개, SFX44종",
+  "description": "전국 590개 골프장 검색, AI맞춤추천, 샷트래커히트맵Canvas, 골프에티켓30조, 프로스윙라이브러리10인, 클럽별거리차트14종, 라운드타임라인, 스트레칭가이드12종, 소셜피드, 코스컨디션리포트, 멘탈코칭10단계, Golf IQ v3 15문항, 토너먼트매니저, 그린리딩시뮬레이터, 핸디캡추적, 업적56개, SFX56종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -14,11 +14,11 @@
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ],
   "shortcuts": [
-    { "name": "Tournament Manager", "url": "./index.html#tournament", "description": "토너먼트 브래킷 매니저" },
-    { "name": "Green Reading Sim", "url": "./index.html#green-sim", "description": "그린 리딩 시뮬레이터" },
-    { "name": "Golf Rules", "url": "./index.html#rules", "description": "골프 규칙 백과사전 20조" },
-    { "name": "Equipment Guide", "url": "./index.html#equipment", "description": "골프 장비 백과 15종" },
-    { "name": "Handicap History", "url": "./index.html#handicap", "description": "핸디캡 히스토리 추적" },
-    { "name": "Season Report", "url": "./index.html#season-report", "description": "시즌 종합 리포트" }
+    { "name": "Shot Heatmap", "url": "./index.html#heatmap", "description": "샷 트래커 히트맵 Canvas" },
+    { "name": "Golf Etiquette", "url": "./index.html#etiquette", "description": "골프 에티켓 30조" },
+    { "name": "Pro Swings", "url": "./index.html#pro", "description": "프로 스윙 라이브러리 10인" },
+    { "name": "Club Distance", "url": "./index.html#clubdist", "description": "클럽별 거리 차트 14종" },
+    { "name": "Mental Coach", "url": "./index.html#mental", "description": "멘탈 코칭 10단계" },
+    { "name": "Tournament Manager", "url": "./index.html#tournament", "description": "토너먼트 브래킷 매니저" }
   ]
 }

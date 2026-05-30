@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smartgolf-v20';
+const CACHE_NAME = 'smartgolf-v21';
 const ASSETS = [
   './',
   './index.html',
@@ -16,6 +16,7 @@ const ASSETS = [
   './v15_patch.js',
   './v16_patch.js',
   './v17_patch.js',
+  './v18_patch.js',
   './courses_enriched.json',
   './manifest.json'
 ];
@@ -33,7 +34,7 @@ self.addEventListener('fetch', e => {
     e.respondWith(
       fetch(e.request).then(r => {
         return r.text().then(html => {
-          const scripts = ['features.js', 'v6_patch.js', 'v7_patch.js', 'v8_patch.js', 'v9_patch.js', 'v10_patch.js', 'v11_patch.js', 'v12_patch.js', 'v13_patch.js', 'v14_patch.js', 'v15_patch.js', 'v16_patch.js', 'v17_patch.js'];
+          const scripts = ['features.js', 'v6_patch.js', 'v7_patch.js', 'v8_patch.js', 'v9_patch.js', 'v10_patch.js', 'v11_patch.js', 'v12_patch.js', 'v13_patch.js', 'v14_patch.js', 'v15_patch.js', 'v16_patch.js', 'v17_patch.js', 'v18_patch.js'];
           scripts.forEach(s => {
             if (html.includes('</body>') && !html.includes(s)) {
               html = html.replace('</body>', '<script src="' + s + '" defer><\/script>\n</body>');

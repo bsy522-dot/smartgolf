@@ -2,6 +2,53 @@
 
 ---
 
+## [AUTO] 2026-05-30 smartgolf v18.0 - 샷트래커히트맵Canvas+골프에티켓30조+프로스윙라이브러리10인+클럽별거리차트14종+라운드타임라인+스트레칭12종+소셜피드+코스컨디션리포트+멘탈코칭10단계+Golf IQ v3 15문항+업적12추가(44→56)+SFX12종(44→56)
+
+### 벤치마킹 (vs 카카오골프/골프보/스마트스코어)
+| # | 열위점 | 해결방법 | 상태 |
+|---|-------|---------|------|
+| 1 | 샷 분포 히트맵 시각화 없음 | Canvas 기반 코스 위 샷 분포 히트맵 + 5종 샷타입 | DONE |
+| 2 | 코스 플라이오버/홀 프리뷰 없음 | SVG 코스 아웃라인 + 히트맵 통합 시각화 | DONE |
+| 3 | 골프 에티켓 가이드 없음 | 30조 에티켓 6카테고리(Tee/Fairway/Green/Bunker/Club House/General) | DONE |
+| 4 | 프로 스윙 참고 없음 | 10인 프로 스윙 라이브러리 (스타일/팁/통계/메이저) | DONE |
+| 5 | 클럽별 거리 통계 차트 없음 | 14클럽 거리 바차트 + 사용자 커스텀 입력 | DONE |
+| 6 | 라운드 타임라인(샷별) 없음 | 홀별 스코어 타임라인 + 라운드 기록 관리 | DONE |
+| 7 | 스트레칭/웜업 가이드 없음 | 12종 운동 3카테고리(Warmup/Pre-Shot/Cooldown) | DONE |
+| 8 | 소셜 피드/커뮤니티 없음 | 소셜 피드 + 포스팅/좋아요/공유 기능 | DONE |
+| 9 | 코스 컨디션 리포트 없음 | 6메트릭 코스 상태 기록 + 이력 관리 | DONE |
+| 10 | 멘탈 코칭 프로그램 없음 | 10단계 멘탈 코칭 (호흡/시각화/루틴/감정관리) | DONE |
+
+### 개발 내용
+- **v18_patch.js**: 신규 (937줄 57KB, 자기완결형 IIFE 패치 모듈)
+  - Shot Tracker Heatmap: Canvas 500x340 코스 시각화, 5종 샷타입(Fairway/Rough/Bunker/Green/OB) 분포도
+  - Golf Etiquette Master: 30조 규칙, 6카테고리 탭 필터, 아코디언 확장/접기
+  - Pro Swing Library: 10인 프로 (Tiger/Rory/Hogan/Nicklaus/Seve/Snead/Jones/Annika/Watson/Nelson)
+  - Club Distance Chart: 14클럽 수평 바차트, 사용자 거리 입력, 색상 그라디언트
+  - Round Timeline: 샷별 타임라인 뷰, 라운드 생성/기록, 스코어명 자동계산
+  - Stretching Guide: 12종 운동, 3카테고리(Warmup 6/Pre-Shot 3/Cooldown 3) 탭 필터
+  - Social Feed: 피드 포스팅/좋아요/공유, 기본 5개 샘플 게시글
+  - Course Condition Report: 6메트릭(Green/Fairway/Bunker/Rough/Cart Path/Overall) CRUD
+  - Mental Coaching: 10단계 프로그램 (호흡법/시각화/과정집중/수용/10초룰/긍정자기대화/루틴/압박재정의/홀리셋/라운드반성)
+  - Golf Quiz v3: 15문항 프로급 (스팅어/FedEx Cup/Links/로프트/핸디캡인덱스/라이더컵/CR&SR/딤플/Stimp/Dormie/샤프트/최다우승/Break/Up&Down/Albatross)
+  - 업적 +12개 (44→56): shot_tracker/shot_50/fairway_finder/etiquette_reader/pro_fan/club_setup/round_recorder/five_rounds/stretcher/social_poster/condition_reporter/mental_master
+  - SFX +12종 (44→56): heatmap/etiquette/pro_swing/club_dist/timeline/stretch/feed_like/feed_post/condition/mental/achieve/quiz
+  - 키보드 단축키 +10종: Shift+H(Heatmap)/E(Etiquette)/P(Pro)/D(ClubDist)/T(Timeline)/W(Stretch)/L(Feed)/C(Condition)/M(Mental)/Q(Quiz)
+  - 퀵 액션 버튼 10종 자동 삽입
+
+- **sw.js**: v20→v21 (v18_patch.js PRECACHE+자동주입)
+- **index.html**: v18.0 SEO 전면 갱신 (title/desc/keywords/OG/Twitter + v18 스크립트 태그)
+- **manifest.json**: v18.0 설명 + shortcuts 6종 갱신
+
+### 품질검증
+- JS 문법: PASS (node -c)
+- 괄호 밸런스: ALL OK (parentheses 0, braces 0, brackets 0)
+- HTML div 밸런스: 248/248 PASS
+- 외부 CDN: 0건 (v18_patch.js 내)
+- 개인정보: 0건 (이메일 0, 전화번호 0)
+- Manifest JSON: PASS
+
+---
+
 ## [AUTO] 2026-05-29 smartgolf v17.0 - 토너먼트매니저+스윙분석노트북10체크+골프규칙백과20조+장비백과15종+AI라운드코치+그린리딩시뮬레이터+핸디캡히스토리Canvas차트+시즌리포트PNG+Golf IQ v2 15문항+업적12추가(32→44)+SFX12종(32→44)
 
 ### 1차: 벤치마킹 분석 (카카오골프/골프존/스마트스코어)
