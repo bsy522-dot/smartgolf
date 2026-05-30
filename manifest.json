@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, AI맞춤추천, 샷트래커히트맵Canvas, 골프에티켓30조, 프로스윙라이브러리10인, 클럽별거리차트14종, 라운드타임라인, 스트레칭가이드12종, 소셜피드, 코스컨디션리포트, 멘탈코칭10단계, Golf IQ v3 15문항, 토너먼트매니저, 그린리딩시뮬레이터, 핸디캡추적, 업적56개, SFX56종",
+  "description": "전국 590개 골프장 검색, AI맞춤추천, 라운드사후분석, 바람전략가이드8종, 골프드레스코드8종, 코스레이팅슬로프계산기, 벌타분석트래커, 동반자관리, 골프마일리지10레벨, 명예의전당, Golf IQ v4, 샷히트맵, 에티켓30, 프로스윙10인, 멘탈코칭, 업적68개, SFX68종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -14,11 +14,11 @@
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ],
   "shortcuts": [
-    { "name": "Shot Heatmap", "url": "./index.html#heatmap", "description": "샷 트래커 히트맵 Canvas" },
-    { "name": "Golf Etiquette", "url": "./index.html#etiquette", "description": "골프 에티켓 30조" },
-    { "name": "Pro Swings", "url": "./index.html#pro", "description": "프로 스윙 라이브러리 10인" },
-    { "name": "Club Distance", "url": "./index.html#clubdist", "description": "클럽별 거리 차트 14종" },
-    { "name": "Mental Coach", "url": "./index.html#mental", "description": "멘탈 코칭 10단계" },
-    { "name": "Tournament Manager", "url": "./index.html#tournament", "description": "토너먼트 브래킷 매니저" }
+    { "name": "Post-Round Analysis", "url": "./index.html#postround", "description": "라운드 사후 분석" },
+    { "name": "Wind Strategy", "url": "./index.html#wind", "description": "바람 전략 가이드 8종" },
+    { "name": "Hall of Fame", "url": "./index.html#hof", "description": "명예의 전당" },
+    { "name": "Golf Mileage", "url": "./index.html#mileage", "description": "골프 마일리지 레벨업" },
+    { "name": "Course Rating Calc", "url": "./index.html#rating", "description": "코스레이팅 슬로프 계산기" },
+    { "name": "Penalty Tracker", "url": "./index.html#penalty", "description": "벌타 분석 트래커" }
   ]
 }
