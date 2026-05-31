@@ -1373,3 +1373,83 @@ v4.0 대비 10개 열위점 해소, 경쟁앱 대비 우위 확보
 - manifest.json: v15.0 기능 설명, 단축키 2종 추가
 - 총 코드량: 11,852줄 → 12,703줄 (+851, +7.2%)
 
+
+---
+
+## [AUTO] 2026-05-31 SmartGolf v21.0
+
+### 1차: 벤치마킹 분석
+
+**경쟁 앱**: 카카오골프예약, 골프존, 스마트스코어, Shot Tracer, Arccos
+
+| 열위점 | 경쟁앱 기준 | v21 해결 |
+|--------|-----------|---------|
+| Strokes Gained 분석 없음 | Arccos SG 통계 | ✅ SG Calculator (Tee/Approach/Short/Putting) |
+| 스코어 공유 불가 | 스마트스코어 소셜카드 | ✅ Canvas 600x380 PNG 공유카드 |
+| 퍼트 세부 분석 부재 | Arccos 퍼트 히트맵 | ✅ 18홀 퍼트트래커 (1퍼트/3퍼트 분석) |
+| 라운드 비교 기능 없음 | 스마트스코어 비교뷰 | ✅ 라운드 A vs B 델타 비교 |
+| 예약 딥링크 없음 | 카카오골프 예약 | ✅ 5개 플랫폼 딥링크 생성 |
+| 골프 용어사전 없음 | 골프존 아카데미 | ✅ 100개 용어 검색+펼치기 |
+| 체크리스트 없음 | FightCamp 준비 리스트 | ✅ 10항목 프리라운드 체크리스트 |
+| 연습 계획 없음 | Arccos 연습 추적 | ✅ 7요일 주간 연습 플래너 |
+| 퀴즈 갱신 필요 | 자체 기준 | ✅ Golf IQ v6 (15문항 SG/핸디캡/규칙) |
+| 업적 부족 | 자체 기준 | ✅ 12개 추가 (80→92) |
+
+### 2차: 개발팀 투입 내역
+
+**v21_patch.js**: 신규 (1095줄 ~65KB, 자기완결형 IIFE 패치 모듈)
+
+#### 프론트엔드
+- 9개 모달 오버레이 (공통 디자인 시스템 v21)
+- 반응형 그리드 (v21-grid2/3/4, 520px 이하 단일 컬럼)
+- 다크모드 완전 지원 (CSS 변수 기반)
+- 탭 인터페이스 (퍼트트래커 3탭: 기록/통계/이력)
+
+#### 백엔드/로직
+- **Strokes Gained Calculator**: FIR/GIR/Putts/Scrambles 기반 SG 4영역 분석
+  - Tee-to-Green, Approach, Short Game, Putting 각각 계산
+  - Bogey Golfer 기준 baseline 대비 차이 계산
+  - 수동 입력 + 사후분석 데이터 연동
+- **Per-Hole Putt Tracker**: 18홀 개별 퍼트수 입력/저장/통계
+  - 홀별 평균 히트맵 (색상 코딩: 녹/황/적)
+  - 1퍼트 비율, 3퍼트 비율 자동 계산
+- **Round Comparison**: 2라운드 선택 → 6항목 델타 분석
+- **Booking Deep-Link**: 5개 플랫폼 (네이버/카카오/골프존/스마트스코어/구글)
+
+#### 콘텐츠 제작
+- **Golf Dictionary**: 100개 골프 용어 (한/영/정의, 검색 필터)
+- **Golf IQ v6**: 15문항 (SG/핸디캡/딩플/스틱프미터/나쏘/규칙통합)
+- **Pre-Round Checklist**: 10항목 (스윙연습~멘탈준비)
+- **Weekly Planner**: 7요일 템플릿 (레인지/칩핑/피지컬/퍼팅/전략)
+
+#### 비주얼/캔버스
+- **Score Share Card**: Canvas 600x380 그래디언트 + 4통계카드 + 스코어차트 + SG바
+  - PNG 다운로드 + 클립보드 복사
+  - 라인차트 (최근 10라운드 추이)
+
+#### 오디오
+- **SFX 12종 추가 (80→92)**: sg_calc, sg_positive, sg_negative, share_card, putt_track, putt_1, compare, booking, dict_open, checklist, planner, quiz21
+
+#### 업적
+- **12개 추가 (80→92)**: sg_analyst, share_master, putt_tracker, putt_master, one_putt_king, round_compare, booking_user, dict_scholar, prep_ready, plan_setter, quiz_v6_pass, all_rounder_v21
+
+#### 키보드 단축키 (+9종)
+- Shift+G (SG분석), Shift+C (공유카드), Shift+T (퍼트), Shift+R (비교)
+- Shift+B (예약), Shift+V (사전), Shift+K (체크리스트), Shift+J (플래너), Shift+I (퀴즈)
+
+### 3차: 품질검증 결과
+
+| 항목 | 결과 |
+|------|------|
+| JS 문법 (v21_patch.js) | ✅ PASS |
+| JS 문법 (sw.js) | ✅ PASS |
+| JSON 검증 (manifest.json) | ✅ PASS |
+| 괄호 밸런스 () | ✅ 0 |
+| 괄호 밸런스 {} | ✅ 0 |
+| 괄호 밸런스 [] | ✅ 0 |
+| HTML div 밸런스 | ✅ 248/248 |
+| 외부 CDN | ✅ 0건 (허용 CDN 외) |
+| 개인정보 | ✅ 0건 |
+| v21 스크립트 태그 | ✅ 포함됨 |
+| SW 캐시 | ✅ v24로 갱신 |
+
