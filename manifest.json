@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, AI맞춤추천, 4인그룹스코어링(스킨스+나쏘), 코스플라이오버SVG9홀, 샷디스퍼전분석Canvas, 클럽피팅가이드8항목, 캐디AI노트, 그린스피드8단계, 포토갤러리, 시즌리뷰대시보드, Golf IQ v5, 업적80개, SFX80종",
+  "description": "전국 590개 골프장 검색, AI맞춤추천, 퍼팅시뮬레이터Canvas, 클럽추천AI(바람+경사+라이보정), 스윙체크리스트12항목, 코스매니지먼트9홀, GIR/FIR트래커, 골프피트니스12종, 페이스트래커18홀, Golf IQ v6, 업적92개, SFX92종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -19,6 +19,8 @@
     { "name": "Shot Dispersion", "url": "./index.html#dispersion", "description": "샷 디스퍼전 분석" },
     { "name": "Club Fitting", "url": "./index.html#fitting", "description": "클럽 피팅 가이드 8항목" },
     { "name": "Caddie AI", "url": "./index.html#caddie", "description": "캐디 AI 노트" },
-    { "name": "Green Speed", "url": "./index.html#green", "description": "그린 스피드 가이드 8단계" }
+    { "name": "Green Speed", "url": "./index.html#green", "description": "그린 스피드 가이드 8단계" },
+    { "name": "Putting Simulator", "url": "./index.html#putt", "description": "퍼팅 시뮬레이터" },
+    { "name": "Club AI", "url": "./index.html#clubai", "description": "클럽 추천 AI" }
   ]
 }
