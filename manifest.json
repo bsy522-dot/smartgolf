@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, AI맞춤추천, 라운드사후분석, 바람전략가이드8종, 골프드레스코드8종, 코스레이팅슬로프계산기, 벌타분석트래커, 동반자관리, 골프마일리지10레벨, 명예의전당, Golf IQ v4, 샷히트맵, 에티켓30, 프로스윙10인, 멘탈코칭, 업적68개, SFX68종",
+  "description": "전국 590개 골프장 검색, AI맞춤추천, 4인그룹스코어링(스킨스+나쏘), 코스플라이오버SVG9홀, 샷디스퍼전분석Canvas, 클럽피팅가이드8항목, 캐디AI노트, 그린스피드8단계, 포토갤러리, 시즌리뷰대시보드, Golf IQ v5, 업적80개, SFX80종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -14,11 +14,11 @@
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ],
   "shortcuts": [
-    { "name": "Post-Round Analysis", "url": "./index.html#postround", "description": "라운드 사후 분석" },
-    { "name": "Wind Strategy", "url": "./index.html#wind", "description": "바람 전략 가이드 8종" },
-    { "name": "Hall of Fame", "url": "./index.html#hof", "description": "명예의 전당" },
-    { "name": "Golf Mileage", "url": "./index.html#mileage", "description": "골프 마일리지 레벨업" },
-    { "name": "Course Rating Calc", "url": "./index.html#rating", "description": "코스레이팅 슬로프 계산기" },
-    { "name": "Penalty Tracker", "url": "./index.html#penalty", "description": "벌타 분석 트래커" }
+    { "name": "Group Scorecard", "url": "./index.html#group", "description": "4인 그룹 스코어링 + 스킨스 + 나쏘" },
+    { "name": "Course Flyover", "url": "./index.html#flyover", "description": "코스 플라이오버 SVG 9홀" },
+    { "name": "Shot Dispersion", "url": "./index.html#dispersion", "description": "샷 디스퍼전 분석" },
+    { "name": "Club Fitting", "url": "./index.html#fitting", "description": "클럽 피팅 가이드 8항목" },
+    { "name": "Caddie AI", "url": "./index.html#caddie", "description": "캐디 AI 노트" },
+    { "name": "Green Speed", "url": "./index.html#green", "description": "그린 스피드 가이드 8단계" }
   ]
 }
