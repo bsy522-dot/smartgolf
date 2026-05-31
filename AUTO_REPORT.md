@@ -2,6 +2,88 @@
 
 ---
 
+## [AUTO] 2026-05-31 smartgolf v21.0 - 퍼팅시뮬레이터Canvas+클럽추천AI(바람+경사+라이보정)+스윙체크리스트12항목+코스매니지먼트9홀+GIR/FIR트래커+골프피트니스12종+페이스트래커18홀+Golf IQ v6 15문항+업적12추가(80→92)+SFX12종(80→92)
+
+### 1차: 벤치마킹 분석
+
+**경쟁앱**: 카카오골프예약, 골프존, 스마트스코어, Arccos Caddie, Golfshot
+
+| 기능 | 경쟁앱 현황 | SmartGolf v20 상태 | v21 목표 |
+|------|------------|-------------------|---------|
+| 퍼팅 연습 | Arccos 퍼팅 분석, PuttView 시뮬 | 미지원 | Canvas 퍼팅 시뮬+브레이크+통계 |
+| 클럽 추천 | Arccos AI 클럽 추천 (유료) | 클럽피팅가이드만 | 거리+바람+경사+라이 4중보정 AI |
+| 스윙 체크 | Golfshot 스윙 팁 | 스윙분석노트북만 | 12항목 인터랙티브 체크리스트 |
+| 코스 전략 | Arccos 코스별 추천 (유료) | 코스공략노트만 | 9홀 상세 전략+위험요소+팁 |
+| GIR/FIR | 스마트스코어 GIR 통계 | 미지원 | 18홀 GIR + 14홀 FIR + 히스토리 |
+| 골프 피트니스 | FightCamp식 운동루틴 | 스트레칭12종만 | 12종 근력/유연성/균형 루틴 |
+| 페이스 트래커 | 골프존 라운드 시간표시 | 라운드타임라인만 | 실시간 타이머+홀별시간+SVG링 |
+| 골프 퀴즈 | 없음 | Golf IQ v5 | v6 15문항 (에임포인트/X팩터/플럽라이 등) |
+
+### 2차: 개발 (v21_patch.js - 1120줄 ~73KB)
+
+**신규 기능 8종:**
+
+1. **퍼팅 시뮬레이터** (Shift+P) - Canvas 500x380 퍼팅 그린
+   - 거리 1-15m 조절, 좌/직선/우 브레이크 설정
+   - 클릭/터치로 방향+파워 설정, 브레이크 보정 적용
+   - 성공/실패 통계, 연속 성공 기록, 30개 궤적 표시
+2. **클럽 추천 AI** (Shift+C) - 14종 클럽 데이터베이스
+   - 목표 거리 10-280m 슬라이더 실시간 추천
+   - 4중 조건 보정: 바람(역풍+10%/순풍-10%), 라이(러프-15%/벙커-30%), 경사(오르막+8%/내리막-8%)
+   - 적합도 프로그레스 바, 카테고리별 색상 구분
+3. **스윙 체크리스트** (Shift+L) - 12항목 4카테고리
+   - 셋업(4): 그립/스탠스/얼라인먼트/볼포지션
+   - 스윙(4): 테이크어웨이/백스윙탑/다운스윙전환/임팩트
+   - 피니시(1): 피니시자세
+   - 리듬(2): 템포체크/호흡체크
+   - 진행률 프로그레스 바, 초기화 기능
+4. **코스 매니지먼트** (Shift+M) - 9홀 상세 전략
+   - 홀별: 전략/팁/위험요소 3종 정보
+   - PAR/야드 뱃지, 좌/우 OB/워터/벙커 위험 표시
+5. **GIR/FIR 트래커** (Shift+J) - 18홀 GIR + 14홀 FIR
+   - 3상태 토글 (미입력/적중/미스), 색상 구분
+   - 퍼센티지 자동 계산, 라운드 저장/히스토리 50건
+6. **골프 피트니스** (Shift+W) - 12종 운동
+   - 힙로테이션/토소로테이션/스쿼트/플랭크/어깨스트레칭/런지/밴드풀어파트/햄스트링컬/데드버그/카프레이즈/버드독/넥스트레칭
+   - 세트/횟수, 타겟 근육 표시, 일별 진행률 추적
+7. **페이스 트래커** (Shift+T) - 실시간 라운드 타이머
+   - SVG 원형 프로그레스 링, 목표 4시간 대비 표시
+   - 홀별 시간 기록, 페이스 양호/느림 상태 표시
+   - 18홀 완주 시 자동 정지 + 업적 해금
+8. **Golf IQ v6** (Shift+Q) - 15문항 4지선다 퀴즈
+   - 에임포인트리딩/레이업/프리샷루틴/스트로크게인드/침묵의룰/바운스각도/버디퍼팅/티업하이트/레이트히트/X팩터/플럽라이/코스레이팅vs슬로프/ESA/볼마크라인
+
+**추가:**
+- 업적 12개 추가 (80→92): putt_10/putt_streak5/club_used/checklist_all/strategy_view/gir_50/fir_50/fitness_all/pace_18/pace_under4h/quiz_s/all_rounder
+- SFX 12종 추가 (80→92): putt_hit/putt_hole/club_select/checklist_check/strategy_open/gir_toggle/fitness_start/pace_tick/pace_alert/quiz_correct_v6/quiz_wrong_v6/achievement_v21
+- 키보드 단축키 +8종 (Shift+P/C/L/M/J/W/T/Q)
+- 퀵 액션 버튼 8종 자동 삽입
+
+### 3차: 품질 검증
+
+| 항목 | 결과 |
+|------|------|
+| JS 문법 (node -c) | PASS |
+| 괄호 () 균형 | 796/796 PASS |
+| 중괄호 {} 균형 | 357/357 PASS |
+| 대괄호 [] 균형 | 121/121 PASS |
+| 외부 CDN (금지) | 0건 PASS |
+| 개인정보 노출 | 0건 PASS (@keyframes/@media만 매칭) |
+| HTML div 균형 | 248/248 PASS |
+| manifest.json 유효성 | valid JSON PASS |
+| v21_patch.js 스크립트 태그 | index.html 1건 PASS |
+| sw.js v21_patch.js 캐시 | ASSETS+scripts 2건 PASS |
+| localStorage 키 충돌 | sg_putt_stats/sg_club_conditions/sg_swing_checklist/sg_gir_data/sg_gir_history/sg_fitness_done/sg_quiz_v6/sg_achievements_v21 고유 |
+
+### 4차: 인프라
+
+- v21_patch.js: 1120줄 신규 생성 (~73KB)
+- sw.js: v23 → v24 (v21_patch.js PRECACHE + 자동주입)
+- index.html: v21_patch.js 스크립트 태그, SEO v21.0 갱신 (title/desc/OG/Twitter/keywords +39개)
+- manifest.json: v21.0 설명 + shortcuts +2종 (Putting Simulator/Club AI)
+
+---
+
 ## [AUTO] 2026-05-31 smartgolf v20.0 - 4인그룹스코어링(스킨스+나쏘)+코스플라이오버SVG9홀+샷디스퍼전분석Canvas+클럽피팅가이드8항목+캐디AI노트9홀+그린스피드가이드8단계+포토갤러리+시즌리뷰대시보드+Golf IQ v5 15문항+업적12추가(68→80)+SFX12종(68→80)
 
 ### 1차: 벤치마킹 분석
