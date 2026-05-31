@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, AI맞춤추천, 4인그룹스코어링(스킨스+나쏘), 코스플라이오버SVG9홀, 샷디스퍼전분석Canvas, 클럽피팅가이드8항목, 캐디AI노트, 그린스피드8단계, 포토갤러리, 시즌리뷰대시보드, Golf IQ v5, 업적80개, SFX80종",
+  "description": "전국 590개 골프장 검색, Strokes Gained 분석기, 스코어공유카드Canvas, 퍼트트래커18홀, 라운드비교뷰, 예약딥링크5플랫폼, 골프용어사전100선, 프리라운드체크리스트, 주간연습플래너, Golf IQ v6, 업적92개, SFX92종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -14,11 +14,11 @@
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ],
   "shortcuts": [
-    { "name": "Group Scorecard", "url": "./index.html#group", "description": "4인 그룹 스코어링 + 스킨스 + 나쏘" },
-    { "name": "Course Flyover", "url": "./index.html#flyover", "description": "코스 플라이오버 SVG 9홀" },
-    { "name": "Shot Dispersion", "url": "./index.html#dispersion", "description": "샷 디스퍼전 분석" },
-    { "name": "Club Fitting", "url": "./index.html#fitting", "description": "클럽 피팅 가이드 8항목" },
-    { "name": "Caddie AI", "url": "./index.html#caddie", "description": "캐디 AI 노트" },
-    { "name": "Green Speed", "url": "./index.html#green", "description": "그린 스피드 가이드 8단계" }
+    { "name": "Strokes Gained", "url": "./index.html#sg", "description": "Strokes Gained 분석기" },
+    { "name": "Score Share Card", "url": "./index.html#share", "description": "스코어 공유 카드 생성" },
+    { "name": "Putt Tracker", "url": "./index.html#putts", "description": "퍼트 트래커 18홀" },
+    { "name": "Round Compare", "url": "./index.html#compare", "description": "라운드 비교 뷰" },
+    { "name": "Golf Dictionary", "url": "./index.html#dict", "description": "골프 용어사전 100선" },
+    { "name": "Golf IQ v6", "url": "./index.html#quiz", "description": "Golf IQ v6 퀴즈 15문항" }
   ]
 }
