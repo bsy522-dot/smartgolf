@@ -1,9 +1,9 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, AI맞춤추천, WHS핸디캡계산기, 코스1:1비교, 골프퀴즈20문, 일일골프팁, 연속출석, 업적30종, 공유프로필카드, 골프역사연표, 스코어트렌드차트, 연습메모, 통계대시보드, 골프룰가이드25+, 라운드공유카드, 피트니스워밍업, 코스날씨상세, 즐겨찾기폴더, 용어사전80+, 오늘어디갈까, 홀별스코어카드, 클럽거리관리, 동반자관리, 라운딩체크리스트, 레이더차트비교, 가성비분석, GPS거리계산, 코스공략18홀, 스윙다이어리, 그린리딩가이드, 장비추천시스템, 토너먼트모드, 멘탈코칭, 에티켓25, 계절컨디션, 라운드타임라인, 효과음",
+  "description": "전국 590개 골프장 검색, AI맞춤추천, 프리샷루틴빌더12단계, 클럽거리관리14종Canvas, 연습일지5종, 코스전략노트, 골프목표플래너4기간, 날씨클럽조정가이드, 골프영양가이드8종, Golf IQ v7 15문항, 업적104개, SFX104종",
   "lang": "ko",
-  "categories": ["sports", "lifestyle"],
+  "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f5f7f5",
@@ -12,5 +12,17 @@
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "shortcuts": [
+    { "name": "Group Scorecard", "url": "./index.html#group", "description": "4인 그룹 스코어링 + 스킨스 + 나쏘" },
+    { "name": "Course Flyover", "url": "./index.html#flyover", "description": "코스 플라이오버 SVG 9홀" },
+    { "name": "Shot Dispersion", "url": "./index.html#dispersion", "description": "샷 디스퍼전 분석" },
+    { "name": "Club Fitting", "url": "./index.html#fitting", "description": "클럽 피팅 가이드 8항목" },
+    { "name": "Caddie AI", "url": "./index.html#caddie", "description": "캐디 AI 노트" },
+    { "name": "Green Speed", "url": "./index.html#green", "description": "그린 스피드 가이드 8단계" },
+    { "name": "Putting Simulator", "url": "./index.html#putt", "description": "퍼팅 시뮬레이터 Canvas" },
+    { "name": "Live Scorecard", "url": "./index.html#live", "description": "18홀 라이브 스코어카드" },
+    { "name": "Pre-shot Routine", "url": "./index.html#routine", "description": "프리샷 루틴 빌더 12단계" },
+    { "name": "Club Distance", "url": "./index.html#clubdist", "description": "클럽 거리 관리 14종 Canvas" }
   ]
 }
