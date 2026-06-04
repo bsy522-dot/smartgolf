@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, AI맞춤추천, 프리샷루틴빌더12단계, 클럽거리관리14종Canvas, 연습일지5종, 코스전략노트, 골프목표플래너4기간, 날씨클럽조정가이드, 골프영양가이드8종, Golf IQ v7 15문항, 업적104개, SFX104종",
+  "description": "전국 590개 골프장 검색, AI맞춤추천, 골프용어사전150개, 스윙체크포인트6단계Canvas, 연습드릴12종, 라운드리마인더D-day, 퍼포먼스트렌드Canvas, 코스리뷰시스템, 골프명언, Golf IQ v8 15문항, 업적116개, SFX116종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -23,6 +23,9 @@
     { "name": "Putting Simulator", "url": "./index.html#putt", "description": "퍼팅 시뮬레이터 Canvas" },
     { "name": "Live Scorecard", "url": "./index.html#live", "description": "18홀 라이브 스코어카드" },
     { "name": "Pre-shot Routine", "url": "./index.html#routine", "description": "프리샷 루틴 빌더 12단계" },
-    { "name": "Club Distance", "url": "./index.html#clubdist", "description": "클럽 거리 관리 14종 Canvas" }
+    { "name": "Club Distance", "url": "./index.html#clubdist", "description": "클럽 거리 관리 14종 Canvas" },
+    { "name": "Golf Glossary", "url": "./index.html#glossary", "description": "골프 용어 사전 150개" },
+    { "name": "Swing Check", "url": "./index.html#swing", "description": "스윙 체크포인트 6단계" },
+    { "name": "Golf IQ v8", "url": "./index.html#iqv8", "description": "Golf IQ v8 15문항" }
   ]
 }
