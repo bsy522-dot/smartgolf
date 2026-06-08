@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 590개 골프장 검색, AI맞춤추천, 골프용어사전150개, 스윙체크포인트6단계Canvas, 연습드릴12종, 라운드리마인더D-day, 퍼포먼스트렌드Canvas, 코스리뷰시스템, 골프명언, Golf IQ v8 15문항, 업적116개, SFX116종",
+  "description": "전국 578개 골프장 검색, AI맞춤추천, 멘탈코칭10기법, 연습히트맵Canvas, 코스컨디션트래커, 핸디캡추이Canvas, 토너먼트3종, 스윙템포트레이너, 골프체력테스트6항목레이더, 샷패턴분석Canvas, Golf IQ v9 15문항, 업적128개, SFX128종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -26,6 +26,10 @@
     { "name": "Club Distance", "url": "./index.html#clubdist", "description": "클럽 거리 관리 14종 Canvas" },
     { "name": "Golf Glossary", "url": "./index.html#glossary", "description": "골프 용어 사전 150개" },
     { "name": "Swing Check", "url": "./index.html#swing", "description": "스윙 체크포인트 6단계" },
-    { "name": "Golf IQ v8", "url": "./index.html#iqv8", "description": "Golf IQ v8 15문항" }
+    { "name": "Golf IQ v8", "url": "./index.html#iqv8", "description": "Golf IQ v8 15문항" },
+    { "name": "Mental Coach", "url": "./index.html#mental", "description": "멘탈 코칭 10기법" },
+    { "name": "Tournament", "url": "./index.html#tournament", "description": "토너먼트 3종 모드" },
+    { "name": "Handicap Trend", "url": "./index.html#hcp", "description": "핸디캡 추이 분석 Canvas" },
+    { "name": "Golf IQ v9", "url": "./index.html#iqv9", "description": "Golf IQ v9 15문항" }
   ]
 }
