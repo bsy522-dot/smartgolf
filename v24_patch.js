@@ -10,6 +10,8 @@
 
   // ---------- CSS ----------
   const css = `
+/* v7_patch 중복 날씨위젯(현재 코스 날씨) 숨김 — v24 종합 날씨로 대체 */
+#modalBody div[style*="#e3f2fd"][style*="#bbdefb"]{display:none !important}
 .wx-section{margin-top:14px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
 .wx-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;background:linear-gradient(135deg,#1565c0,#42a5f5);color:#fff}
 .wx-head .wx-title{font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px}

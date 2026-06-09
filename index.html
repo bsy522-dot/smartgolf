@@ -1407,6 +1407,8 @@ function renderResults() {
     const ratingHTML = c.rt ? `<div class="card-rating"><i class="fas fa-star"></i> ${c.rt.toFixed(1)}</div>` : '';
     const sq = encodeURIComponent(c.n + ' 골프장');
     const bq = encodeURIComponent(c.n + ' 골프장 예약');
+    const cardBook = c.book || c.site || ('https://search.naver.com/search.naver?query=' + bq);
+    const cardBookDirect = !!(c.book || c.site);
 
     let priceHTML = '';
     if (c.weekday > 0 || c.weekend > 0) {
@@ -1452,7 +1454,7 @@ function renderResults() {
         ${c.p ? `<div class="card-info-row"><i class="fas fa-phone"></i> ${c.p}</div>` : ''}
       </div>
       <div class="card-actions">
-        <a class="card-btn btn-booking" href="https://search.naver.com/search.naver?query=${bq}" target="_blank" onclick="event.stopPropagation()"><i class="fas fa-calendar-check"></i> 예약</a>
+        <a class="card-btn btn-booking" href="${cardBook}" target="_blank" title="${cardBookDirect ? '공식 예약/홈페이지' : '예약 검색'}" onclick="event.stopPropagation()"><i class="fas fa-calendar-check"></i> 예약${cardBookDirect ? '<i class="fas fa-arrow-up-right-from-square" style="font-size:8px;margin-left:3px;opacity:.7"></i>' : ''}</a>
         <a class="card-btn btn-naver" href="https://map.naver.com/v5/search/${sq}" target="_blank" onclick="event.stopPropagation()"><i class="fas fa-map"></i> 지도</a>
         <a class="card-btn btn-kakao" href="https://map.kakao.com/?q=${sq}" target="_blank" onclick="event.stopPropagation()"><i class="fas fa-location-dot"></i> 카카오</a>
         ${c.p ? `<a class="card-btn btn-call" href="tel:${c.p.replace(/[^0-9-]/g,'')}" onclick="event.stopPropagation()"><i class="fas fa-phone"></i></a>` : ''}
