@@ -186,3 +186,32 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addFab);
   else addFab();
 })();
+
+/* ====================================================================
+ * v25 좌측 플로팅버튼(.sg25-fab 9종)이 모바일에서 콘텐츠를 가리는 문제 해결:
+ * 하단 가로 스크롤바로 재배치(기능 접근성 유지). v25가 비동기 생성하므로 폴링.
+ * ==================================================================== */
+(function () {
+  'use strict';
+  function tidyFabs() {
+    var fabs = document.querySelectorAll('.sg25-fab');
+    if (!fabs.length) return false;
+    var bar = document.getElementById('sg25FabBar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'sg25FabBar';
+      bar.style.cssText = 'position:fixed;left:6px;right:64px;bottom:58px;z-index:93;display:flex;gap:7px;padding:5px 4px;overflow-x:auto;-webkit-overflow-scrolling:touch';
+      document.body.appendChild(bar);
+    }
+    fabs.forEach(function (f) {
+      f.style.position = 'static';
+      f.style.flex = '0 0 auto';
+      f.style.left = ''; f.style.top = ''; f.style.right = ''; f.style.bottom = ''; f.style.margin = '0';
+      bar.appendChild(f);
+    });
+    return true;
+  }
+  var tries = 0;
+  var iv = setInterval(function () { if (tidyFabs() || ++tries > 25) clearInterval(iv); }, 350);
+  // 화면 회전/리사이즈 시 재정렬 보장은 불필요(이미 bar 안에 flow)
+})();
