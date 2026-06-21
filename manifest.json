@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 578개 골프장 검색, AI맞춤추천, 코스공략가이드18홀Canvas, 라운드플래너종합, 장비인벤토리관리, 골프통계마스터Canvas, AI스윙진단6단계48항목, 코스버킷리스트20곳, 시즌플래너월별목표, 18홀워크스루Canvas, Golf IQ v10 15문항, 업적140개, SFX140종",
+  "description": "전국 578개 골프장 검색, AI맞춤추천, 라운드리뷰AI분석기Canvas, 코스리뷰커뮤니티5점+해시태그, 골프파트너매칭4축Canvas, 라운드예산관리자CanvasPie, 클럽추천AI상황별14종, 그린리딩트레이너Canvas, 체력분석대시보드6축CanvasRadar, 골프루틴빌더8단계, Golf IQ v11 15문항, 업적152개, SFX152종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -14,23 +14,23 @@
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ],
   "shortcuts": [
+    { "name": "Round Review AI", "url": "./index.html#review27", "description": "라운드 리뷰 AI 분석기 Canvas" },
+    { "name": "Course Community", "url": "./index.html#community", "description": "코스 리뷰 커뮤니티 5점+해시태그" },
+    { "name": "Partner Match", "url": "./index.html#partner", "description": "골프 파트너 매칭 4축 Canvas" },
+    { "name": "Budget Manager", "url": "./index.html#budget27", "description": "라운드 예산 관리자 Pie Canvas" },
+    { "name": "Club AI", "url": "./index.html#clubai", "description": "클럽 추천 AI 상황별 14종" },
+    { "name": "Green Reading", "url": "./index.html#green27", "description": "그린 리딩 트레이너 Canvas" },
+    { "name": "Fitness Radar", "url": "./index.html#fitness27", "description": "체력 분석 6축 Radar Canvas" },
+    { "name": "Golf Routine", "url": "./index.html#routine", "description": "골프 루틴 빌더 8단계" },
+    { "name": "Golf IQ v11", "url": "./index.html#iqv11", "description": "Golf IQ v11 15문항" },
     { "name": "Course Strategy", "url": "./index.html#strategy", "description": "코스 공략 가이드 18홀 Canvas" },
-    { "name": "Round Planner", "url": "./index.html#planner", "description": "라운드 플래너 종합 (날씨+동반자+준비물)" },
+    { "name": "Round Planner", "url": "./index.html#planner", "description": "라운드 플래너 종합" },
     { "name": "Equipment Manager", "url": "./index.html#equip", "description": "장비 인벤토리 관리 14클럽" },
     { "name": "Stats Master", "url": "./index.html#stats", "description": "골프 통계 마스터 Canvas" },
     { "name": "Swing Diagnosis", "url": "./index.html#swing26", "description": "AI 스윙 진단 6단계 48항목" },
     { "name": "Bucket List", "url": "./index.html#bucket", "description": "코스 버킷리스트 20곳" },
-    { "name": "Season Planner", "url": "./index.html#season", "description": "시즌 플래너 월별 목표" },
-    { "name": "Hole Walkthrough", "url": "./index.html#walkthru", "description": "18홀 워크스루 Canvas" },
-    { "name": "Golf IQ v10", "url": "./index.html#iqv10", "description": "Golf IQ v10 15문항" },
     { "name": "Group Scorecard", "url": "./index.html#group", "description": "4인 그룹 스코어링 + 스킨스 + 나쏘" },
-    { "name": "Mental Coach", "url": "./index.html#mental", "description": "멘탈 코칭 10기법" },
     { "name": "Tournament", "url": "./index.html#tournament", "description": "토너먼트 3종 모드" },
-    { "name": "Handicap Trend", "url": "./index.html#hcp", "description": "핸디캡 추이 분석 Canvas" },
-    { "name": "Golf Glossary", "url": "./index.html#glossary", "description": "골프 용어 사전 150개" },
-    { "name": "Swing Check", "url": "./index.html#swing", "description": "스윙 체크포인트 6단계" },
-    { "name": "Putting Simulator", "url": "./index.html#putt", "description": "퍼팅 시뮬레이터 Canvas" },
-    { "name": "Live Scorecard", "url": "./index.html#live", "description": "18홀 라이브 스코어카드" },
-    { "name": "Club Distance", "url": "./index.html#clubdist", "description": "클럽 거리 관리 14종 Canvas" }
+    { "name": "Putting Simulator", "url": "./index.html#putt", "description": "퍼팅 시뮬레이터 Canvas" }
   ]
 }
