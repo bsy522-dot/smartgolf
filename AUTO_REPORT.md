@@ -1677,3 +1677,47 @@ v4.0 대비 10개 열위점 해소, 경쟁앱 대비 우위 확보
 - index.html: v22_patch.js 스크립트 태그, SEO v22.0 갱신, 버전표기 통일, 키워드 12종 추가
 - manifest.json: v22.0 기능 설명, 단축키 2종 추가 (Pre-shot Routine, Club Distance)
 - AUTO_REPORT.md: v22.0 리포트 추가
+
+---
+
+## [AUTO] 2026-06-21 smartgolf - v27.0 라운드리뷰AI분석기Canvas + 코스리뷰커뮤니티5점+해시태그 + 골프파트너매칭4축Canvas + 라운드예산관리자CanvasPie + 클럽추천AI상황별14종 + 그린리딩트레이너Canvas + 체력분석대시보드6축CanvasRadar + 골프루틴빌더8단계 + Golf IQ v11 15문항 + 업적+12(140→152) + SFX12종 + 키보드8종
+
+### 1차: 벤치마킹 (카카오골프예약/골프존/스마트스코어 대비)
+| 열위점 | 경쟁앱 | v27 해결 |
+|--------|--------|----------|
+| 라운드 후 분석 리포트 없음 | 스마트스코어: 라운드 리뷰 6영역 | 라운드 리뷰 AI 분석기 6영역 Canvas 바차트 + 등급 |
+| 코스 리뷰/평점 시스템 없음 | 카카오골프: 별점+리뷰+태그 | 코스 리뷰 커뮤니티 5점 + 3세부평가 + 해시태그 검색 |
+| 동반자 성향 분석 없음 | 골프존: 파트너 추천 | 파트너 매칭 4축 Radar Canvas (실력/매너/페이스/소통) |
+| 라운드 비용 분석 없음 | 카카오: 가격비교 | 라운드 예산 관리자 7항목 Pie Canvas + 이력 관리 |
+| 상황별 클럽 가이드 없음 | Arccos: 거리/상황별 추천 | 클럽 추천 AI 10상황 + 14종 클럽 차트 |
+| 그린 리딩 연습 없음 | 골프존: 그린 3D 슬로프 | 그린 리딩 트레이너 5홀 Canvas + 경사/속도 판단 |
+| 골프 체력 분석 없음 | FightCamp: 피트니스 Radar | 체력 분석 6축 Radar Canvas (유연/코어/파워/밸런스/지구력/회전) |
+| 워밍업 루틴 체크리스트 없음 | 스마트스코어: 워밍업 가이드 | 골프 루틴 빌더 8단계 40분 체크리스트 |
+| 고급 퀴즈 부족 | Arccos: 골프 지식 | Golf IQ v11 15문항 (SG/그린/클럽/멘탈) |
+| 하단 네비 겹침 (v26 바) | - | v27 하단바 z-index 조정, v26 바와 공존 |
+
+### 2차: 개발내역
+- **v27_patch.js**: 신규 (944줄 ~62KB, 자기완결형 IIFE 패치 모듈)
+- 라운드 리뷰 AI 분석기: 6영역 (드라이버/아이언/숏게임/퍼팅/코스전략/멘탈) Canvas 바차트, S~D등급, AI 팁 자동생성, 30건 이력
+- 코스 리뷰 커뮤니티: 5점 별점 + 3세부(코스관리/시설/가성비) + 텍스트리뷰 + 해시태그 + 검색 필터, 50건 보관
+- 골프 파트너 매칭: 4축 (실력/매너/페이스/소통) Radar Canvas 비교, 궁합도 % 산출
+- 라운드 예산 관리자: 7항목 (그린피/카트비/캐디피/식사/음료/연습장/기타) Canvas Pie 도넛차트, 비율% 표시, 20건 이력
+- 클럽 추천 AI: 10가지 상황 (넓은티샷/좁은티샷/맞바람/러프/오르막/내리막/벙커/그린사이드/나무아래/워터해저드) + 14종 클럽 차트
+- 그린 리딩 트레이너: Canvas 그린 시각화, 경사+속도+거리 표시, 5홀 에임 방향 퀴즈, 점수 추적
+- 체력 분석 대시보드: 6축 (유연성/코어/파워/밸런스/지구력/회전력) Radar Canvas, S~D등급, 약점별 운동 추천
+- 골프 루틴 빌더: 8단계 40분 프리라운드 워밍업 (스트레칭→퍼팅→숏아이언→미들→우드→드라이버→어프로치→실전시뮬), 체크리스트+프로그레스바
+- Golf IQ v11: 15문항 (스트로크게인드/에임포인트/잠정구/템포비율/라이각/WHS/맞바람/바운스/스팀프미터/프리샷루틴/드로우/컨시드/코스매니지먼트/로브샷/멘탈관리)
+- 업적 +12개 (140→152): review_first/review_10/community_first/community_5/partner_first/budget_first/budget_5/green_first/green_master/fitness_first/routine_first/routine_complete/quiz_v11_try/quiz_v11_perfect/v27_explorer
+- SFX 12종: review_open/review_submit/community_open/community_post/partner_open/partner_match/budget_open/budget_save/club_open/club_recommend/green_open/green_putt/fitness_open/fitness_record/routine_open/routine_complete/quiz_v11/quiz_correct11/achieve_v27
+- 키보드 Shift+R/V/P/B/C/G/F/T + ESC 닫기
+- 하단 스크롤 네비게이션 바 9종
+
+### 3차: 품질검증
+- JS 구문: PASS (node -c v27_patch.js)
+- 괄호 밸런스: ALL BALANCED (문자열 내 리터럴 제외 정확히 0)
+- HTML div: 248/248 BALANCED
+- CDN: 0건 (Leaflet/unpkg만 허용)
+- 개인정보: 0건
+- sw.js: v30→v31 (v27_patch.js PRECACHE + 자동주입)
+- manifest.json: v27.0 설명 + shortcuts 18종
+- index.html: v27.0 SEO 전면 갱신 (title/desc/keywords/OG/Twitter)
