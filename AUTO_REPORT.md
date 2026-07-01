@@ -1721,3 +1721,50 @@ v4.0 대비 10개 열위점 해소, 경쟁앱 대비 우위 확보
 - sw.js: v30→v31 (v27_patch.js PRECACHE + 자동주입)
 - manifest.json: v27.0 설명 + shortcuts 18종
 - index.html: v27.0 SEO 전면 갱신 (title/desc/keywords/OG/Twitter)
+
+---
+
+## [AUTO] 2026-07-01 SmartGolf v28.0
+
+### 벤치마크 대상: 카카오골프예약, 골프존, 스마트스코어
+
+| 기존 부족점 | 경쟁사 우수 기능 | v28 신규 구현 |
+|---|---|---|
+| 코스 레이아웃 시각화 없음 | 카카오골프: 홀별 코스맵 | 코스 스케치 18홀 Canvas (파/야드/형태/설명/팁) |
+| 라운드 타임라인 기능 없음 | 골프존: 라운드 일정 관리 | 라운드 타임라인 플래너 (워밍업/프론트9/브레이크/백9/쿨다운/19번홀) |
+| 날씨 기반 클럽 보정 없음 | 스마트스코어: 기온/바람 알림 | 날씨 클럽 보정 차트 Canvas (기온/바람/고도/습도 4축 보정) |
+| 티타임 예약 가이드 없음 | 카카오골프: 시간대별 가격 | 티타임 어시스턴트 (시즌별/요일별 가격그리드+혼잡도바) |
+| 골프 소셜 기능 없음 | 골프존: 커뮤니티 피드 | 골프 소셜 피드 (라운드/연습/업적/팁/질문 5종 포스트) |
+| 코스 비교 기능 없음 | 스마트스코어: 코스 리뷰 비교 | 코스 비교 레이더 5축 Canvas (난이도/컨디션/시설/가성비/접근성) |
+| 스윙 체크 간편 도구 없음 | 골프존: 스윙 자가 진단 | 스윙 체크 24항목 (어드레스/백스윙/다운스윙/피니시 4카테고리) |
+| 시즌 리포트 없음 | 스마트스코어: 시즌 요약 | 시즌 리포트 카드 Canvas (6통계+월별추이선+등급+PNG다운로드) |
+
+### 2차: 개발내역
+- **v28_patch.js**: 신규 (1095줄 ~75KB, 자기완결형 IIFE 패치 모듈, SGV28 네임스페이스)
+- 코스 스케치 18홀: 18홀 레이아웃 Canvas (각 홀 par/yards/shape/desc/tip), 탭 네비게이션 (전반/후반), 홀 선택 상세보기
+- 라운드 타임라인 플래너: 6구간 (워밍업30/프론트9-90/브레이크30/백9-90/쿨다운20/19번홀60) 시간조정 가능, 스택바 Canvas, 시간효율등급
+- 날씨 클럽 보정 차트: 기온/바람/고도/습도 4축 보정계수, 14클럽별 조정거리 바차트 Canvas, 라운드 전 전략 도구
+- 티타임 어시스턴트: 시즌별 추천 (봄/여름/가을/겨울), 가격 그리드 (주중새벽/주중오전/주중오후/주말새벽/주말오전/주말오후), 요일별 혼잡도바, 예약 팁
+- 골프 소셜 피드: 작성/피드/통계 3탭, 5종 포스트(라운드/연습/업적/팁/질문), 기분+점수 기록, 좋아요/댓글, 30건 이력
+- 코스 비교 레이더: 8개 샘플 코스, 5축(난이도/컨디션/시설/가성비/접근성) Radar Canvas, 코스 선택 비교 오버레이
+- 스윙 체크 24항목: 4카테고리(어드레스6/백스윙6/다운스윙6/피니시6), 체크박스 영구저장, 프로그레스바, 완료율%
+- 시즌 리포트 카드: 6통계(라운드수/평균타수/베스트/GIR%/FIR%/평균퍼트), 월별 스코어 추이 라인차트 Canvas, S~D등급, PNG 다운로드/클립보드 복사
+- Golf IQ v12: 15문항 (코스레이팅/슬로프레이팅/날씨클럽보정/FIR/스테이블포드/나쏘/캐리vs런/벙커전략/그린읽기/PGA투어평균/레이업/릴리스/피벗/피니시/멘탈이미지트레이닝)
+- 업적 +15개 (152→167): sketch_first/sketch_18/timeline_first/timeline_perfect/weather_first/weather_pro/tee_first/social_first/social_10/compare_first/compare_all/swingcheck_first/swingcheck_complete/season_first/season_download/quiz_v12_try/quiz_v12_perfect/v28_explorer
+- SFX 19종: sketch_open/sketch_hole/timeline_open/timeline_save/weather_open/weather_calc/tee_open/tee_select/social_open/social_post/social_like/compare_open/compare_select/swingcheck_open/swingcheck_toggle/season_open/season_download/quiz_v12/achieve_v28
+- 키보드 Shift+K/L/W/E/O/D/X/N + ESC 닫기
+- 하단 스크롤 네비게이션 바 9종 (코스스케치/타임라인/날씨보정/티타임/소셜/코스비교/스윙체크/시즌리포트/IQ v12)
+
+### 3차: 품질검증
+- JS 구문: PASS (node -c v28_patch.js)
+- CDN: 0건 (외부 URL 참조 없음, Leaflet/unpkg만 index.html에서 허용)
+- 개인정보: 0건
+- sw.js: v31→v32 (v28_patch.js PRECACHE + 자동주입)
+- manifest.json: v28.0 설명 + shortcuts +8종 (총 26종)
+- index.html: v28.0 SEO 전면 갱신 (title/desc/keywords/OG/Twitter + v28 키워드 추가)
+
+### 4차: 최종정리
+- 파일: v28_patch.js (1095줄, 75KB)
+- 커밋: [AUTO] 2026-07-01 smartgolf v28.0
+- 누적 현황: 전국 585개 골프장, 기능 26종+, 업적 167개, SFX 171종, Golf IQ v12
+

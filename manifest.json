@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 578개 골프장 검색, AI맞춤추천, 라운드리뷰AI분석기Canvas, 코스리뷰커뮤니티5점+해시태그, 골프파트너매칭4축Canvas, 라운드예산관리자CanvasPie, 클럽추천AI상황별14종, 그린리딩트레이너Canvas, 체력분석대시보드6축CanvasRadar, 골프루틴빌더8단계, Golf IQ v11 15문항, 업적152개, SFX152종",
+  "description": "전국 585개 골프장 검색, AI맞춤추천, 코스스케치18홀Canvas, 라운드타임라인플래너, 날씨클럽보정차트Canvas, 티타임어시스턴트, 골프소셜피드, 코스비교레이더5축Canvas, 스윙체크24항목, 시즌리포트카드Canvas, Golf IQ v12 15문항, 업적167개, SFX171종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -31,6 +31,14 @@
     { "name": "Bucket List", "url": "./index.html#bucket", "description": "코스 버킷리스트 20곳" },
     { "name": "Group Scorecard", "url": "./index.html#group", "description": "4인 그룹 스코어링 + 스킨스 + 나쏘" },
     { "name": "Tournament", "url": "./index.html#tournament", "description": "토너먼트 3종 모드" },
-    { "name": "Putting Simulator", "url": "./index.html#putt", "description": "퍼팅 시뮬레이터 Canvas" }
+    { "name": "Putting Simulator", "url": "./index.html#putt", "description": "퍼팅 시뮬레이터 Canvas" },
+    { "name": "Course Sketch", "url": "./index.html#sketch28", "description": "코스 스케치 18홀 Canvas" },
+    { "name": "Round Timeline", "url": "./index.html#timeline28", "description": "라운드 타임라인 플래너" },
+    { "name": "Weather Strategy", "url": "./index.html#weather28", "description": "날씨 클럽 보정 차트 Canvas" },
+    { "name": "Tee Assistant", "url": "./index.html#tee28", "description": "티타임 어시스턴트" },
+    { "name": "Golf Social", "url": "./index.html#social28", "description": "골프 소셜 피드" },
+    { "name": "Course Compare", "url": "./index.html#compare28", "description": "코스 비교 레이더 5축 Canvas" },
+    { "name": "Swing Check", "url": "./index.html#swingcheck28", "description": "스윙 체크 24항목" },
+    { "name": "Season Report", "url": "./index.html#season28", "description": "시즌 리포트 카드 Canvas" }
   ]
 }
