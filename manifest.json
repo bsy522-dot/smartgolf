@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 585개 골프장 검색, AI맞춤추천, 코스스케치18홀Canvas, 라운드타임라인플래너, 날씨클럽보정차트Canvas, 티타임어시스턴트, 골프소셜피드, 코스비교레이더5축Canvas, 스윙체크24항목, 시즌리포트카드Canvas, Golf IQ v12 15문항, 업적167개, SFX171종",
+  "description": "전국 585개 골프장 검색, AI맞춤추천, 핸디캡골트래커Canvas마일스톤, 라운드페이스타이머18홀, 클럽피팅어드바이저6축RadarCanvas, 골프여행플래너8지역Canvas, 코스컨디션로거6요소, 멘탈게임워크샵Canvas호흡, 샷메이킹가이드Canvas10종탄도, 골프에티켓마스터20시나리오, Golf IQ v13 15문항, 업적182개, SFX190종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -39,6 +39,14 @@
     { "name": "Golf Social", "url": "./index.html#social28", "description": "골프 소셜 피드" },
     { "name": "Course Compare", "url": "./index.html#compare28", "description": "코스 비교 레이더 5축 Canvas" },
     { "name": "Swing Check", "url": "./index.html#swingcheck28", "description": "스윙 체크 24항목" },
-    { "name": "Season Report", "url": "./index.html#season28", "description": "시즌 리포트 카드 Canvas" }
+    { "name": "Season Report", "url": "./index.html#season28", "description": "시즌 리포트 카드 Canvas" },
+    { "name": "Handicap Goal", "url": "./index.html#handicap29", "description": "핸디캡 골 트래커 Canvas 마일스톤" },
+    { "name": "Round Pace", "url": "./index.html#pace29", "description": "라운드 페이스 타이머 18홀" },
+    { "name": "Club Fitting", "url": "./index.html#fitting29", "description": "클럽 피팅 어드바이저 6축 Radar Canvas" },
+    { "name": "Golf Travel", "url": "./index.html#travel29", "description": "골프 여행 플래너 8지역 Canvas" },
+    { "name": "Course Condition", "url": "./index.html#condition29", "description": "코스 컨디션 로거 6요소" },
+    { "name": "Mental Game", "url": "./index.html#mental29", "description": "멘탈 게임 워크샵 Canvas 호흡" },
+    { "name": "Shot Making", "url": "./index.html#shot29", "description": "샷 메이킹 가이드 Canvas 10종 탄도" },
+    { "name": "Golf Etiquette", "url": "./index.html#etiquette29", "description": "골프 에티켓 마스터 20시나리오" }
   ]
 }

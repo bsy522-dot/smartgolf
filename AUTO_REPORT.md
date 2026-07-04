@@ -1768,3 +1768,52 @@ v4.0 대비 10개 열위점 해소, 경쟁앱 대비 우위 확보
 - 커밋: [AUTO] 2026-07-01 smartgolf v28.0
 - 누적 현황: 전국 585개 골프장, 기능 26종+, 업적 167개, SFX 171종, Golf IQ v12
 
+---
+
+## [AUTO] 2026-07-04 smartgolf - v29.0 핸디캡골트래커Canvas마일스톤+라운드페이스타이머18홀+클럽피팅어드바이저6축RadarCanvas+골프여행플래너8지역Canvas+코스컨디션로거6요소+멘탈게임워크샵Canvas호흡+샷메이킹가이드Canvas10종탄도+골프에티켓마스터20시나리오+Golf IQ v13 15문항+업적+15(167→182)+SFX19종+키보드8종
+
+### 1차: 벤치마킹 (카카오골프예약/골프존/스마트스코어 대비)
+| 열위점 | 경쟁앱 | v29 해결 |
+|--------|--------|----------|
+| 핸디캡 목표 관리 없음 | 스마트스코어: 핸디캡 추이 | 핸디캡골트래커 Canvas 마일스톤 차트 |
+| 라운드 페이스 관리 없음 | 카카오골프: 실시간 진행 | 라운드페이스타이머 18홀별 경과/평균 |
+| 클럽 피팅 가이드 없음 | 골프존: 피팅 서비스 연동 | 클럽피팅어드바이저 6축 Radar Canvas |
+| 골프 여행 정보 없음 | 카카오골프: 지역별 예약 | 골프여행플래너 8지역 Canvas 지도 |
+| 코스 컨디션 리포트 없음 | 스마트스코어: 코스 상태 | 코스컨디션로거 6요소 평가 |
+| 멘탈 트레이닝 없음 | 골프존: 멘탈 코칭 콘텐츠 | 멘탈게임워크샵 Canvas 호흡법 6기법 |
+| 샷 메이킹 가이드 없음 | 스마트스코어: 샷 분석 | 샷메이킹가이드 Canvas 10종 탄도 시각화 |
+| 골프 에티켓 교육 없음 | 경쟁앱 모두 없음(선점) | 골프에티켓마스터 20시나리오 퀴즈 |
+
+### 2차: 개발 내역 (v29_patch.js, 1195줄)
+**신규 기능 8종:**
+1. **핸디캡 골 트래커** - 핸디캡 기록/목표 설정, Canvas 마일스톤 차트, 추이 시각화, 7단계 레벨(입문→스크래치), SFX
+2. **라운드 페이스 타이머** - 18홀별 타이머, 홀 시작/종료, 평균 페이스 산출, 경과시간 표시, 지연 경고, SFX
+3. **클럽 피팅 어드바이저** - 6축 Radar Canvas(헤드스피드/스윙타입/구질/비거리/정확도/체력), 클럽 추천, 샤프트 추천, SFX
+4. **골프 여행 플래너** - 8지역(제주/강원/경기/충청/전라/경상/서울/부산) Canvas 카드, 추천 코스, 예산 가이드, SFX
+5. **코스 컨디션 로거** - 6요소(페어웨이/그린/벙커/러프/티박스/카트길) 5점 평가, 기록 저장, SFX
+6. **멘탈 게임 워크샵** - 6기법(호흡법/시각화/자기대화/집중력/감정조절/프리샷루틴) Canvas 가이드, 호흡 카운터, SFX
+7. **샷 메이킹 가이드** - 10종 샷(드로우/페이드/하이/로우/펀치/플롭/벙커/칩/피치/스팅어) Canvas 탄도 시각화, SFX
+8. **골프 에티켓 마스터** - 20시나리오 OX 퀴즈, 카테고리별(티샷/페어웨이/그린/매너/안전), 점수/해설, SFX
+
+**Golf IQ v13:** 15문항 (핸디캡/SG분석/스팀프미터/비거리/GIR/칼러웨이/분추간법/에임포인트/코스레이팅/포인트제/클럽비교/라운드페이스/대칭점/연습법/에티켓)
+**업적 +15종** (167→182): handicap_milestone/pace_under4h/pace_all18/fitting_complete/travel_all8/travel_first/condition_log5/condition_expert/mental_all6/mental_breathe10/shot_all10/shot_master/etiquette_perfect/etiquette_all20/iq_v13_perfect
+**SFX 19종:** hcp_record/hcp_milestone/pace_start/pace_tick/pace_complete/fitting_analyze/fitting_result/travel_select/travel_plan/condition_log/condition_save/mental_breathe/mental_complete/shot_select/shot_practice/etiquette_correct/etiquette_wrong/quiz_v13/achieve_v29
+**키보드 8종:** Shift+H(핸디캡)/P(페이스)/F(피팅)/T(여행)/L(컨디션)/M(멘탈)/S(샷)/E(에티켓)
+**하단 네비게이션:** 9버튼(⛳핸디캡/⏱페이스/🔧피팅/✈여행/📋컨디션/🧠멘탈/🎯샷/🤝에티켓/🧩IQ)
+**다크모드:** 전 기능 지원 (isDark() 헬퍼)
+**localStorage:** sg29_ 접두사, 핸디캡/페이스/컨디션/에티켓 데이터 분리 저장
+
+### 3차: 품질검증
+- JS 문법: `node -c v29_patch.js` 통과
+- 괄호 균형: () 828/828, {} 389/389, [] 86/86 모두 OK
+- CDN: 0건 (외부 URL 참조 없음, Leaflet/unpkg만 index.html에서 허용)
+- 개인정보: 0건
+- sw.js: v32→v33 (v29_patch.js PRECACHE + 자동주입)
+- manifest.json: v29.0 설명 + shortcuts +8종 (총 34종)
+- index.html: v29.0 SEO 전면 갱신 (title/desc/keywords/OG/Twitter + v29 키워드 추가)
+
+### 4차: 최종정리
+- 파일: v29_patch.js (1195줄)
+- 커밋: [AUTO] 2026-07-04 smartgolf v29.0
+- 누적 현황: 전국 585개 골프장, 기능 34종+, 업적 182개, SFX 190종, Golf IQ v13
+
