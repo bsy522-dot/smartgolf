@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smartgolf-v33';
+const CACHE_NAME = 'smartgolf-v34';
 const ASSETS = [
   './',
   './index.html',
@@ -28,6 +28,7 @@ const ASSETS = [
   './v27_patch.js',
   './v28_patch.js',
   './v29_patch.js',
+  './v30_patch.js',
   './courses_enriched.json',
   './manifest.json'
 ];
@@ -45,7 +46,7 @@ self.addEventListener('fetch', e => {
     e.respondWith(
       fetch(e.request).then(r => {
         return r.text().then(html => {
-          const scripts = ['features.js', 'v6_patch.js', 'v7_patch.js', 'v8_patch.js', 'v9_patch.js', 'v10_patch.js', 'v11_patch.js', 'v12_patch.js', 'v13_patch.js', 'v14_patch.js', 'v15_patch.js', 'v16_patch.js', 'v17_patch.js', 'v18_patch.js', 'v19_patch.js', 'v20_patch.js', 'v21_patch.js', 'v22_patch.js', 'v23_patch.js', 'v24_patch.js', 'v25_patch.js', 'v26_patch.js', 'v27_patch.js', 'v28_patch.js', 'v29_patch.js'];
+          const scripts = ['features.js', 'v6_patch.js', 'v7_patch.js', 'v8_patch.js', 'v9_patch.js', 'v10_patch.js', 'v11_patch.js', 'v12_patch.js', 'v13_patch.js', 'v14_patch.js', 'v15_patch.js', 'v16_patch.js', 'v17_patch.js', 'v18_patch.js', 'v19_patch.js', 'v20_patch.js', 'v21_patch.js', 'v22_patch.js', 'v23_patch.js', 'v24_patch.js', 'v25_patch.js', 'v26_patch.js', 'v27_patch.js', 'v28_patch.js', 'v29_patch.js', 'v30_patch.js'];
           scripts.forEach(s => {
             if (html.includes('</body>') && !html.includes(s)) {
               html = html.replace('</body>', '<script src="' + s + '" defer><\/script>\n</body>');

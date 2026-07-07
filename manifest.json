@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 585개 골프장 검색, AI맞춤추천, 핸디캡골트래커Canvas마일스톤, 라운드페이스타이머18홀, 클럽피팅어드바이저6축RadarCanvas, 골프여행플래너8지역Canvas, 코스컨디션로거6요소, 멘탈게임워크샵Canvas호흡, 샷메이킹가이드Canvas10종탄도, 골프에티켓마스터20시나리오, Golf IQ v13 15문항, 업적182개, SFX190종",
+  "description": "전국 585개 골프장 검색, AI맞춤추천, 스윙스피드존분석기Canvas14클럽x5존, 코스매니지먼트플래너Canvas18홀전략맵, 퍼팅브레이크시뮬Canvas3D경사, 라운드컨디션최적화Canvas6축Radar, 골프장날씨비교Canvas8코스3일, 프로샷라이브러리Canvas10프로12샷, 클럽헤드스피드트래커CanvasLine20세션, 시즌챌린지보드Canvas12미션, Golf IQ v14 15문항, 업적197개, SFX202종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -47,6 +47,14 @@
     { "name": "Course Condition", "url": "./index.html#condition29", "description": "코스 컨디션 로거 6요소" },
     { "name": "Mental Game", "url": "./index.html#mental29", "description": "멘탈 게임 워크샵 Canvas 호흡" },
     { "name": "Shot Making", "url": "./index.html#shot29", "description": "샷 메이킹 가이드 Canvas 10종 탄도" },
-    { "name": "Golf Etiquette", "url": "./index.html#etiquette29", "description": "골프 에티켓 마스터 20시나리오" }
+    { "name": "Golf Etiquette", "url": "./index.html#etiquette29", "description": "골프 에티켓 마스터 20시나리오" },
+    { "name": "Swing Speed Zone", "url": "./index.html#swingspeed30", "description": "스윙 스피드 존 분석기 14클럽 5축 Radar Canvas" },
+    { "name": "Course Mgmt", "url": "./index.html#coursemgmt30", "description": "코스 매니지먼트 플래너 18홀 전략맵 Canvas" },
+    { "name": "Putt Break 3D", "url": "./index.html#puttbreak30", "description": "퍼팅 그린 브레이크 시뮬레이터 3D Canvas" },
+    { "name": "Condition Radar", "url": "./index.html#condopt30", "description": "라운드 컨디션 최적화 6축 Radar Canvas" },
+    { "name": "Weather Compare", "url": "./index.html#weather30", "description": "골프장 날씨 비교 8코스 3일 Canvas" },
+    { "name": "Pro Shot Library", "url": "./index.html#proshots30", "description": "프로 샷 라이브러리 10프로 12샷 Canvas" },
+    { "name": "Head Speed", "url": "./index.html#headspeed30", "description": "클럽헤드 스피드 트래커 Line Canvas" },
+    { "name": "Season Challenge", "url": "./index.html#challenge30", "description": "시즌 챌린지 보드 12미션 Canvas" }
   ]
 }
