@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 585개 골프장 검색, AI맞춤추천, 스윙스피드존분석기Canvas14클럽x5존, 코스매니지먼트플래너Canvas18홀전략맵, 퍼팅브레이크시뮬Canvas3D경사, 라운드컨디션최적화Canvas6축Radar, 골프장날씨비교Canvas8코스3일, 프로샷라이브러리Canvas10프로12샷, 클럽헤드스피드트래커CanvasLine20세션, 시즌챌린지보드Canvas12미션, Golf IQ v14 15문항, 업적197개, SFX202종",
+  "description": "전국 585개 골프장 검색, AI맞춤추천, 라운드리플레이분석기Canvas18홀, 그린어택각도분석기Canvas, 페어웨이히트맵Canvas14클럽, 스코어분포벨커브Canvas, 파3전략시뮬Canvas, 멘탈에너지미터Canvas6축Radar, 미스샷패턴코렉터Canvas8종, 시즌목표달성트래커Canvas10목표, Golf IQ v15 15문항, 업적212개, SFX214종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -55,6 +55,14 @@
     { "name": "Weather Compare", "url": "./index.html#weather30", "description": "골프장 날씨 비교 8코스 3일 Canvas" },
     { "name": "Pro Shot Library", "url": "./index.html#proshots30", "description": "프로 샷 라이브러리 10프로 12샷 Canvas" },
     { "name": "Head Speed", "url": "./index.html#headspeed30", "description": "클럽헤드 스피드 트래커 Line Canvas" },
-    { "name": "Season Challenge", "url": "./index.html#challenge30", "description": "시즌 챌린지 보드 12미션 Canvas" }
+    { "name": "Season Challenge", "url": "./index.html#challenge30", "description": "시즌 챌린지 보드 12미션 Canvas" },
+    { "name": "Round Replay", "url": "./index.html#replay31", "description": "라운드 리플레이 분석기 18홀 Canvas" },
+    { "name": "Green Attack", "url": "./index.html#greenatk31", "description": "그린 어택 각도 분석기 Canvas" },
+    { "name": "Fairway Hitmap", "url": "./index.html#hitmap31", "description": "페어웨이 히트맵 14클럽 Canvas" },
+    { "name": "Score Bell Curve", "url": "./index.html#bellcurve31", "description": "스코어 분포 벨커브 Canvas" },
+    { "name": "Par3 Strategy", "url": "./index.html#par3sim31", "description": "파3홀 전략 시뮬레이터 Canvas" },
+    { "name": "Mental Meter", "url": "./index.html#mental31", "description": "멘탈 에너지 미터 6축 Radar Canvas" },
+    { "name": "Miss Corrector", "url": "./index.html#missfix31", "description": "미스샷 패턴 코렉터 8종 Canvas" },
+    { "name": "Goal Tracker", "url": "./index.html#goaltrack31", "description": "시즌 목표 달성 트래커 10목표 Canvas" }
   ]
 }
