@@ -2,6 +2,49 @@
 
 ---
 
+## [AUTO] 2026-07-14 smartgolf - v32.0 클럽퍼포먼스히트맵Canvas14x6_620x400 + 라운드비용최적화Canvas580x360 + 스윙템포메트로놈Canvas580x340 + 핸디캡코스매칭Canvas600x380 + 퍼팅성공확률계산기Canvas560x340 + 연습스트릭캘린더Canvas580x360 + 골프바디밸런스6축RadarCanvas560x360 + 나만의코스레시피Canvas600x380 + Golf IQ v16 15문항 + 업적+15(212->227) + SFX12종(214->226) + 키보드8종
+
+### 1차 벤치마킹 (카카오골프/골프존/스마트스코어 대비)
+| 열위점 | 경쟁앱 | 해결방법 |
+|--------|--------|----------|
+| 클럽별 상세 성능 시각화 없음 | 골프존 클럽분석 | 클럽퍼포먼스히트맵 14x6 Canvas |
+| 라운드 비용 관리 기능 없음 | 카카오골프 가계부 | 라운드비용최적화 도넛+바차트 Canvas |
+| 스윙 템포 측정 없음 | 골프존 스윙분석 | 스윙템포메트로놈 BPM Canvas |
+| 핸디캡 기반 코스 추천 없음 | 스마트스코어 추천 | 핸디캡코스매칭 티선택 Canvas |
+| 퍼팅 확률 통계 없음 | 아커스 퍼팅분석 | 퍼팅성공확률 PGA통계기반 Canvas |
+| 연습 습관 추적 없음 | 골프존 연습기록 | 연습스트릭캘린더 히트맵 Canvas |
+| 체력 자가진단 부족 | FightCamp 피트니스 | 골프바디밸런스 6축 Radar Canvas |
+| 코스 커스텀 설계 없음 | SimCity 빌더 | 나만의코스레시피 18홀 Canvas |
+
+### 2차 개발 (v32_patch.js, ~1000줄)
+- 클럽퍼포먼스히트맵: 14클럽(DR~LW) x 6지표(Distance/Accuracy/Consistency/Trajectory/Spin/Feel) 히트맵 Canvas 620x400, 셀클릭 점수조정, 최강/최약 클럽 자동분석
+- 라운드비용최적화: 6비용항목(Green Fee/Cart/Caddie/Food&Drink/Equipment/Other) 도넛차트+수평바 Canvas 580x360, 최적화 팁 자동생성
+- 스윙템포메트로놈: TAP기반 BPM 측정, 이상적 72BPM 기준선, 일관성 S~D등급, 30세션 라인차트 Canvas 580x340
+- 핸디캡코스매칭: HCP 0-36 슬라이더, 5종 티(Championship/Back/Middle/Senior/Forward) 추천, 전략 가이드 Canvas 600x380
+- 퍼팅성공확률계산기: PGA Tour 통계 기반, 거리/경사/그린스피드 3축, 성공확률 곡선 Canvas 560x340
+- 연습스트릭캘린더: 월별 히트맵, 6종 연습유형, 현재/최대 스트릭, 강도별 색상코딩 Canvas 580x360
+- 골프바디밸런스: 유연성/코어/하체/상체/밸런스/지구력 6축 Radar Canvas 560x360, 추천 테스트 자동생성
+- 나만의코스레시피: 18홀 커스텀 코스 설계, Par/Yards/Hazards 개별설정, 홀클릭 선택, 랜덤화 Canvas 600x380
+- Golf IQ v16: 15문항 (딤플수/매치플레이/래그퍼팅/로프트/컴프레션/벙커규칙/MOI/스크램블/PGA스윙속도/그레인/드라이버재질/클럽길이제한/스팀프미터12/스테이블포드/플라이어라이)
+- 업적 +15개 (212->227): Club Analyst/Budget Pro/Metronome Master/Course Matcher/Probability Guru/3-Day Streak/7-Day Warrior/Golf Athlete/Course Architect/IQ v16 Genius/IQ v16 Clear/Multi-Tooler/Expense Tracker/Rhythm Keeper/v32 Complete
+- SFX 12종 Web Audio API (club_perf/cost_open/cost_calc/tempo_tap/tempo_good/hcp_match/putt_calc/putt_hole/streak_log/body_scan/course_design/quiz_v16/achieve_v32)
+- 키보드 Shift+H/J/K/L/M/N/O/P
+
+### 3차 품질검증
+- JS Syntax: node -c PASS
+- 괄호 Balance: ALL BALANCED (1168/315/197)
+- CDN 참조: 0건 (Leaflet만 허용)
+- 개인정보: 0건
+- 하단 네비바 신규생성: 0건 (기존 sg30-bottom-bar에 append만)
+- 다크모드: CSS 변수 기반 자동 대응
+- 반응형: @media max-width:600px 대응
+
+### 4차 마무리
+- 파일: v32_patch.js(신규), index.html(SEO), sw.js(캐시v36), manifest.json(설명+shortcuts8종)
+- 총 shortcuts: 58종 (50+8)
+
+---
+
 ## [AUTO] 2026-07-11 smartgolf - v31.0 라운드리플레이분석기Canvas18홀560x340 + 그린어택각도분석기Canvas580x360 + 페어웨이히트맵Canvas14클럽600x380 + 스코어분포벨커브Canvas560x320 + 파3홀전략시뮬Canvas580x360 + 멘탈에너지미터Canvas6축Radar520x340 + 미스샷패턴코렉터Canvas8종580x380 + 시즌목표달성트래커Canvas10목표600x360 + Golf IQ v15 15문항 + 업적+15(197->212) + SFX12종(202->214) + 키보드8종
 
 ### 1차: 벤치마킹 (카카오골프예약/골프존/스마트스코어 대비)

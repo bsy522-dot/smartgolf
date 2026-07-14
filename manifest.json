@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 585개 골프장 검색, AI맞춤추천, 라운드리플레이분석기Canvas18홀, 그린어택각도분석기Canvas, 페어웨이히트맵Canvas14클럽, 스코어분포벨커브Canvas, 파3전략시뮬Canvas, 멘탈에너지미터Canvas6축Radar, 미스샷패턴코렉터Canvas8종, 시즌목표달성트래커Canvas10목표, Golf IQ v15 15문항, 업적212개, SFX214종",
+  "description": "전국 585개 골프장 검색, AI맞춤추천, 클럽퍼포먼스히트맵Canvas14x6, 라운드비용최적화Canvas, 스윙템포메트로놈Canvas, 핸디캡코스매칭Canvas, 퍼팅성공확률Canvas, 연습스트릭캘린더Canvas, 골프바디밸런스6축Radar, 나만의코스레시피Canvas, Golf IQ v16 15문항, 업적227개, SFX226종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -63,6 +63,14 @@
     { "name": "Par3 Strategy", "url": "./index.html#par3sim31", "description": "파3홀 전략 시뮬레이터 Canvas" },
     { "name": "Mental Meter", "url": "./index.html#mental31", "description": "멘탈 에너지 미터 6축 Radar Canvas" },
     { "name": "Miss Corrector", "url": "./index.html#missfix31", "description": "미스샷 패턴 코렉터 8종 Canvas" },
-    { "name": "Goal Tracker", "url": "./index.html#goaltrack31", "description": "시즌 목표 달성 트래커 10목표 Canvas" }
+    { "name": "Goal Tracker", "url": "./index.html#goaltrack31", "description": "시즌 목표 달성 트래커 10목표 Canvas" },
+    { "name": "Club Perf Heatmap", "url": "./index.html#clubperf32", "description": "클럽 퍼포먼스 히트맵 14x6 Canvas" },
+    { "name": "Round Cost", "url": "./index.html#roundcost32", "description": "라운드 비용 최적화 Canvas" },
+    { "name": "Swing Tempo", "url": "./index.html#tempo32", "description": "스윙 템포 메트로놈 Canvas" },
+    { "name": "HCP Match", "url": "./index.html#hcpmatch32", "description": "핸디캡 코스 매칭 Canvas" },
+    { "name": "Putt Probability", "url": "./index.html#puttprob32", "description": "퍼팅 성공 확률 계산기 Canvas" },
+    { "name": "Practice Streak", "url": "./index.html#streak32", "description": "연습 스트릭 캘린더 Canvas" },
+    { "name": "Body Balance", "url": "./index.html#bodybal32", "description": "골프 바디 밸런스 6축 Radar Canvas" },
+    { "name": "Course Recipe", "url": "./index.html#recipe32", "description": "나만의 코스 레시피 18홀 Canvas" }
   ]
 }
