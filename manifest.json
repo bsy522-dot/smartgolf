@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 585개 골프장 검색, AI맞춤추천, 클럽퍼포먼스히트맵Canvas14x6, 라운드비용최적화Canvas, 스윙템포메트로놈Canvas, 핸디캡코스매칭Canvas, 퍼팅성공확률Canvas, 연습스트릭캘린더Canvas, 골프바디밸런스6축Radar, 나만의코스레시피Canvas, Golf IQ v16 15문항, 업적227개, SFX226종",
+  "description": "전국 585개 골프장 검색, AI맞춤추천, 클럽수명트래커Canvas, 라운드난이도예측Canvas, 훈련주기화플래너Canvas, 샷궤적시뮬레이터Canvas, 코스컨디션전략매트릭스Canvas, 라운드페이스비교Canvas, 클럽세트옵티마이저Canvas, 라운드리듬분석기Canvas, Golf IQ v17 15문항, 업적242개, SFX239종",
   "lang": "ko",
   "categories": ["sports", "lifestyle", "education"],
   "start_url": "./index.html",
@@ -71,6 +71,14 @@
     { "name": "Putt Probability", "url": "./index.html#puttprob32", "description": "퍼팅 성공 확률 계산기 Canvas" },
     { "name": "Practice Streak", "url": "./index.html#streak32", "description": "연습 스트릭 캘린더 Canvas" },
     { "name": "Body Balance", "url": "./index.html#bodybal32", "description": "골프 바디 밸런스 6축 Radar Canvas" },
-    { "name": "Course Recipe", "url": "./index.html#recipe32", "description": "나만의 코스 레시피 18홀 Canvas" }
+    { "name": "Course Recipe", "url": "./index.html#recipe32", "description": "나만의 코스 레시피 18홀 Canvas" },
+    { "name": "Club Life", "url": "./index.html#clublife33", "description": "클럽 수명 트래커 Canvas" },
+    { "name": "Round Difficulty", "url": "./index.html#difficulty33", "description": "라운드 난이도 예측 Canvas" },
+    { "name": "Training Period", "url": "./index.html#training33", "description": "훈련 주기화 플래너 Canvas" },
+    { "name": "Shot Trajectory", "url": "./index.html#trajectory33", "description": "샷 궤적 시뮬레이터 Canvas" },
+    { "name": "Condition Matrix", "url": "./index.html#condmatrix33", "description": "코스 컨디션 전략 매트릭스 Canvas" },
+    { "name": "Pace Compare", "url": "./index.html#pacecomp33", "description": "라운드 페이스 비교 Canvas" },
+    { "name": "Club Set Opt", "url": "./index.html#clubset33", "description": "클럽 세트 옵티마이저 Canvas" },
+    { "name": "Round Rhythm", "url": "./index.html#rhythm33", "description": "라운드 리듬 분석기 Canvas" }
   ]
 }
