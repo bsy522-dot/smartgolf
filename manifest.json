@@ -1,84 +1,400 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 585개 골프장 검색, AI맞춤추천, 클럽수명트래커Canvas, 라운드난이도예측Canvas, 훈련주기화플래너Canvas, 샷궤적시뮬레이터Canvas, 코스컨디션전략매트릭스Canvas, 라운드페이스비교Canvas, 클럽세트옵티마이저Canvas, 라운드리듬분석기Canvas, Golf IQ v17 15문항, 업적242개, SFX239종",
+  "description": "전국 585개 골프장 검색, AI맞춤추천, 티샷성공률분석기Canvas620x380, 라운드감정트래커Canvas580x360, 파세이브분석기Canvas620x400, 골프시즌캘린더Canvas620x380, 코스공략노트패드Canvas600x360, 클럽거리히스토그램Canvas620x400, 라운드에너지매니저Canvas580x360, 핸디캡시뮬레이터Canvas600x380, Golf IQ v18 15문항, 업적257개, SFX252종",
   "lang": "ko",
-  "categories": ["sports", "lifestyle", "education"],
+  "categories": [
+    "sports",
+    "lifestyle",
+    "education"
+  ],
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f5f7f5",
   "theme_color": "#1a7a3a",
   "orientation": "portrait-primary",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ],
   "shortcuts": [
-    { "name": "Round Review AI", "url": "./index.html#review27", "description": "라운드 리뷰 AI 분석기 Canvas" },
-    { "name": "Course Community", "url": "./index.html#community", "description": "코스 리뷰 커뮤니티 5점+해시태그" },
-    { "name": "Partner Match", "url": "./index.html#partner", "description": "골프 파트너 매칭 4축 Canvas" },
-    { "name": "Budget Manager", "url": "./index.html#budget27", "description": "라운드 예산 관리자 Pie Canvas" },
-    { "name": "Club AI", "url": "./index.html#clubai", "description": "클럽 추천 AI 상황별 14종" },
-    { "name": "Green Reading", "url": "./index.html#green27", "description": "그린 리딩 트레이너 Canvas" },
-    { "name": "Fitness Radar", "url": "./index.html#fitness27", "description": "체력 분석 6축 Radar Canvas" },
-    { "name": "Golf Routine", "url": "./index.html#routine", "description": "골프 루틴 빌더 8단계" },
-    { "name": "Golf IQ v11", "url": "./index.html#iqv11", "description": "Golf IQ v11 15문항" },
-    { "name": "Course Strategy", "url": "./index.html#strategy", "description": "코스 공략 가이드 18홀 Canvas" },
-    { "name": "Round Planner", "url": "./index.html#planner", "description": "라운드 플래너 종합" },
-    { "name": "Equipment Manager", "url": "./index.html#equip", "description": "장비 인벤토리 관리 14클럽" },
-    { "name": "Stats Master", "url": "./index.html#stats", "description": "골프 통계 마스터 Canvas" },
-    { "name": "Swing Diagnosis", "url": "./index.html#swing26", "description": "AI 스윙 진단 6단계 48항목" },
-    { "name": "Bucket List", "url": "./index.html#bucket", "description": "코스 버킷리스트 20곳" },
-    { "name": "Group Scorecard", "url": "./index.html#group", "description": "4인 그룹 스코어링 + 스킨스 + 나쏘" },
-    { "name": "Tournament", "url": "./index.html#tournament", "description": "토너먼트 3종 모드" },
-    { "name": "Putting Simulator", "url": "./index.html#putt", "description": "퍼팅 시뮬레이터 Canvas" },
-    { "name": "Course Sketch", "url": "./index.html#sketch28", "description": "코스 스케치 18홀 Canvas" },
-    { "name": "Round Timeline", "url": "./index.html#timeline28", "description": "라운드 타임라인 플래너" },
-    { "name": "Weather Strategy", "url": "./index.html#weather28", "description": "날씨 클럽 보정 차트 Canvas" },
-    { "name": "Tee Assistant", "url": "./index.html#tee28", "description": "티타임 어시스턴트" },
-    { "name": "Golf Social", "url": "./index.html#social28", "description": "골프 소셜 피드" },
-    { "name": "Course Compare", "url": "./index.html#compare28", "description": "코스 비교 레이더 5축 Canvas" },
-    { "name": "Swing Check", "url": "./index.html#swingcheck28", "description": "스윙 체크 24항목" },
-    { "name": "Season Report", "url": "./index.html#season28", "description": "시즌 리포트 카드 Canvas" },
-    { "name": "Handicap Goal", "url": "./index.html#handicap29", "description": "핸디캡 골 트래커 Canvas 마일스톤" },
-    { "name": "Round Pace", "url": "./index.html#pace29", "description": "라운드 페이스 타이머 18홀" },
-    { "name": "Club Fitting", "url": "./index.html#fitting29", "description": "클럽 피팅 어드바이저 6축 Radar Canvas" },
-    { "name": "Golf Travel", "url": "./index.html#travel29", "description": "골프 여행 플래너 8지역 Canvas" },
-    { "name": "Course Condition", "url": "./index.html#condition29", "description": "코스 컨디션 로거 6요소" },
-    { "name": "Mental Game", "url": "./index.html#mental29", "description": "멘탈 게임 워크샵 Canvas 호흡" },
-    { "name": "Shot Making", "url": "./index.html#shot29", "description": "샷 메이킹 가이드 Canvas 10종 탄도" },
-    { "name": "Golf Etiquette", "url": "./index.html#etiquette29", "description": "골프 에티켓 마스터 20시나리오" },
-    { "name": "Swing Speed Zone", "url": "./index.html#swingspeed30", "description": "스윙 스피드 존 분석기 14클럽 5축 Radar Canvas" },
-    { "name": "Course Mgmt", "url": "./index.html#coursemgmt30", "description": "코스 매니지먼트 플래너 18홀 전략맵 Canvas" },
-    { "name": "Putt Break 3D", "url": "./index.html#puttbreak30", "description": "퍼팅 그린 브레이크 시뮬레이터 3D Canvas" },
-    { "name": "Condition Radar", "url": "./index.html#condopt30", "description": "라운드 컨디션 최적화 6축 Radar Canvas" },
-    { "name": "Weather Compare", "url": "./index.html#weather30", "description": "골프장 날씨 비교 8코스 3일 Canvas" },
-    { "name": "Pro Shot Library", "url": "./index.html#proshots30", "description": "프로 샷 라이브러리 10프로 12샷 Canvas" },
-    { "name": "Head Speed", "url": "./index.html#headspeed30", "description": "클럽헤드 스피드 트래커 Line Canvas" },
-    { "name": "Season Challenge", "url": "./index.html#challenge30", "description": "시즌 챌린지 보드 12미션 Canvas" },
-    { "name": "Round Replay", "url": "./index.html#replay31", "description": "라운드 리플레이 분석기 18홀 Canvas" },
-    { "name": "Green Attack", "url": "./index.html#greenatk31", "description": "그린 어택 각도 분석기 Canvas" },
-    { "name": "Fairway Hitmap", "url": "./index.html#hitmap31", "description": "페어웨이 히트맵 14클럽 Canvas" },
-    { "name": "Score Bell Curve", "url": "./index.html#bellcurve31", "description": "스코어 분포 벨커브 Canvas" },
-    { "name": "Par3 Strategy", "url": "./index.html#par3sim31", "description": "파3홀 전략 시뮬레이터 Canvas" },
-    { "name": "Mental Meter", "url": "./index.html#mental31", "description": "멘탈 에너지 미터 6축 Radar Canvas" },
-    { "name": "Miss Corrector", "url": "./index.html#missfix31", "description": "미스샷 패턴 코렉터 8종 Canvas" },
-    { "name": "Goal Tracker", "url": "./index.html#goaltrack31", "description": "시즌 목표 달성 트래커 10목표 Canvas" },
-    { "name": "Club Perf Heatmap", "url": "./index.html#clubperf32", "description": "클럽 퍼포먼스 히트맵 14x6 Canvas" },
-    { "name": "Round Cost", "url": "./index.html#roundcost32", "description": "라운드 비용 최적화 Canvas" },
-    { "name": "Swing Tempo", "url": "./index.html#tempo32", "description": "스윙 템포 메트로놈 Canvas" },
-    { "name": "HCP Match", "url": "./index.html#hcpmatch32", "description": "핸디캡 코스 매칭 Canvas" },
-    { "name": "Putt Probability", "url": "./index.html#puttprob32", "description": "퍼팅 성공 확률 계산기 Canvas" },
-    { "name": "Practice Streak", "url": "./index.html#streak32", "description": "연습 스트릭 캘린더 Canvas" },
-    { "name": "Body Balance", "url": "./index.html#bodybal32", "description": "골프 바디 밸런스 6축 Radar Canvas" },
-    { "name": "Course Recipe", "url": "./index.html#recipe32", "description": "나만의 코스 레시피 18홀 Canvas" },
-    { "name": "Club Life", "url": "./index.html#clublife33", "description": "클럽 수명 트래커 Canvas" },
-    { "name": "Round Difficulty", "url": "./index.html#difficulty33", "description": "라운드 난이도 예측 Canvas" },
-    { "name": "Training Period", "url": "./index.html#training33", "description": "훈련 주기화 플래너 Canvas" },
-    { "name": "Shot Trajectory", "url": "./index.html#trajectory33", "description": "샷 궤적 시뮬레이터 Canvas" },
-    { "name": "Condition Matrix", "url": "./index.html#condmatrix33", "description": "코스 컨디션 전략 매트릭스 Canvas" },
-    { "name": "Pace Compare", "url": "./index.html#pacecomp33", "description": "라운드 페이스 비교 Canvas" },
-    { "name": "Club Set Opt", "url": "./index.html#clubset33", "description": "클럽 세트 옵티마이저 Canvas" },
-    { "name": "Round Rhythm", "url": "./index.html#rhythm33", "description": "라운드 리듬 분석기 Canvas" }
+    {
+      "name": "Round Review AI",
+      "url": "./index.html#review27",
+      "description": "라운드 리뷰 AI 분석기 Canvas"
+    },
+    {
+      "name": "Course Community",
+      "url": "./index.html#community",
+      "description": "코스 리뷰 커뮤니티 5점+해시태그"
+    },
+    {
+      "name": "Partner Match",
+      "url": "./index.html#partner",
+      "description": "골프 파트너 매칭 4축 Canvas"
+    },
+    {
+      "name": "Budget Manager",
+      "url": "./index.html#budget27",
+      "description": "라운드 예산 관리자 Pie Canvas"
+    },
+    {
+      "name": "Club AI",
+      "url": "./index.html#clubai",
+      "description": "클럽 추천 AI 상황별 14종"
+    },
+    {
+      "name": "Green Reading",
+      "url": "./index.html#green27",
+      "description": "그린 리딩 트레이너 Canvas"
+    },
+    {
+      "name": "Fitness Radar",
+      "url": "./index.html#fitness27",
+      "description": "체력 분석 6축 Radar Canvas"
+    },
+    {
+      "name": "Golf Routine",
+      "url": "./index.html#routine",
+      "description": "골프 루틴 빌더 8단계"
+    },
+    {
+      "name": "Golf IQ v11",
+      "url": "./index.html#iqv11",
+      "description": "Golf IQ v11 15문항"
+    },
+    {
+      "name": "Course Strategy",
+      "url": "./index.html#strategy",
+      "description": "코스 공략 가이드 18홀 Canvas"
+    },
+    {
+      "name": "Round Planner",
+      "url": "./index.html#planner",
+      "description": "라운드 플래너 종합"
+    },
+    {
+      "name": "Equipment Manager",
+      "url": "./index.html#equip",
+      "description": "장비 인벤토리 관리 14클럽"
+    },
+    {
+      "name": "Stats Master",
+      "url": "./index.html#stats",
+      "description": "골프 통계 마스터 Canvas"
+    },
+    {
+      "name": "Swing Diagnosis",
+      "url": "./index.html#swing26",
+      "description": "AI 스윙 진단 6단계 48항목"
+    },
+    {
+      "name": "Bucket List",
+      "url": "./index.html#bucket",
+      "description": "코스 버킷리스트 20곳"
+    },
+    {
+      "name": "Group Scorecard",
+      "url": "./index.html#group",
+      "description": "4인 그룹 스코어링 + 스킨스 + 나쏘"
+    },
+    {
+      "name": "Tournament",
+      "url": "./index.html#tournament",
+      "description": "토너먼트 3종 모드"
+    },
+    {
+      "name": "Putting Simulator",
+      "url": "./index.html#putt",
+      "description": "퍼팅 시뮬레이터 Canvas"
+    },
+    {
+      "name": "Course Sketch",
+      "url": "./index.html#sketch28",
+      "description": "코스 스케치 18홀 Canvas"
+    },
+    {
+      "name": "Round Timeline",
+      "url": "./index.html#timeline28",
+      "description": "라운드 타임라인 플래너"
+    },
+    {
+      "name": "Weather Strategy",
+      "url": "./index.html#weather28",
+      "description": "날씨 클럽 보정 차트 Canvas"
+    },
+    {
+      "name": "Tee Assistant",
+      "url": "./index.html#tee28",
+      "description": "티타임 어시스턴트"
+    },
+    {
+      "name": "Golf Social",
+      "url": "./index.html#social28",
+      "description": "골프 소셜 피드"
+    },
+    {
+      "name": "Course Compare",
+      "url": "./index.html#compare28",
+      "description": "코스 비교 레이더 5축 Canvas"
+    },
+    {
+      "name": "Swing Check",
+      "url": "./index.html#swingcheck28",
+      "description": "스윙 체크 24항목"
+    },
+    {
+      "name": "Season Report",
+      "url": "./index.html#season28",
+      "description": "시즌 리포트 카드 Canvas"
+    },
+    {
+      "name": "Handicap Goal",
+      "url": "./index.html#handicap29",
+      "description": "핸디캡 골 트래커 Canvas 마일스톤"
+    },
+    {
+      "name": "Round Pace",
+      "url": "./index.html#pace29",
+      "description": "라운드 페이스 타이머 18홀"
+    },
+    {
+      "name": "Club Fitting",
+      "url": "./index.html#fitting29",
+      "description": "클럽 피팅 어드바이저 6축 Radar Canvas"
+    },
+    {
+      "name": "Golf Travel",
+      "url": "./index.html#travel29",
+      "description": "골프 여행 플래너 8지역 Canvas"
+    },
+    {
+      "name": "Course Condition",
+      "url": "./index.html#condition29",
+      "description": "코스 컨디션 로거 6요소"
+    },
+    {
+      "name": "Mental Game",
+      "url": "./index.html#mental29",
+      "description": "멘탈 게임 워크샵 Canvas 호흡"
+    },
+    {
+      "name": "Shot Making",
+      "url": "./index.html#shot29",
+      "description": "샷 메이킹 가이드 Canvas 10종 탄도"
+    },
+    {
+      "name": "Golf Etiquette",
+      "url": "./index.html#etiquette29",
+      "description": "골프 에티켓 마스터 20시나리오"
+    },
+    {
+      "name": "Swing Speed Zone",
+      "url": "./index.html#swingspeed30",
+      "description": "스윙 스피드 존 분석기 14클럽 5축 Radar Canvas"
+    },
+    {
+      "name": "Course Mgmt",
+      "url": "./index.html#coursemgmt30",
+      "description": "코스 매니지먼트 플래너 18홀 전략맵 Canvas"
+    },
+    {
+      "name": "Putt Break 3D",
+      "url": "./index.html#puttbreak30",
+      "description": "퍼팅 그린 브레이크 시뮬레이터 3D Canvas"
+    },
+    {
+      "name": "Condition Radar",
+      "url": "./index.html#condopt30",
+      "description": "라운드 컨디션 최적화 6축 Radar Canvas"
+    },
+    {
+      "name": "Weather Compare",
+      "url": "./index.html#weather30",
+      "description": "골프장 날씨 비교 8코스 3일 Canvas"
+    },
+    {
+      "name": "Pro Shot Library",
+      "url": "./index.html#proshots30",
+      "description": "프로 샷 라이브러리 10프로 12샷 Canvas"
+    },
+    {
+      "name": "Head Speed",
+      "url": "./index.html#headspeed30",
+      "description": "클럽헤드 스피드 트래커 Line Canvas"
+    },
+    {
+      "name": "Season Challenge",
+      "url": "./index.html#challenge30",
+      "description": "시즌 챌린지 보드 12미션 Canvas"
+    },
+    {
+      "name": "Round Replay",
+      "url": "./index.html#replay31",
+      "description": "라운드 리플레이 분석기 18홀 Canvas"
+    },
+    {
+      "name": "Green Attack",
+      "url": "./index.html#greenatk31",
+      "description": "그린 어택 각도 분석기 Canvas"
+    },
+    {
+      "name": "Fairway Hitmap",
+      "url": "./index.html#hitmap31",
+      "description": "페어웨이 히트맵 14클럽 Canvas"
+    },
+    {
+      "name": "Score Bell Curve",
+      "url": "./index.html#bellcurve31",
+      "description": "스코어 분포 벨커브 Canvas"
+    },
+    {
+      "name": "Par3 Strategy",
+      "url": "./index.html#par3sim31",
+      "description": "파3홀 전략 시뮬레이터 Canvas"
+    },
+    {
+      "name": "Mental Meter",
+      "url": "./index.html#mental31",
+      "description": "멘탈 에너지 미터 6축 Radar Canvas"
+    },
+    {
+      "name": "Miss Corrector",
+      "url": "./index.html#missfix31",
+      "description": "미스샷 패턴 코렉터 8종 Canvas"
+    },
+    {
+      "name": "Goal Tracker",
+      "url": "./index.html#goaltrack31",
+      "description": "시즌 목표 달성 트래커 10목표 Canvas"
+    },
+    {
+      "name": "Club Perf Heatmap",
+      "url": "./index.html#clubperf32",
+      "description": "클럽 퍼포먼스 히트맵 14x6 Canvas"
+    },
+    {
+      "name": "Round Cost",
+      "url": "./index.html#roundcost32",
+      "description": "라운드 비용 최적화 Canvas"
+    },
+    {
+      "name": "Swing Tempo",
+      "url": "./index.html#tempo32",
+      "description": "스윙 템포 메트로놈 Canvas"
+    },
+    {
+      "name": "HCP Match",
+      "url": "./index.html#hcpmatch32",
+      "description": "핸디캡 코스 매칭 Canvas"
+    },
+    {
+      "name": "Putt Probability",
+      "url": "./index.html#puttprob32",
+      "description": "퍼팅 성공 확률 계산기 Canvas"
+    },
+    {
+      "name": "Practice Streak",
+      "url": "./index.html#streak32",
+      "description": "연습 스트릭 캘린더 Canvas"
+    },
+    {
+      "name": "Body Balance",
+      "url": "./index.html#bodybal32",
+      "description": "골프 바디 밸런스 6축 Radar Canvas"
+    },
+    {
+      "name": "Course Recipe",
+      "url": "./index.html#recipe32",
+      "description": "나만의 코스 레시피 18홀 Canvas"
+    },
+    {
+      "name": "Club Life",
+      "url": "./index.html#clublife33",
+      "description": "클럽 수명 트래커 Canvas"
+    },
+    {
+      "name": "Round Difficulty",
+      "url": "./index.html#difficulty33",
+      "description": "라운드 난이도 예측 Canvas"
+    },
+    {
+      "name": "Training Period",
+      "url": "./index.html#training33",
+      "description": "훈련 주기화 플래너 Canvas"
+    },
+    {
+      "name": "Shot Trajectory",
+      "url": "./index.html#trajectory33",
+      "description": "샷 궤적 시뮬레이터 Canvas"
+    },
+    {
+      "name": "Condition Matrix",
+      "url": "./index.html#condmatrix33",
+      "description": "코스 컨디션 전략 매트릭스 Canvas"
+    },
+    {
+      "name": "Pace Compare",
+      "url": "./index.html#pacecomp33",
+      "description": "라운드 페이스 비교 Canvas"
+    },
+    {
+      "name": "Club Set Opt",
+      "url": "./index.html#clubset33",
+      "description": "클럽 세트 옵티마이저 Canvas"
+    },
+    {
+      "name": "Round Rhythm",
+      "url": "./index.html#rhythm33",
+      "description": "라운드 리듬 분석기 Canvas"
+    },
+    {
+      "name": "Tee Shot Analyzer",
+      "url": "./index.html#teeshot34",
+      "description": "티샷 성공률 분석기 Canvas"
+    },
+    {
+      "name": "Emotion Tracker",
+      "url": "./index.html#emotion34",
+      "description": "라운드 감정 트래커 Canvas"
+    },
+    {
+      "name": "Par Save",
+      "url": "./index.html#parsave34",
+      "description": "파세이브 분석기 Canvas"
+    },
+    {
+      "name": "Season Calendar",
+      "url": "./index.html#season34",
+      "description": "골프 시즌 캘린더 Canvas"
+    },
+    {
+      "name": "Course Notes",
+      "url": "./index.html#notes34",
+      "description": "코스 공략 노트패드 Canvas"
+    },
+    {
+      "name": "Club Distance",
+      "url": "./index.html#dist34",
+      "description": "클럽 거리 히스토그램 Canvas"
+    },
+    {
+      "name": "Energy Manager",
+      "url": "./index.html#energy34",
+      "description": "라운드 에너지 매니저 Canvas"
+    },
+    {
+      "name": "HCP Simulator",
+      "url": "./index.html#hcpsim34",
+      "description": "핸디캡 시뮬레이터 Canvas"
+    }
   ]
 }

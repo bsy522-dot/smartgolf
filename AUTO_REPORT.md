@@ -1,5 +1,3 @@
-# SmartGolf AUTO Development Report
-
 ---
 
 ## [AUTO] 2026-07-17 smartgolf - v33.0 클럽수명트래커Canvas580x360 + 라운드난이도예측Canvas600x380 + 훈련주기화플래너Canvas600x400 + 샷궤적시뮬레이터Canvas620x400 + 코스컨디션전략매트릭스Canvas640x400 + 라운드페이스비교Canvas600x360 + 클럽세트옵티마이저Canvas620x380 + 라운드리듬분석기Canvas600x360 + Golf IQ v17 15문항 + 업적+15(227->242) + SFX13종(226->239) + 키보드8종
@@ -1988,3 +1986,66 @@ v4.0 대비 10개 열위점 해소, 경쟁앱 대비 우위 확보
 - 커밋: [AUTO] 2026-07-04 smartgolf v29.0
 - 누적 현황: 전국 585개 골프장, 기능 34종+, 업적 182개, SFX 190종, Golf IQ v13
 
+
+---
+
+## [AUTO] 2026-07-20 SmartGolf v34.0 Report
+
+### 1차: 벤치마킹 분석 (카카오골프/골프존/스마트스코어)
+
+| 열위점 | 경쟁앱 기능 | v34 해결 |
+|--------|-----------|---------|
+| 티샷 통계 부재 | 스마트스코어: 페어웨이 적중 통계 | 티샷성공률분석기Canvas620x380 |
+| 감정 추적 없음 | 골프존: 라운드 감정 기록 | 라운드감정트래커Canvas580x360 |
+| 파세이브 분석 부재 | 스마트스코어: 업다운 통계 | 파세이브분석기Canvas620x400 |
+| 시즌 히트맵 없음 | 카카오골프: 월별 라운드 현황 | 골프시즌캘린더Canvas620x380 |
+| 코스 공략 메모 없음 | 골프존: 홀별 전략 노트 | 코스공략노트패드Canvas600x360 |
+| 거리 분포도 부재 | 스마트스코어: 거리 히스토그램 | 클럽거리히스토그램Canvas620x400 |
+| 에너지 관리 없음 | 경쟁앱: 영양/수분 관리 | 라운드에너지매니저Canvas580x360 |
+| 핸디캡 예측 없음 | WHS 기반 예측 기능 | 핸디캡시뮬레이터Canvas600x380 |
+
+### 2차: 개발팀 투입 내용
+
+#### v34_patch.js (신규 ~900줄, 자기완결형 IIFE 패치 모듈)
+1. **티샷 성공률 분석기**: 14개 Par4/5홀 페어웨이 적중률 바차트 Canvas 620x380, 좌/우미스 비율, 클럽별 성공률, S~D등급
+2. **라운드 감정 트래커**: 18홀 감정곡선 라인차트 Canvas 580x360, 8감정유형(Confident/Focused/Relaxed/Excited/Nervous/Frustrated/Calm/Determined), 도미넌트 감정 분석
+3. **파세이브 분석기**: 8상황(Green Miss/Bunker/Rough/Water/Deep Rough/Fringe/Fairway Bunker/Downhill) 성공률 수평바+파이차트 Canvas 620x400, S~D종합등급
+4. **골프 시즌 캘린더**: 12개월 히트맵 3x4 그리드 Canvas 620x380, 라운드수/평균스코어/HCP 표시, 활동 강도 색상코딩
+5. **코스 공략 노트패드**: 18홀 탭 선택, 미니 코스맵 Canvas 600x360, 핀위치/바람/전략 시각화, 홀별 전략 팁 자동생성
+6. **클럽 거리 히스토그램**: 14클럽(DR~LW) 거리분포 Canvas 620x400, 평균/최소-최대 범위/표준편차 시각화, 그라디언트 바
+7. **라운드 에너지 매니저**: 18홀 에너지/수분/영양 3축 라인차트 Canvas 580x360, 위험구간(30%이하) 감지, 보급 타이밍 추천
+8. **핸디캡 시뮬레이터**: WHS 공식 기반 20라운드 입력 Canvas 600x380, 핸디캡 인덱스 자동계산, 스코어/코스레이팅 듀얼 라인차트, 목표 핸디캡 예측
+
+#### 부가 기능
+- **Golf IQ v18**: 15문항 (WHS핸디캡/골프공무게/스팀프미터/파5 2온/런치앵글/슬로프레이팅155/스크램블링/맞바람보정/MOI/SG:Putting/코스레이팅/딤플역할/업앤다운PGA/ESC규정/최대클럽수)
+- **업적 +15개** (242→257): Tee Master/Emotion Reader/Par Saver/Season Planner/Course Scout/Distance Guru/Energy Manager/Handicap Analyst/IQ v18 Challenger/IQ v18 Graduate/IQ v18 Genius/v34 Multi-Tooler/v34 Explorer/v34 Complete
+- **SFX 13종** Web Audio API (tee_hit/tee_miss/emotion_log/emotion_up/par_save/par_miss/season_view/note_write/dist_scan/energy_check/energy_low/hcp_sim/quiz_v18/achieve_v34)
+- **키보드** Shift+A/S/D/F/G/H/J/K (8종)
+- 기존 sg30-bottom-bar에 9버튼 append (하단 네비바 신규생성 없음 - UI불가침 규칙 준수)
+
+#### 파일 변경 내역
+- `v34_patch.js`: 신규 (~900줄)
+- `index.html`: v34.0 SEO 전면 갱신 (title/desc/keywords/OG/Twitter) + v34스크립트태그
+- `sw.js`: v37→v38 (smartgolf-v38 캐시, v34_patch.js PRECACHE+자동주입)
+- `manifest.json`: v34.0 설명+shortcuts 8종 추가 (총74종)
+
+### 3차: 품질팀 검증 결과
+
+| 항목 | 결과 |
+|------|------|
+| JS 문법 검증 (node -c) | PASS |
+| 외부 CDN 사용 | 0건 (Leaflet만 허용) |
+| 개인정보 노출 | 0건 |
+| 하단 고정 네비바 신설 | 0건 (UI불가침 규칙 준수) |
+| 기존 네비게이션 클릭 가능 | 확인 완료 |
+| 파일 삭제 | 0건 |
+| HTML entities 따옴표 인코딩 | 준수 |
+
+### 4차: 마무리
+
+- 커밋: `[AUTO] 2026-07-20 smartgolf v34.0`
+- 벤치마킹 8개 열위점 해결
+- 업적 242→257 (+15)
+- SFX 239→252 (+13)
+- Golf IQ v18 15문항 추가
+- shortcuts 66→74종 (+8)
