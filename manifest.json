@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 585개 골프장 검색, AI맞춤추천, 티샷성공률분석기Canvas620x380, 라운드감정트래커Canvas580x360, 파세이브분석기Canvas620x400, 골프시즌캘린더Canvas620x380, 코스공략노트패드Canvas600x360, 클럽거리히스토그램Canvas620x400, 라운드에너지매니저Canvas580x360, 핸디캡시뮬레이터Canvas600x380, Golf IQ v18 15문항, 업적257개, SFX252종",
+  "description": "전국 585개 골프장 검색, AI맞춤추천, 스윙플레인분석기Canvas620x400, 홀바이홀전략맵Canvas640x400, 퍼포먼스트렌드라인Canvas620x380, 골프장비수명관리Canvas600x380, 라운드날씨상관분석Canvas620x400, 스코어카드히트맵Canvas620x380, 골프체형분석기Canvas600x380, 라운드목표달성률Canvas620x380, Golf IQ v19 15문항, 업적272개, SFX265종",
   "lang": "ko",
   "categories": [
     "sports",
@@ -395,6 +395,46 @@
       "name": "HCP Simulator",
       "url": "./index.html#hcpsim34",
       "description": "핸디캡 시뮬레이터 Canvas"
+    },
+    {
+      "name": "Swing Plane",
+      "url": "./index.html#swingplane35",
+      "description": "스윙 플레인 분석기 8체크포인트 Radar Canvas"
+    },
+    {
+      "name": "Hole Strategy",
+      "url": "./index.html#holestrategy35",
+      "description": "홀바이홀 전략맵 18홀 Canvas"
+    },
+    {
+      "name": "Perf Trend",
+      "url": "./index.html#perftrend35",
+      "description": "퍼포먼스 트렌드라인 30R Canvas"
+    },
+    {
+      "name": "Equip Life",
+      "url": "./index.html#equiplife35",
+      "description": "골프장비 수명관리 17아이템 Canvas"
+    },
+    {
+      "name": "Weather Corr",
+      "url": "./index.html#weathercorr35",
+      "description": "라운드 날씨 상관분석 Canvas"
+    },
+    {
+      "name": "Score Heatmap",
+      "url": "./index.html#scoreheatmap35",
+      "description": "스코어카드 히트맵 18x10 Canvas"
+    },
+    {
+      "name": "Body Analyzer",
+      "url": "./index.html#bodytype35",
+      "description": "골프 체형분석기 5축 Radar Canvas"
+    },
+    {
+      "name": "Goal Rate",
+      "url": "./index.html#goalrate35",
+      "description": "라운드 목표달성률 도넛 Canvas"
     }
   ]
 }

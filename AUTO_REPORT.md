@@ -1,5 +1,48 @@
 ---
 
+## [AUTO] 2026-07-23 smartgolf - v35.0 스윙플레인분석기Canvas620x400 + 홀바이홀전략맵Canvas640x400 + 퍼포먼스트렌드라인Canvas620x380 + 골프장비수명관리Canvas600x380 + 라운드날씨상관분석Canvas620x400 + 스코어카드히트맵Canvas620x380 + 골프체형분석기Canvas600x380 + 라운드목표달성률Canvas620x380 + Golf IQ v19 15문항 + 업적+15(257->272) + SFX16종(252->265+) + 키보드8종
+
+### 1차 벤치마킹 (카카오골프/골프존/스마트스코어 대비)
+| 열위점 | 경쟁앱 | 해결방법 |
+|--------|--------|----------|
+| 스윙 플레인 각도 분석 없음 | 골프존 스윙분석 | 스윙플레인분석기 Canvas 8체크포인트 Radar 차트 S~D등급 |
+| 홀별 전략 시각화 없음 | 카카오골프 코스정보 | 홀바이홀전략맵 Canvas 18홀 난이도 히트맵 클럽/바람/전략 |
+| 장기 퍼포먼스 트렌드 없음 | 스마트스코어 통계 | 퍼포먼스트렌드라인 Canvas 30R 5지표 이동평균 |
+| 장비 수명/교체 관리 미흡 | 골프존 장비서비스 | 골프장비수명관리 Canvas 17아이템 마모도 수평바 교체알림 |
+| 날씨-스코어 상관 분석 없음 | 스마트스코어 날씨 | 라운드날씨상관분석 Canvas 온도vs스코어 산점도 4축분석 |
+| 스코어카드 패턴 시각화 없음 | 골프존 리포트 | 스코어카드히트맵 Canvas 18x10 컬러코딩 강약점 |
+| 체형별 스윙 추천 없음 | 카카오골프 피팅 | 골프체형분석기 Canvas 5축 Radar 체형분류 클럽추천 |
+| 라운드 목표 달성률 추적 없음 | 스마트스코어 목표 | 라운드목표달성률 Canvas 8목표 도넛차트 S~D등급 |
+
+### 2차 개발 (v35_patch.js, 1493줄)
+- 스윙플레인분석기: 8체크포인트(Address/Takeaway/Halfway Back/Top/Transition/Halfway Down/Impact/Follow Through) 1-10점 Radar Canvas 620x400, 세션히스토리, S~D등급
+- 홀바이홀전략맵: 18홀 인터랙티브 그리드 Canvas 640x400, 홀별 Par/거리/전략/클럽/바람 편집, 난이도 히트맵 컬러코딩
+- 퍼포먼스트렌드라인: 30라운드 라인차트 Canvas 620x380, Score/Putts/FIR/GIR/Penalties 5탭, 5R 이동평균, Best/Worst/Avg 마커
+- 골프장비수명관리: 14클럽+가방+신발+장갑 17아이템 Canvas 600x380, 사용횟수/마모도 수평바(녹~빨), 교체 알림
+- 라운드날씨상관분석: 온도(10~35°C) vs 스코어 산점도 Canvas 620x400, 바람/습도/강수확률 4축 분석, 최적/최악 컨디션
+- 스코어카드히트맵: 18홀x10라운드 Canvas 620x380, Eagle파랑/Birdie하늘/Par초록/Bogey노랑/Double주황/Triple빨강, 강약점홀 자동식별
+- 골프체형분석기: 키/몸무게/팔길이/다리길이/유연성 5축 Radar Canvas 600x380, Power/Technical/Balanced/Flexible/Compact 5유형 분류, 스윙/클럽 추천
+- 라운드목표달성률: 8목표(스코어/FIR%/GIR%/퍼트수/파세이브/보기프리홀/Up&Down%/페널티) 도넛차트 Canvas 620x380, 30R 히스토리, S~D등급
+- Golf IQ v19: 15문항 (스윙플레인각도/런치앵글/스핀축틸트/디봇수리/OB드롭/언플레이어블/코스레이팅vs슬로프/타이거우즈메이저/PGA투어드라이버거리/웨지바운스/퍼터로프트/클럽MOI/백스핀감소/에임포인트/브레이크계산)
+- 업적 +15개 (257->272): swing_plane_master/strategy_mapper/trend_analyst/equipment_guardian/weather_analyst/heatmap_creator/body_analyst/goal_achiever/iq_v19_genius/iq_v19_clear/multi_feature_v35/swing_s_rank/trend_30round/weather_best/v35_complete
+- SFX 16종 Web Audio API (swing_check/swing_grade/strategy_edit/strategy_save/trend_scan/trend_peak/equip_wear/equip_replace/weather_scan/weather_best/heatmap_log/body_scan/goal_set/goal_achieve/quiz_v19/achieve_v35)
+- 키보드 Shift+Q/W/E/R/T/Y/U/I
+
+### 3차 품질검증
+- JS 구문검사: node --check v35_patch.js PASS (1493줄)
+- 하단 네비바 신설: 0건 (sg30-bottom-bar에 append만 - UI불가침 규칙 준수)
+- 외부 CDN: 0건 (Leaflet 기존 허용)
+- 개인정보: 0건
+- HTML entities 따옴표: 준수
+
+### 4차 마무리
+- index.html: v35.0 SEO 전면 갱신 (title/desc/OG/Twitter) + v35스크립트태그
+- sw.js: v38→v39 (smartgolf-v39 캐시, v35_patch.js PRECACHE+자동주입)
+- manifest.json: v35.0 설명+shortcuts 8종 추가 (총74종)
+- AUTO_REPORT.md: v35 보고서 추가
+
+---
+
 ## [AUTO] 2026-07-17 smartgolf - v33.0 클럽수명트래커Canvas580x360 + 라운드난이도예측Canvas600x380 + 훈련주기화플래너Canvas600x400 + 샷궤적시뮬레이터Canvas620x400 + 코스컨디션전략매트릭스Canvas640x400 + 라운드페이스비교Canvas600x360 + 클럽세트옵티마이저Canvas620x380 + 라운드리듬분석기Canvas600x360 + Golf IQ v17 15문항 + 업적+15(227->242) + SFX13종(226->239) + 키보드8종
 
 ### 1차 벤치마킹 (카카오골프/골프존/스마트스코어 대비)
