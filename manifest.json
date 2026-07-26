@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 585개 골프장 검색, AI맞춤추천, 스윙플레인분석기Canvas620x400, 홀바이홀전략맵Canvas640x400, 퍼포먼스트렌드라인Canvas620x380, 골프장비수명관리Canvas600x380, 라운드날씨상관분석Canvas620x400, 스코어카드히트맵Canvas620x380, 골프체형분석기Canvas600x380, 라운드목표달성률Canvas620x380, Golf IQ v19 15문항, 업적272개, SFX265종",
+  "description": "전국 585개 골프장 검색, AI맞춤추천, 홀인원확률계산기Canvas620x400, 클럽스윙웨이트최적화Canvas600x380, 라운드페이스분석기Canvas620x380, 그린언듈레이션시뮬Canvas640x400, 골프부상예방가이드Canvas600x380, Par세이브패턴분석Canvas620x400, 코스경로플래너Canvas620x380, 시즌피크분석기Canvas620x400, Golf IQ v20 15문항, 업적287개, SFX284종",
   "lang": "ko",
   "categories": [
     "sports",
@@ -435,6 +435,46 @@
       "name": "Goal Rate",
       "url": "./index.html#goalrate35",
       "description": "라운드 목표달성률 도넛 Canvas"
+    },
+    {
+      "name": "HIO Calc",
+      "url": "./index.html#hiocalc36",
+      "description": "홀인원 확률 계산기 Canvas 620x400"
+    },
+    {
+      "name": "Swing Weight",
+      "url": "./index.html#swingweight36",
+      "description": "클럽 스윙웨이트 최적화 Canvas 600x380"
+    },
+    {
+      "name": "Round Pace",
+      "url": "./index.html#pace36",
+      "description": "라운드 페이스 분석기 Canvas 620x380"
+    },
+    {
+      "name": "Green Undulation",
+      "url": "./index.html#green36",
+      "description": "그린 언듈레이션 시뮬레이터 Canvas 640x400"
+    },
+    {
+      "name": "Injury Prevent",
+      "url": "./index.html#injury36",
+      "description": "골프 부상 예방 가이드 Canvas 600x380"
+    },
+    {
+      "name": "Par Save",
+      "url": "./index.html#parsave36",
+      "description": "Par 세이브 패턴 분석 Canvas 620x400"
+    },
+    {
+      "name": "Course Route",
+      "url": "./index.html#route36",
+      "description": "코스 경로 플래너 Canvas 620x380"
+    },
+    {
+      "name": "Season Peak",
+      "url": "./index.html#season36",
+      "description": "시즌 피크 분석기 Canvas 620x400"
     }
   ]
 }
