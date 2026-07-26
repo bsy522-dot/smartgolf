@@ -1,5 +1,38 @@
 ---
 
+## [AUTO] 2026-07-26 smartgolf - v36.0 홀인원확률계산기 + 클럽스윙웨이트최적화 + 라운드페이스분석기 + 그린언듈레이션시뮬 + 골프부상예방가이드 + Par세이브패턴분석 + 코스경로플래너 + 시즌피크분석기 + Golf IQ v20 15문항 + 업적+15(272->287) + SFX16종(268->284)
+
+### 1차 벤치마킹 (카카오골프/골프존/스마트스코어 대비)
+| 열위점 | 경쟁앱 | 해결방법 |
+|--------|--------|----------|
+| 홀인원 확률 분석 없음 | 골프존 통계 | 홀인원확률계산기 Canvas 10클럽 5레벨 확률 바차트 |
+| 클럽 스윙웨이트 관리 없음 | 스마트스코어 클럽관리 | 스윙웨이트최적화 Canvas 12클럽 이상/현재 비교 S~D등급 |
+| 라운드 페이스 추적 없음 | 카카오골프 라운드 | 페이스분석기 Canvas 18홀 소요시간 이상대비 |
+| 그린 형태 시뮬레이션 없음 | 골프존 GDR | 그린언듈레이션시뮬 Canvas 8유형 Radar 경사/스팀프 |
+| 부상 예방 가이드 없음 | 없음 (차별화) | 부상예방가이드 Canvas 8부위 위험도 예방운동 |
+| Par 세이브 분석 없음 | 스마트스코어 통계 | Par세이브패턴 Canvas 10상황 성공률 수평바 |
+| 코스 경로 전략 비교 없음 | 카카오골프 코스정보 | 코스경로플래너 Canvas 6전략 Risk-vs-Reward 산점도 |
+| 시즌별 분석 없음 | 골프존 시즌 | 시즌피크분석기 Canvas 12월 복합차트 (라운드/혼잡/기온/그린피) |
+
+### 2차 개발 (v36_patch.js 1311줄)
+- 8개 Canvas 기능 신규 구현 (홀인원/스윙웨이트/페이스/그린/부상/Par세이브/경로/시즌)
+- Golf IQ v20: 15문항 (홀인원보험/스팀프미터/이글/Ready Golf/페이드/디봇수리/핸디캡Slope/CR/레이업/퍼터로프트/앵커퍼팅/부상빈도/시즌그린피/Par세이브/라운드시간)
+- 업적 +15 (272→287): hio_calculator/swing_weight_expert/pace_analyzer/green_reader/injury_preventer/par_saver/route_planner/season_analyst/golf_iq_v20/golf_iq_v20_master/v36_explorer/v36_complete/hio_dreamer/green_all_types/season_planner
+- SFX 16종 Web Audio API
+- 키보드 Shift+A~L (9섹션)
+- 네비바: 기존 sg30-bottom-bar에 9버튼 append (UI 불가침 규칙 준수)
+
+### 3차 품질검증
+- JS 구문: PASS (node -c, 1311줄)
+- JSON: PASS (manifest.json 90 shortcuts)
+- CDN: 0건 (외부 CDN 참조 없음)
+- 개인정보: 0건
+- 하단 네비바 신규생성: 0건 (기존 바에 append만)
+- SW 캐시: v39→v40 업그레이드, v36_patch.js PRECACHE 포함
+- SEO: title/desc/OG/Twitter 전면 갱신
+
+---
+
 ## [AUTO] 2026-07-23 smartgolf - v35.0 스윙플레인분석기Canvas620x400 + 홀바이홀전략맵Canvas640x400 + 퍼포먼스트렌드라인Canvas620x380 + 골프장비수명관리Canvas600x380 + 라운드날씨상관분석Canvas620x400 + 스코어카드히트맵Canvas620x380 + 골프체형분석기Canvas600x380 + 라운드목표달성률Canvas620x380 + Golf IQ v19 15문항 + 업적+15(257->272) + SFX16종(252->265+) + 키보드8종
 
 ### 1차 벤치마킹 (카카오골프/골프존/스마트스코어 대비)
