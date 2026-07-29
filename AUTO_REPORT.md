@@ -1,5 +1,38 @@
 ---
 
+## [AUTO] 2026-07-29 smartgolf - v37.0 드라이버발사각최적화기 + 코스매니지먼트시나리오 + 퍼팅거리감트레이너 + 스코어분포벨커브 + 라운드에너지매니저 + 미스샷패턴분석기 + 골프심리프로파일러 + 핸디캡시뮬레이터 + Golf IQ v21 15문항 + 업적+15(287->302) + SFX16종(284->300)
+
+### 1차 벤치마킹 (카카오골프/골프존/스마트스코어 대비)
+| 열위점 | 경쟁앱 | 해결방법 |
+|--------|--------|----------|
+| 드라이버 런치 데이터 분석 없음 | 골프존 GDR 런치모니터 | 드라이버발사각최적화기 Canvas 6각도×5스핀 히트맵 620x400 |
+| 코스 의사결정 시뮬 없음 | 카카오골프 코스가이드 | 코스매니지먼트시나리오 Canvas 6상황 리스크-리워드 640x400 |
+| 퍼팅 거리감 훈련 없음 | 스마트스코어 퍼팅통계 | 퍼팅거리감트레이너 Canvas 6거리 편차바차트 600x380 |
+| 스코어 분포 통계 없음 | 골프존 리포트 | 스코어분포벨커브 Canvas 30R 히스토그램+가우시안 620x400 |
+| 라운드 중 체력 관리 없음 | 없음 (차별화) | 라운드에너지매니저 Canvas 18홀 3축 에너지 라인차트 600x380 |
+| 미스샷 패턴 분석 없음 | 스마트스코어 샷분석 | 미스샷패턴분석기 Canvas 13클럽×6미스유형 히트맵 620x380 |
+| 골프 심리/멘탈 프로파일 없음 | 없음 (차별화) | 골프심리프로파일러 Canvas 6축 레이더 4유형분류 620x400 |
+| 핸디캡 개선 시뮬 없음 | 골프존 핸디캡 | 핸디캡시뮬레이터 Canvas 반원게이지+목표라인차트 600x380 |
+
+### 2차 개발 (v37_patch.js 1952줄)
+- 8개 Canvas 기능 신규 구현 (발사각/코스매니지먼트/퍼팅트레이너/벨커브/에너지/미스샷/심리/핸디캡)
+- Golf IQ v21: 15문항 (발사각/스핀량/코스매니지먼트/퍼팅브레이크/스코어분산/라운드체력/슬라이스교정/훅원인/멘탈루틴/핸디캡계산/코스레이팅/퍼팅거리/에너지보충/심리유형/미스샷패턴)
+- 업적 +15 (287→302): launch_optimizer/course_strategist/putt_precision/bell_analyst/energy_master/miss_detective/psych_explorer/hcap_simulator/iq_v21_challenger/iq_v21_master/v37_explorer/v37_complete/launch_sweep/putt_all_dist/psych_master
+- SFX 16종 Web Audio API (launch_scan/launch_opt/course_plan/course_decide/putt_train/putt_hit/bell_curve/bell_mark/energy_log/energy_boost/miss_scan/miss_drill/psych_scan/hcap_sim/quiz_v21/achieve_v37)
+- 키보드 Shift+Q/W/E/R/T/Y/U/I/O (9섹션)
+- 네비바: 기존 sg30-bottom-bar에 9버튼 append (UI 불가침 규칙 준수)
+
+### 3차 품질검증
+- JS 구문: PASS (node -c, 1952줄)
+- JSON: PASS (manifest.json 99 shortcuts)
+- CDN: 0건 (외부 CDN 참조 없음, Leaflet만 허용)
+- 개인정보: 0건
+- 하단 네비바 신규생성: 0건 (기존 바에 append만)
+- SW 캐시: v40→v41 업그레이드, v37_patch.js PRECACHE 포함
+- SEO: title/desc/OG/Twitter 전면 갱신 (v37.0)
+
+---
+
 ## [AUTO] 2026-07-26 smartgolf - v36.0 홀인원확률계산기 + 클럽스윙웨이트최적화 + 라운드페이스분석기 + 그린언듈레이션시뮬 + 골프부상예방가이드 + Par세이브패턴분석 + 코스경로플래너 + 시즌피크분석기 + Golf IQ v20 15문항 + 업적+15(272->287) + SFX16종(268->284)
 
 ### 1차 벤치마킹 (카카오골프/골프존/스마트스코어 대비)

@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 585개 골프장 검색, AI맞춤추천, 홀인원확률계산기Canvas620x400, 클럽스윙웨이트최적화Canvas600x380, 라운드페이스분석기Canvas620x380, 그린언듈레이션시뮬Canvas640x400, 골프부상예방가이드Canvas600x380, Par세이브패턴분석Canvas620x400, 코스경로플래너Canvas620x380, 시즌피크분석기Canvas620x400, Golf IQ v20 15문항, 업적287개, SFX284종",
+  "description": "전국 585개 골프장 검색, AI맞춤추천, 드라이버발사각최적화기Canvas620x400, 코스매니지먼트시나리오Canvas640x400, 퍼팅거리감트레이너Canvas600x380, 스코어분포벨커브Canvas620x400, 라운드에너지매니저Canvas600x380, 미스샷패턴분석기Canvas620x380, 골프심리프로파일러Canvas620x400, 핸디캡시뮬레이터Canvas600x380, Golf IQ v21 15문항, 업적302개, SFX300종",
   "lang": "ko",
   "categories": [
     "sports",
@@ -475,6 +475,46 @@
       "name": "Season Peak",
       "url": "./index.html#season36",
       "description": "시즌 피크 분석기 Canvas 620x400"
+    },
+    {
+      "name": "Launch Angle",
+      "url": "./index.html#launch37",
+      "description": "드라이버 발사각 최적화기 Canvas 620x400"
+    },
+    {
+      "name": "Course Mgmt",
+      "url": "./index.html#course37",
+      "description": "코스 매니지먼트 시나리오 Canvas 640x400"
+    },
+    {
+      "name": "Putt Trainer",
+      "url": "./index.html#putt37",
+      "description": "퍼팅 거리감 트레이너 Canvas 600x380"
+    },
+    {
+      "name": "Score Bell",
+      "url": "./index.html#bell37",
+      "description": "스코어 분포 벨커브 Canvas 620x400"
+    },
+    {
+      "name": "Energy Mgr",
+      "url": "./index.html#energy37",
+      "description": "라운드 에너지 매니저 Canvas 600x380"
+    },
+    {
+      "name": "Miss Shot",
+      "url": "./index.html#miss37",
+      "description": "미스샷 패턴 분석기 Canvas 620x380"
+    },
+    {
+      "name": "Golf Psych",
+      "url": "./index.html#psych37",
+      "description": "골프 심리 프로파일러 Canvas 620x400"
+    },
+    {
+      "name": "Handicap Sim",
+      "url": "./index.html#hcap37",
+      "description": "핸디캡 시뮬레이터 Canvas 600x380"
     }
   ]
 }
