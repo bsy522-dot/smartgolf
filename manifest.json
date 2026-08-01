@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 585개 골프장 검색, AI맞춤추천, 드라이버발사각최적화기Canvas620x400, 코스매니지먼트시나리오Canvas640x400, 퍼팅거리감트레이너Canvas600x380, 스코어분포벨커브Canvas620x400, 라운드에너지매니저Canvas600x380, 미스샷패턴분석기Canvas620x380, 골프심리프로파일러Canvas620x400, 핸디캡시뮬레이터Canvas600x380, Golf IQ v21 15문항, 업적302개, SFX300종",
+  "description": "전국 585개 골프장 검색, AI맞춤추천, 스윙일관성지표분석기Canvas620x400, 라운드리스크리워드매트릭스Canvas640x400, 퍼팅스트로크분석기Canvas600x380, 클럽로테이션최적화기Canvas620x380, 멘탈레질리언스트래커Canvas620x400, 홀별스트로크게인드분석기Canvas620x400, 야드지배력히트맵Canvas600x380, 종합골프성장보고서Canvas620x400, Golf IQ v22 15문항, 업적317개, SFX316종",
   "lang": "ko",
   "categories": [
     "sports",
@@ -515,6 +515,46 @@
       "name": "Handicap Sim",
       "url": "./index.html#hcap37",
       "description": "핸디캡 시뮬레이터 Canvas 600x380"
+    },
+    {
+      "name": "Swing Consistency",
+      "url": "./index.html#consistency38",
+      "description": "스윙 일관성 지표 분석기 Canvas 620x400"
+    },
+    {
+      "name": "Risk Reward",
+      "url": "./index.html#riskreward38",
+      "description": "라운드 리스크-리워드 매트릭스 Canvas 640x400"
+    },
+    {
+      "name": "Putt Stroke",
+      "url": "./index.html#puttstroke38",
+      "description": "퍼팅 스트로크 분석기 Canvas 600x380"
+    },
+    {
+      "name": "Club Rotation",
+      "url": "./index.html#rotation38",
+      "description": "클럽 로테이션 최적화기 Canvas 620x380"
+    },
+    {
+      "name": "Mental Resilience",
+      "url": "./index.html#resilience38",
+      "description": "멘탈 레질리언스 트래커 Canvas 620x400"
+    },
+    {
+      "name": "Strokes Gained",
+      "url": "./index.html#sg38",
+      "description": "홀별 스트로크 게인드 분석기 Canvas 620x400"
+    },
+    {
+      "name": "Yardage Map",
+      "url": "./index.html#yardage38",
+      "description": "야드 지배력 히트맵 Canvas 600x380"
+    },
+    {
+      "name": "Growth Report",
+      "url": "./index.html#growth38",
+      "description": "종합 골프 성장 보고서 Canvas 620x400"
     }
   ]
 }
