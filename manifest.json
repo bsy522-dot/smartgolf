@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 585개 골프장 검색, AI맞춤추천, 스윙일관성지표분석기Canvas620x400, 라운드리스크리워드매트릭스Canvas640x400, 퍼팅스트로크분석기Canvas600x380, 클럽로테이션최적화기Canvas620x380, 멘탈레질리언스트래커Canvas620x400, 홀별스트로크게인드분석기Canvas620x400, 야드지배력히트맵Canvas600x380, 종합골프성장보고서Canvas620x400, Golf IQ v22 15문항, 업적317개, SFX316종",
+  "description": "전국 585개 골프장 검색, AI맞춤추천, 코스난이도열분해기Canvas620x400, 프랙티스세션옵티마이저Canvas640x400, 스코어추세예측기Canvas620x400, 그립압력프로파일러Canvas600x380, 페어웨이적중전략맵Canvas620x400, 라운드리듬분석기Canvas640x400, Golf IQ성장추적기Canvas600x380, 종합경쟁력벤치마크Canvas620x400, Golf IQ v23 15문항, 업적332개, SFX332종",
   "lang": "ko",
   "categories": [
     "sports",
@@ -555,6 +555,46 @@
       "name": "Growth Report",
       "url": "./index.html#growth38",
       "description": "종합 골프 성장 보고서 Canvas 620x400"
+    },
+    {
+      "name": "Course Difficulty",
+      "url": "./index.html#diff39",
+      "description": "코스 난이도 열분해기 Canvas 620x400"
+    },
+    {
+      "name": "Practice Optimizer",
+      "url": "./index.html#practice39",
+      "description": "프랙티스 세션 옵티마이저 Canvas 640x400"
+    },
+    {
+      "name": "Score Trend",
+      "url": "./index.html#trend39",
+      "description": "스코어 추세 예측기 Canvas 620x400"
+    },
+    {
+      "name": "Grip Pressure",
+      "url": "./index.html#grip39",
+      "description": "그립 압력 프로파일러 Canvas 600x380"
+    },
+    {
+      "name": "Fairway Strategy",
+      "url": "./index.html#fairway39",
+      "description": "페어웨이 적중 전략 맵 Canvas 620x400"
+    },
+    {
+      "name": "Round Rhythm",
+      "url": "./index.html#rhythm39",
+      "description": "라운드 리듬 분석기 Canvas 640x400"
+    },
+    {
+      "name": "IQ Growth",
+      "url": "./index.html#iqgrow39",
+      "description": "Golf IQ 성장 추적기 Canvas 600x380"
+    },
+    {
+      "name": "Benchmark",
+      "url": "./index.html#bench39",
+      "description": "종합 경쟁력 벤치마크 Canvas 620x400"
     }
   ]
 }
