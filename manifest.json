@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 585개 골프장 검색, AI맞춤추천, 코스난이도열분해기Canvas620x400, 프랙티스세션옵티마이저Canvas640x400, 스코어추세예측기Canvas620x400, 그립압력프로파일러Canvas600x380, 페어웨이적중전략맵Canvas620x400, 라운드리듬분석기Canvas640x400, Golf IQ성장추적기Canvas600x380, 종합경쟁력벤치마크Canvas620x400, Golf IQ v23 15문항, 업적332개, SFX332종",
+  "description": "전국 585개 골프장 검색, AI맞춤추천, 스윙역학시뮬레이터Canvas620x400, 리스크리워드매트릭스Canvas640x400, 클럽조합최적화기Canvas620x400, 수면성적상관분석기Canvas600x380, 스코어카드패턴마이너Canvas640x400, 코스컨디션임팩트Canvas620x400, 미스샷교정가이드Canvas600x380, 라운드엔트로피분석기Canvas620x400, Golf IQ v24 15문항, 업적347개, SFX348종",
   "lang": "ko",
   "categories": [
     "sports",
@@ -595,6 +595,46 @@
       "name": "Benchmark",
       "url": "./index.html#bench39",
       "description": "종합 경쟁력 벤치마크 Canvas 620x400"
+    },
+    {
+      "name": "Swing Mechanics",
+      "url": "./index.html#swing40",
+      "description": "스윙 역학 시뮬레이터 Canvas 620x400"
+    },
+    {
+      "name": "Risk-Reward",
+      "url": "./index.html#risk40",
+      "description": "홀별 리스크-리워드 매트릭스 Canvas 640x400"
+    },
+    {
+      "name": "Club Combo",
+      "url": "./index.html#combo40",
+      "description": "클럽 조합 최적화기 Canvas 620x400"
+    },
+    {
+      "name": "Sleep Perf",
+      "url": "./index.html#sleep40",
+      "description": "수면-성적 상관분석기 Canvas 600x380"
+    },
+    {
+      "name": "Pattern Miner",
+      "url": "./index.html#pattern40",
+      "description": "스코어카드 패턴 마이너 Canvas 640x400"
+    },
+    {
+      "name": "Course Condition",
+      "url": "./index.html#cond40",
+      "description": "코스 컨디션 임팩트 분석기 Canvas 620x400"
+    },
+    {
+      "name": "Miss-Shot Guide",
+      "url": "./index.html#miss40",
+      "description": "미스샷 유형별 교정 가이드 Canvas 600x380"
+    },
+    {
+      "name": "Entropy",
+      "url": "./index.html#entropy40",
+      "description": "라운드 엔트로피 분석기 Canvas 620x400"
     }
   ]
 }
