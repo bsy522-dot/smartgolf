@@ -4,8 +4,8 @@
   // ===== LOCALSTORAGE HELPER =====
   var LS = function (k, v) {
     return v === undefined
-      ? JSON.parse(localStorage.getItem('sg40_' + k) || 'null')
-      : localStorage.setItem('sg40_' + k, JSON.stringify(v));
+      ? JSON.parse(localStorage.getItem('sg40b_' + k) || 'null')
+      : localStorage.setItem('sg40b_' + k, JSON.stringify(v));
   };
 
   // ===== SFX ENGINE (16 new SFX, 332->348) =====
@@ -112,6 +112,25 @@
     if (pct >= 60) return 'B';
     if (pct >= 40) return 'C';
     return 'D';
+  }
+
+  // ===== 빈 상태 안내 =====
+  var EMPTY_MSG = '기록을 추가하면 표시됩니다';
+  function drawEmpty40(ctx, W, H, title) {
+    ctx.fillStyle = '#0a0a1a';
+    ctx.fillRect(0, 0, W, H);
+    if (title) {
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(title, 20, 30);
+    }
+    ctx.fillStyle = 'rgba(255,255,255,.45)';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(EMPTY_MSG, W / 2, H / 2);
+    ctx.textBaseline = 'alphabetic';
   }
 
   // ===== ACHIEVEMENTS ENGINE (15 new, 332->347) =====
@@ -262,30 +281,26 @@
     sg40sfx('risk_plot');
     unlockAchievement('sg40_risk_analyst');
     var ov = document.getElementById('sg40-risk') || createOverlay('sg40-risk');
-    var holes = [];
-    for (var i = 1; i <= 18; i++) {
-      holes.push({
-        hole: i,
-        risk: Math.round(20 + Math.random() * 70),
-        reward: Math.round(15 + Math.random() * 75),
-        par: [3, 4, 4, 5, 3, 4, 4, 4, 5, 4, 3, 4, 5, 4, 4, 3, 4, 5][i - 1],
-        strategy: Math.random() > 0.5 ? 'aggressive' : 'safe'
-      });
-    }
+    var holes = LS('risk_data') || [];
 
     var safeCount = holes.filter(function (h) { return h.strategy === 'safe'; }).length;
     if (safeCount >= 6) unlockAchievement('sg40_safe_player');
 
     var html = '<div class="sg40-panel"><div class="sg40-hdr"><h2><span class="sg40-hdr-icon">⚖️</span>홀별 리스크-리워드 매트릭스</h2><button class="sg40-x" onclick="this.closest(\'.sg40-overlay\').classList.remove(\'active\')">&times;</button></div>';
     html += '<canvas id="sg40-risk-cv" width="640" height="400" style="width:100%;border-radius:14px;background:#0a0a1a;margin-bottom:16px"></canvas>';
-    html += '<div class="sg40-card"><h4>🗺️ 18홀 전략 요약</h4>';
-    html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
-    holes.forEach(function (h) {
-      var bgColor = h.strategy === 'aggressive' ? 'rgba(231,76,60,.15)' : 'rgba(46,204,113,.15)';
-      var borderColor = h.strategy === 'aggressive' ? 'rgba(231,76,60,.4)' : 'rgba(46,204,113,.4)';
-      html += '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:10px;padding:8px;text-align:center"><div style="color:#fff;font-weight:800;font-size:13px">' + h.hole + 'H</div><div style="font-size:10px;color:rgba(255,255,255,.5)">Par ' + h.par + '</div><div style="font-size:10px;color:' + (h.strategy === 'aggressive' ? '#e74c3c' : '#2ecc71') + ';font-weight:700;margin-top:2px">' + (h.strategy === 'aggressive' ? '공격' : '안전') + '</div></div>';
-    });
-    html += '</div></div></div>';
+    html += '<div class="sg40-card"><h4>🗺️ 홀별 전략 요약</h4>';
+    if (!holes.length) {
+      html += '<p style="color:rgba(255,255,255,.5)">' + EMPTY_MSG + '</p>';
+    } else {
+      html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+      holes.forEach(function (h) {
+        var bgColor = h.strategy === 'aggressive' ? 'rgba(231,76,60,.15)' : 'rgba(46,204,113,.15)';
+        var borderColor = h.strategy === 'aggressive' ? 'rgba(231,76,60,.4)' : 'rgba(46,204,113,.4)';
+        html += '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:10px;padding:8px;text-align:center"><div style="color:#fff;font-weight:800;font-size:13px">' + h.hole + 'H</div><div style="font-size:10px;color:rgba(255,255,255,.5)">Par ' + h.par + '</div><div style="font-size:10px;color:' + (h.strategy === 'aggressive' ? '#e74c3c' : '#2ecc71') + ';font-weight:700;margin-top:2px">' + (h.strategy === 'aggressive' ? '공격' : '안전') + '</div></div>';
+      });
+      html += '</div>';
+    }
+    html += '</div></div>';
     ov.innerHTML = html;
     ov.classList.add('active');
 
@@ -294,6 +309,7 @@
       if (!cv) return;
       var ctx = cv.getContext('2d');
       var W = 640, H = 400;
+      if (!holes.length) { drawEmpty40(ctx, W, H, '리스크 vs 리워드 산점도'); return; }
       ctx.fillStyle = '#0a0a1a';
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = '#fff';
@@ -360,35 +376,37 @@
     sg40sfx('combo_calc');
     unlockAchievement('sg40_combo_opt');
     var ov = document.getElementById('sg40-combo') || createOverlay('sg40-combo');
-    var clubs = [
-      { name: 'DR', dist: 240, freq: 14, color: '#e74c3c' },
-      { name: '3W', dist: 210, freq: 8, color: '#e67e22' },
-      { name: '5W', dist: 190, freq: 6, color: '#f39c12' },
-      { name: '4I', dist: 180, freq: 5, color: '#2ecc71' },
-      { name: '5I', dist: 170, freq: 7, color: '#27ae60' },
-      { name: '6I', dist: 160, freq: 9, color: '#1abc9c' },
-      { name: '7I', dist: 150, freq: 12, color: '#3498db' },
-      { name: '8I', dist: 140, freq: 10, color: '#2980b9' },
-      { name: '9I', dist: 130, freq: 8, color: '#9b59b6' },
-      { name: 'PW', dist: 120, freq: 11, color: '#8e44ad' },
-      { name: 'AW', dist: 100, freq: 9, color: '#e74c3c' },
-      { name: 'SW', dist: 80, freq: 7, color: '#c0392b' },
-      { name: 'LW', dist: 60, freq: 4, color: '#d35400' },
-      { name: 'PT', dist: 0, freq: 18, color: '#7f8c8d' }
+    var CLUB_DEFS = [
+      { name: 'DR', color: '#e74c3c' }, { name: '3W', color: '#e67e22' }, { name: '5W', color: '#f39c12' },
+      { name: '4I', color: '#2ecc71' }, { name: '5I', color: '#27ae60' }, { name: '6I', color: '#1abc9c' },
+      { name: '7I', color: '#3498db' }, { name: '8I', color: '#2980b9' }, { name: '9I', color: '#9b59b6' },
+      { name: 'PW', color: '#8e44ad' }, { name: 'AW', color: '#e74c3c' }, { name: 'SW', color: '#c0392b' },
+      { name: 'LW', color: '#d35400' }, { name: 'PT', color: '#7f8c8d' }
     ];
+    var clubStats = LS('club_stats') || {};
+    var clubs = CLUB_DEFS.map(function (c) {
+      var s = clubStats[c.name] || {};
+      var dist = Number(s.dist), freq = Number(s.freq);
+      return { name: c.name, color: c.color, dist: isFinite(dist) ? dist : null, freq: isFinite(freq) ? freq : null };
+    }).filter(function (c) { return c.dist !== null && c.freq !== null; });
 
+    var totalFreq = clubs.reduce(function (s, c) { return s + c.freq; }, 0);
     var sorted = clubs.slice().sort(function (a, b) { return b.freq - a.freq; });
-    var optimal7 = sorted.slice(0, 7);
-    var coverage = Math.round(optimal7.reduce(function (s, c) { return s + c.freq; }, 0) / clubs.reduce(function (s, c) { return s + c.freq; }, 0) * 100);
-    if (coverage >= 70) unlockAchievement('sg40_coverage');
+    var optimal7 = sorted.slice(0, Math.min(7, sorted.length));
+    var coverage = totalFreq > 0 ? Math.round(optimal7.reduce(function (s, c) { return s + c.freq; }, 0) / totalFreq * 100) : null;
+    if (coverage !== null && coverage >= 70) unlockAchievement('sg40_coverage');
 
     var html = '<div class="sg40-panel"><div class="sg40-hdr"><h2><span class="sg40-hdr-icon">🎒</span>클럽 조합 최적화기</h2><button class="sg40-x" onclick="this.closest(\'.sg40-overlay\').classList.remove(\'active\')">&times;</button></div>';
     html += '<canvas id="sg40-combo-cv" width="620" height="400" style="width:100%;border-radius:14px;background:#0a0a1a;margin-bottom:16px"></canvas>';
-    html += '<div class="sg40-card"><h4>🏆 최적 7클럽 세트</h4>';
-    optimal7.forEach(function (c, i) {
-      html += '<div class="sg40-stat"><span style="color:' + c.color + '">' + (i + 1) + '. ' + c.name + ' (' + c.dist + 'yd)</span><span class="sg40-stat-val">사용빈도 ' + c.freq + '회</span></div>';
-    });
-    html += '<div style="margin-top:12px;text-align:center"><div style="color:#0077b6;font-size:24px;font-weight:900">' + coverage + '%</div><div style="color:rgba(255,255,255,.5);font-size:11px">거리 커버리지</div></div>';
+    html += '<div class="sg40-card"><h4>🏆 사용빈도 상위 클럽</h4>';
+    if (!clubs.length) {
+      html += '<p style="color:rgba(255,255,255,.5)">클럽별 거리·사용 기록이 없습니다. ' + EMPTY_MSG + '</p>';
+    } else {
+      optimal7.forEach(function (c, i) {
+        html += '<div class="sg40-stat"><span style="color:' + c.color + '">' + (i + 1) + '. ' + c.name + ' (' + c.dist + 'yd)</span><span class="sg40-stat-val">사용빈도 ' + c.freq + '회</span></div>';
+      });
+      html += '<div style="margin-top:12px;text-align:center"><div style="color:#0077b6;font-size:24px;font-weight:900">' + coverage + '%</div><div style="color:rgba(255,255,255,.5);font-size:11px">상위 클럽 사용 비중</div></div>';
+    }
     html += '</div></div>';
     ov.innerHTML = html;
     ov.classList.add('active');
@@ -398,19 +416,21 @@
       if (!cv) return;
       var ctx = cv.getContext('2d');
       var W = 620, H = 400;
+      if (!clubs.length) { drawEmpty40(ctx, W, H, '클럽 거리 커버리지 분석'); return; }
       ctx.fillStyle = '#0a0a1a';
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 14px sans-serif';
-      ctx.fillText('14클럽 거리 커버리지 분석', 20, 30);
+      ctx.fillText('클럽 거리 커버리지 분석 (기록 ' + clubs.length + '개)', 20, 30);
 
       var padL = 60, padR = 20, padT = 50, padB = 60;
       var cW = W - padL - padR, cH = H - padT - padB;
       var barW = cW / clubs.length - 4;
+      var maxD = Math.max(50, Math.ceil(Math.max.apply(null, clubs.map(function (c) { return c.dist; })) / 50) * 50);
 
       clubs.forEach(function (c, i) {
         var x = padL + i * (cW / clubs.length) + 2;
-        var barH = c.dist > 0 ? (c.dist / 250) * cH : 0;
+        var barH = c.dist > 0 ? (c.dist / maxD) * cH : 0;
         var y = padT + cH - barH;
         var isOptimal = optimal7.indexOf(c) >= 0;
         ctx.fillStyle = isOptimal ? c.color : 'rgba(255,255,255,.15)';
@@ -434,8 +454,8 @@
       ctx.fillStyle = 'rgba(255,255,255,.4)';
       ctx.font = '10px sans-serif';
       ctx.textAlign = 'right';
-      for (var d = 0; d <= 250; d += 50) {
-        var y = padT + cH - (d / 250) * cH;
+      for (var d = 0; d <= maxD; d += 50) {
+        var y = padT + cH - (d / maxD) * cH;
         ctx.fillText(d + 'yd', padL - 8, y + 4);
         ctx.strokeStyle = 'rgba(255,255,255,.06)';
         ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + cW, y); ctx.stroke();
@@ -444,7 +464,7 @@
       ctx.font = 'bold 11px sans-serif';
       ctx.fillStyle = '#0077b6';
       ctx.textAlign = 'left';
-      ctx.fillText('█ 최적 7클럽', W - 160, 28);
+      ctx.fillText('█ 사용빈도 상위', W - 160, 28);
       ctx.fillStyle = 'rgba(255,255,255,.3)';
       ctx.fillText('█ 미선택', W - 80, 28);
     }, 80);
@@ -455,25 +475,21 @@
     sg40sfx('sleep_corr');
     unlockAchievement('sg40_sleep_track');
     var ov = document.getElementById('sg40-sleep') || createOverlay('sg40-sleep');
-    var data = [];
-    for (var i = 0; i < 20; i++) {
-      var sleep = 5 + Math.random() * 4;
-      var score = Math.round(95 - (sleep - 7) * (sleep - 7) * 1.5 + (Math.random() - 0.5) * 10);
-      data.push({ sleep: Math.round(sleep * 10) / 10, score: Math.max(70, Math.min(100, score)), quality: Math.round(40 + Math.random() * 50) });
-    }
+    var data = LS('sleep_data') || [];
+    var hasSleep = data.length > 0;
 
-    var avgSleep = Math.round(data.reduce(function (s, d) { return s + d.sleep; }, 0) / data.length * 10) / 10;
-    var avgScore = Math.round(data.reduce(function (s, d) { return s + d.score; }, 0) / data.length);
+    var avgSleep = hasSleep ? Math.round(data.reduce(function (s, d) { return s + d.sleep; }, 0) / data.length * 10) / 10 : null;
+    var avgScore = hasSleep ? Math.round(data.reduce(function (s, d) { return s + d.score; }, 0) / data.length) : null;
 
     var html = '<div class="sg40-panel"><div class="sg40-hdr"><h2><span class="sg40-hdr-icon">😴</span>수면-성적 상관분석기</h2><button class="sg40-x" onclick="this.closest(\'.sg40-overlay\').classList.remove(\'active\')">&times;</button></div>';
     html += '<canvas id="sg40-sleep-cv" width="600" height="380" style="width:100%;border-radius:14px;background:#0a0a1a;margin-bottom:16px"></canvas>';
     html += '<div class="sg40-card"><h4>📊 수면 통계 요약</h4>';
-    html += '<div class="sg40-stat"><span>평균 수면 시간</span><span class="sg40-stat-val" style="color:#9b59b6">' + avgSleep + '시간</span></div>';
-    html += '<div class="sg40-stat"><span>평균 스코어</span><span class="sg40-stat-val" style="color:#2ecc71">' + avgScore + '타</span></div>';
-    html += '<div class="sg40-stat"><span>최적 수면</span><span class="sg40-stat-val" style="color:#0077b6">7.0~8.0시간</span></div>';
-    html += '<div class="sg40-stat"><span>상관계수 (r)</span><span class="sg40-stat-val" style="color:#f39c12">-0.72</span></div>';
+    html += '<div class="sg40-stat"><span>기록 수</span><span class="sg40-stat-val" style="color:#0077b6">' + data.length + '건</span></div>';
+    html += '<div class="sg40-stat"><span>평균 수면 시간</span><span class="sg40-stat-val" style="color:#9b59b6">' + (hasSleep ? avgSleep + '시간' : '-') + '</span></div>';
+    html += '<div class="sg40-stat"><span>평균 스코어</span><span class="sg40-stat-val" style="color:#2ecc71">' + (hasSleep ? avgScore + '타' : '-') + '</span></div>';
+    if (!hasSleep) html += '<p style="color:rgba(255,255,255,.5);margin-top:8px">' + EMPTY_MSG + '</p>';
     html += '</div>';
-    html += '<div class="sg40-card"><h4>💡 수면 개선 팁</h4><p>7-8시간 수면 시 스코어 평균 3.2타 개선. 수면 질(REM비율) 60% 이상 유지 시 퍼팅 정확도 15% 향상. 라운드 전날 카페인 14시 이후 제한 권장.</p></div></div>';
+    html += '<div class="sg40-card"><h4>💡 수면 기록 팁</h4><p>라운드 전날 수면 시간과 그날 스코어를 함께 기록하면 위 산점도에 내 데이터가 표시됩니다.</p></div></div>';
     ov.innerHTML = html;
     ov.classList.add('active');
 
@@ -482,6 +498,7 @@
       if (!cv) return;
       var ctx = cv.getContext('2d');
       var W = 600, H = 380;
+      if (!data.length) { drawEmpty40(ctx, W, H, '수면시간 vs 스코어 산점도'); return; }
       ctx.fillStyle = '#0a0a1a';
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = '#fff';
@@ -517,7 +534,7 @@
       ctx.fillStyle = 'rgba(46,204,113,.3)';
       ctx.font = '10px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('최적 수면', (x1 + x2) / 2, padT + 15);
+      ctx.fillText('일반 권장 수면대 (참고)', (x1 + x2) / 2, padT + 15);
 
       // dots
       data.forEach(function (d) {
@@ -527,19 +544,6 @@
         ctx.fillStyle = 'rgba(155,89,182,' + (0.4 + qual * 0.5) + ')';
         ctx.beginPath(); ctx.arc(x, y, 4 + qual * 5, 0, Math.PI * 2); ctx.fill();
       });
-
-      // trend line (approx)
-      ctx.strokeStyle = 'rgba(241,196,15,.6)';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([6, 4]);
-      ctx.beginPath();
-      var ty1 = padT + cH - ((78 - 70) / 30) * cH;
-      var ty2 = padT + cH - ((90 - 70) / 30) * cH;
-      var ty3 = padT + cH - ((85 - 70) / 30) * cH;
-      ctx.moveTo(padL, ty1);
-      ctx.quadraticCurveTo(padL + cW * 0.55, ty2 - 20, padL + cW, ty3);
-      ctx.stroke();
-      ctx.setLineDash([]);
 
       // axis labels
       ctx.fillStyle = 'rgba(255,255,255,.5)';
@@ -556,16 +560,8 @@
     var ov = document.getElementById('sg40-pattern') || createOverlay('sg40-pattern');
     var labels = ['DblBogey+', 'Bogey', 'Par', 'Birdie', 'Eagle'];
     var colors = ['#e74c3c', '#e67e22', '#3498db', '#2ecc71', '#ffd700'];
-    var rounds = [];
-    for (var r = 0; r < 5; r++) {
-      var rd = [];
-      for (var h = 0; h < 18; h++) {
-        var rnd = Math.random();
-        var val = rnd < 0.08 ? 0 : (rnd < 0.3 ? 1 : (rnd < 0.7 ? 2 : (rnd < 0.92 ? 3 : 4)));
-        rd.push(val);
-      }
-      rounds.push(rd);
-    }
+    var savedRounds = LS('scorecards');
+    var rounds = Array.isArray(savedRounds) ? savedRounds.filter(function (rd) { return Array.isArray(rd) && rd.length; }) : [];
 
     // find streaks
     var streaks = [];
@@ -580,20 +576,26 @@
     var html = '<div class="sg40-panel"><div class="sg40-hdr"><h2><span class="sg40-hdr-icon">🔍</span>스코어카드 패턴 마이너</h2><button class="sg40-x" onclick="this.closest(\'.sg40-overlay\').classList.remove(\'active\')">&times;</button></div>';
     html += '<canvas id="sg40-pattern-cv" width="640" height="400" style="width:100%;border-radius:14px;background:#0a0a1a;margin-bottom:16px"></canvas>';
     html += '<div class="sg40-card"><h4>🔥 발견된 연속 패턴 (Par 이상 3홀+)</h4>';
-    if (streaks.length > 0) {
+    if (!rounds.length) {
+      html += '<p style="color:rgba(255,255,255,.5)">' + EMPTY_MSG + '</p>';
+    } else if (streaks.length > 0) {
       streaks.forEach(function (s) { html += '<div class="sg40-stat"><span style="color:#2ecc71">' + s + '</span><span class="sg40-stat-val">3+홀 연속</span></div>'; });
     } else {
       html += '<p style="color:rgba(255,255,255,.5)">3홀 연속 Par 이상 패턴 미발견</p>';
     }
     html += '</div>';
     html += '<div class="sg40-card"><h4>📊 스코어 분포</h4>';
-    var total = rounds.length * 18;
-    labels.forEach(function (lb, li) {
-      var cnt = 0;
-      rounds.forEach(function (rd) { rd.forEach(function (v) { if (v === li) cnt++; }); });
-      var pct = Math.round(cnt / total * 100);
-      html += '<div class="sg40-stat"><span style="color:' + colors[li] + '">' + lb + '</span><span class="sg40-stat-val">' + cnt + '홀 (' + pct + '%)</span></div>';
-    });
+    var total = rounds.reduce(function (s, rd) { return s + rd.length; }, 0);
+    if (!total) {
+      html += '<p style="color:rgba(255,255,255,.5)">' + EMPTY_MSG + '</p>';
+    } else {
+      labels.forEach(function (lb, li) {
+        var cnt = 0;
+        rounds.forEach(function (rd) { rd.forEach(function (v) { if (v === li) cnt++; }); });
+        var pct = Math.round(cnt / total * 100);
+        html += '<div class="sg40-stat"><span style="color:' + colors[li] + '">' + lb + '</span><span class="sg40-stat-val">' + cnt + '홀 (' + pct + '%)</span></div>';
+      });
+    }
     html += '</div></div>';
     ov.innerHTML = html;
     ov.classList.add('active');
@@ -603,15 +605,17 @@
       if (!cv) return;
       var ctx = cv.getContext('2d');
       var W = 640, H = 400;
+      if (!rounds.length) { drawEmpty40(ctx, W, H, '라운드별 홀 패턴 히트맵'); return; }
       ctx.fillStyle = '#0a0a1a';
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 14px sans-serif';
-      ctx.fillText('5라운드 x 18홀 패턴 히트맵', 20, 30);
+      var maxHoles = Math.max.apply(null, rounds.map(function (rd) { return rd.length; }));
+      ctx.fillText(rounds.length + '라운드 x ' + maxHoles + '홀 패턴 히트맵', 20, 30);
 
       var padL = 80, padR = 20, padT = 55, padB = 40;
-      var cellW = (W - padL - padR) / 18;
-      var cellH = (H - padT - padB) / 5;
+      var cellW = (W - padL - padR) / maxHoles;
+      var cellH = (H - padT - padB) / rounds.length;
 
       rounds.forEach(function (rd, ri) {
         ctx.fillStyle = 'rgba(255,255,255,.5)';
@@ -622,7 +626,7 @@
         rd.forEach(function (v, hi) {
           var x = padL + hi * cellW;
           var y = padT + ri * cellH;
-          ctx.fillStyle = colors[v];
+          ctx.fillStyle = colors[v] || 'rgba(255,255,255,.15)';
           ctx.globalAlpha = 0.7;
           ctx.fillRect(x + 1, y + 1, cellW - 2, cellH - 2);
           ctx.globalAlpha = 1;
@@ -630,7 +634,7 @@
       });
 
       // column headers
-      for (var h = 1; h <= 18; h++) {
+      for (var h = 1; h <= maxHoles; h++) {
         ctx.fillStyle = 'rgba(255,255,255,.5)';
         ctx.font = '9px sans-serif';
         ctx.textAlign = 'center';
@@ -656,27 +660,35 @@
     sg40sfx('cond_radar');
     unlockAchievement('sg40_cond_expert');
     var ov = document.getElementById('sg40-cond') || createOverlay('sg40-cond');
-    var axes = [
-      { name: '그린스피드', value: 78, max: 100, tip: 'Stimpmeter 10+ = 빠른 그린. 퍼팅 터치 조절 필요' },
-      { name: '페어웨이 상태', value: 85, max: 100, tip: '잔디 밀도 높을수록 클린 컨택 용이. 런 감소' },
-      { name: '러프 높이', value: 62, max: 100, tip: '4인치 이상 러프: 탈출 우선. 웨지 사용 권장' },
-      { name: '벙커 모래질', value: 70, max: 100, tip: '부드러운 모래: 높은 바운스. 단단한 모래: 낮은 바운스' },
-      { name: '습도/수분', value: 55, max: 100, tip: '습한 코스: 비거리 -5~10%. 클럽업 권장' }
+    var COND_DEFS = [
+      { key: 'green', name: '그린스피드', tip: 'Stimpmeter 10+ = 빠른 그린. 퍼팅 터치 조절 필요' },
+      { key: 'fairway', name: '페어웨이 상태', tip: '잔디 밀도 높을수록 클린 컨택 용이. 런 감소' },
+      { key: 'rough', name: '러프 높이', tip: '4인치 이상 러프: 탈출 우선. 웨지 사용 권장' },
+      { key: 'bunker', name: '벙커 모래질', tip: '부드러운 모래: 높은 바운스. 단단한 모래: 낮은 바운스' },
+      { key: 'humidity', name: '습도/수분', tip: '습한 코스: 비거리 감소. 클럽업 고려' }
     ];
-    var totalScore = Math.round(axes.reduce(function (s, a) { return s + a.value; }, 0) / axes.length);
+    var condSaved = LS('course_cond') || {};
+    var axes = COND_DEFS.map(function (d) {
+      var v = Number(condSaved[d.key]);
+      return { name: d.name, tip: d.tip, max: 100, value: (isFinite(v) && v > 0) ? Math.min(100, v) : null };
+    });
+    var hasCond = axes.every(function (a) { return a.value !== null; });
+    var totalScore = hasCond ? Math.round(axes.reduce(function (s, a) { return s + a.value; }, 0) / axes.length) : null;
 
     var html = '<div class="sg40-panel"><div class="sg40-hdr"><h2><span class="sg40-hdr-icon">🌿</span>코스 컨디션 임팩트 분석기</h2><button class="sg40-x" onclick="this.closest(\'.sg40-overlay\').classList.remove(\'active\')">&times;</button></div>';
     html += '<canvas id="sg40-cond-cv" width="620" height="400" style="width:100%;border-radius:14px;background:#0a0a1a;margin-bottom:16px"></canvas>';
     html += '<div class="sg40-card"><h4>🎯 컨디션 상세 분석</h4>';
     axes.forEach(function (a) {
-      var pct = Math.round(a.value / a.max * 100);
-      var barColor = pct >= 80 ? '#2ecc71' : (pct >= 60 ? '#f39c12' : '#e74c3c');
-      html += '<div style="margin-bottom:14px"><div class="sg40-stat"><span>' + a.name + '</span><span class="sg40-stat-val" style="color:' + barColor + '">' + pct + '%</span></div>';
+      var rated = a.value !== null;
+      var pct = rated ? Math.round(a.value / a.max * 100) : 0;
+      var barColor = !rated ? 'rgba(255,255,255,.15)' : (pct >= 80 ? '#2ecc71' : (pct >= 60 ? '#f39c12' : '#e74c3c'));
+      html += '<div style="margin-bottom:14px"><div class="sg40-stat"><span>' + a.name + '</span><span class="sg40-stat-val" style="color:' + barColor + '">' + (rated ? pct + '%' : '-') + '</span></div>';
       html += '<div class="sg40-progress"><div class="sg40-progress-fill" style="width:' + pct + '%;background:' + barColor + '"></div></div>';
       html += '<p style="color:rgba(255,255,255,.4);font-size:11px;margin-top:4px">' + a.tip + '</p></div>';
     });
+    if (!hasCond) html += '<p style="color:rgba(255,255,255,.5)">코스 컨디션을 입력하지 않았습니다. ' + EMPTY_MSG + '</p>';
     html += '</div>';
-    html += '<div class="sg40-card"><h4>🏆 코스 컨디션 종합 등급</h4><div style="display:flex;align-items:center;gap:16px;margin-top:10px"><div class="sg40-grade ' + gradeClass(totalScore, 100) + '">' + gradeLetter(totalScore, 100) + '</div><div><div style="color:#fff;font-size:18px;font-weight:800">' + totalScore + '점</div><div style="color:rgba(255,255,255,.5);font-size:12px">5축 컨디션 종합</div></div></div></div></div>';
+    html += '<div class="sg40-card"><h4>🏆 코스 컨디션 종합 등급</h4>' + (hasCond ? '<div style="display:flex;align-items:center;gap:16px;margin-top:10px"><div class="sg40-grade ' + gradeClass(totalScore, 100) + '">' + gradeLetter(totalScore, 100) + '</div><div><div style="color:#fff;font-size:18px;font-weight:800">' + totalScore + '점</div><div style="color:rgba(255,255,255,.5);font-size:12px">5축 컨디션 종합</div></div></div>' : '<p style="color:rgba(255,255,255,.5)">' + EMPTY_MSG + '</p>') + '</div></div>';
     ov.innerHTML = html;
     ov.classList.add('active');
 
@@ -685,6 +697,7 @@
       if (!cv) return;
       var ctx = cv.getContext('2d');
       var W = 620, H = 400;
+      if (!hasCond) { drawEmpty40(ctx, W, H, '코스 컨디션 5축 Radar'); return; }
       ctx.fillStyle = '#0a0a1a';
       ctx.fillRect(0, 0, W, H);
 
@@ -764,23 +777,31 @@
     sg40sfx('miss_scan');
     unlockAchievement('sg40_miss_analyst');
     var ov = document.getElementById('sg40-miss') || createOverlay('sg40-miss');
-    var misses = [
-      { name: '슬라이스', freq: 35, severity: 70, axes: [30, 80, 60, 40, 50, 70], fix: '그립 강화, 클럽페이스 닫기, 아웃-인 스윙패스 교정', color: '#e74c3c' },
-      { name: '훅', freq: 20, severity: 55, axes: [70, 30, 50, 60, 40, 50], fix: '그립 약화, 몸 회전 동기화, 클럽페이스 오픈 유지', color: '#e67e22' },
-      { name: '탑핑', freq: 15, severity: 40, axes: [40, 50, 30, 70, 60, 40], fix: '머리 고정, 스윙 아크 유지, 공 위치 확인', color: '#f39c12' },
-      { name: '뒤땅', freq: 25, severity: 65, axes: [50, 40, 70, 30, 50, 60], fix: '체중 이동, 최저점 앞으로, 볼 포지션 조정', color: '#2ecc71' },
-      { name: '생크', freq: 8, severity: 85, axes: [60, 60, 40, 50, 30, 80], fix: '어드레스 거리 확인, 힐 컨택 방지, 팔 경로 교정', color: '#9b59b6' },
-      { name: '푸시', freq: 12, severity: 45, axes: [40, 50, 50, 40, 70, 30], fix: '타겟 정렬 확인, 인-아웃 패스 줄이기, 릴리스 타이밍', color: '#3498db' },
-      { name: '풀', freq: 10, severity: 35, axes: [50, 40, 40, 60, 30, 50], fix: '어깨 정렬, 다운스윙 시작 하체 주도, 클럽 릴리스 조절', color: '#1abc9c' }
+    var MISS_DEFS = [
+      { name: '슬라이스', fix: '그립 강화, 클럽페이스 닫기, 아웃-인 스윙패스 교정', color: '#e74c3c' },
+      { name: '훅', fix: '그립 약화, 몸 회전 동기화, 클럽페이스 오픈 유지', color: '#e67e22' },
+      { name: '탑핑', fix: '머리 고정, 스윙 아크 유지, 공 위치 확인', color: '#f39c12' },
+      { name: '뒤땅', fix: '체중 이동, 최저점 앞으로, 볼 포지션 조정', color: '#2ecc71' },
+      { name: '생크', fix: '어드레스 거리 확인, 힐 컨택 방지, 팔 경로 교정', color: '#9b59b6' },
+      { name: '푸시', fix: '타겟 정렬 확인, 인-아웃 패스 줄이기, 릴리스 타이밍', color: '#3498db' },
+      { name: '풀', fix: '어깨 정렬, 다운스윙 시작 하체 주도, 클럽 릴리스 조절', color: '#1abc9c' }
     ];
+    var missLog = LS('miss_stats') || {};
+    var misses = MISS_DEFS.map(function (m) {
+      var c = Number(missLog[m.name]);
+      return { name: m.name, fix: m.fix, color: m.color, count: (isFinite(c) && c > 0) ? c : 0 };
+    });
+    var recorded = misses.filter(function (m) { return m.count > 0; });
+    var missTotal = recorded.reduce(function (s, m) { return s + m.count; }, 0);
 
-    var fixPlans = misses.filter(function (m) { return m.severity >= 55; });
-    if (fixPlans.length >= 3) unlockAchievement('sg40_fix_master');
+    if (recorded.length >= 3) unlockAchievement('sg40_fix_master');
 
     var html = '<div class="sg40-panel"><div class="sg40-hdr"><h2><span class="sg40-hdr-icon">🎯</span>미스샷 유형별 교정 가이드</h2><button class="sg40-x" onclick="this.closest(\'.sg40-overlay\').classList.remove(\'active\')">&times;</button></div>';
     html += '<canvas id="sg40-miss-cv" width="600" height="380" style="width:100%;border-radius:14px;background:#0a0a1a;margin-bottom:16px"></canvas>';
+    if (!recorded.length) html += '<div class="sg40-card"><p style="color:rgba(255,255,255,.5)">기록된 미스샷이 없습니다. ' + EMPTY_MSG + ' (아래는 유형별 일반 교정법입니다)</p></div>';
     misses.forEach(function (m) {
-      html += '<div class="sg40-card"><h4><span style="color:' + m.color + '">&#9632;</span> ' + m.name + ' (빈도 ' + m.freq + '% / 심각도 ' + m.severity + ')</h4>';
+      var pct = missTotal > 0 ? Math.round(m.count / missTotal * 100) : 0;
+      html += '<div class="sg40-card"><h4><span style="color:' + m.color + '">&#9632;</span> ' + m.name + (m.count > 0 ? ' (내 기록 ' + m.count + '회 / ' + pct + '%)' : '') + '</h4>';
       html += '<p style="color:rgba(255,255,255,.7)"><strong>교정법:</strong> ' + m.fix + '</p></div>';
     });
     html += '</div>';
@@ -792,32 +813,26 @@
       if (!cv) return;
       var ctx = cv.getContext('2d');
       var W = 600, H = 380;
+      if (!recorded.length) { drawEmpty40(ctx, W, H, '내 미스샷 기록 분포'); return; }
       ctx.fillStyle = '#0a0a1a';
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 14px sans-serif';
-      ctx.fillText('미스샷 빈도 및 심각도 분석', 20, 30);
+      ctx.fillText('내 미스샷 기록 분포 (총 ' + missTotal + '회)', 20, 30);
 
       var padL = 90, padR = 20, padT = 50, padB = 30;
       var cH = H - padT - padB;
       var barH = cH / misses.length - 8;
+      var maxCount = Math.max.apply(null, misses.map(function (m) { return m.count; })) || 1;
 
       misses.forEach(function (m, i) {
         var y = padT + i * (cH / misses.length) + 4;
-        var freqW = (m.freq / 40) * (W - padL - padR - 10) * 0.5;
-        var sevW = (m.severity / 100) * (W - padL - padR - 10) * 0.5;
+        var cntW = (m.count / maxCount) * (W - padL - padR - 40);
 
-        // freq bar
         ctx.fillStyle = m.color;
         ctx.globalAlpha = 0.7;
         ctx.beginPath();
-        ctx.roundRect(padL, y, freqW, barH / 2 - 1, [4, 4, 4, 4]);
-        ctx.fill();
-
-        // severity bar
-        ctx.globalAlpha = 0.4;
-        ctx.beginPath();
-        ctx.roundRect(padL, y + barH / 2, sevW, barH / 2 - 1, [4, 4, 4, 4]);
+        ctx.roundRect(padL, y, cntW, barH, [4, 4, 4, 4]);
         ctx.fill();
         ctx.globalAlpha = 1;
 
@@ -827,19 +842,18 @@
         ctx.textAlign = 'right';
         ctx.fillText(m.name, padL - 8, y + barH / 2 + 2);
 
-        // values
+        // value
         ctx.fillStyle = 'rgba(255,255,255,.6)';
         ctx.font = '9px sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(m.freq + '%', padL + freqW + 4, y + barH / 4 + 2);
-        ctx.fillText(m.severity + '', padL + sevW + 4, y + barH * 3 / 4 + 2);
+        ctx.fillText(m.count + '회', padL + cntW + 4, y + barH / 2 + 2);
       });
 
       // legend
       ctx.font = '10px sans-serif';
       ctx.textAlign = 'right';
       ctx.fillStyle = 'rgba(255,255,255,.6)';
-      ctx.fillText('█ 빈도(%) | ░ 심각도', W - 20, 28);
+      ctx.fillText('█ 기록된 미스샷 횟수', W - 20, 28);
     }, 80);
   }
 
@@ -847,30 +861,38 @@
   function openRoundEntropyAnalyzer() {
     sg40sfx('entropy_calc');
     var ov = document.getElementById('sg40-entropy') || createOverlay('sg40-entropy');
-    var kpis = [
-      { name: '스코어 일관성', value: 82, icon: '📊', desc: '라운드 간 스코어 표준편차 기반' },
-      { name: '홀별 안정성', value: 75, icon: '⛳', desc: '홀 타입별 스코어 변동 계수' },
-      { name: '전반/후반 밸런스', value: 88, icon: '⚖️', desc: 'Front 9 vs Back 9 편차' },
-      { name: '파3/4/5 균형', value: 70, icon: '🎯', desc: '파 타입별 성적 균등도' },
-      { name: '멘탈 안정도', value: 65, icon: '🧠', desc: '더블보기 후 회복 속도' },
-      { name: '날씨 적응력', value: 78, icon: '🌤️', desc: '기상 변화 시 성적 유지율' },
-      { name: '클럽 일관성', value: 72, icon: '🏌️', desc: '클럽별 거리 분산도' },
-      { name: '퍼팅 정밀도', value: 85, icon: '🎱', desc: '퍼팅 거리별 정확도 일관성' }
+    var KPI_DEFS = [
+      { key: 'score_consistency', name: '스코어 일관성', icon: '📊', desc: '라운드 간 스코어 표준편차 기반' },
+      { key: 'hole_stability', name: '홀별 안정성', icon: '⛳', desc: '홀 타입별 스코어 변동 계수' },
+      { key: 'front_back', name: '전반/후반 밸런스', icon: '⚖️', desc: 'Front 9 vs Back 9 편차' },
+      { key: 'par_balance', name: '파3/4/5 균형', icon: '🎯', desc: '파 타입별 성적 균등도' },
+      { key: 'mental', name: '멘탈 안정도', icon: '🧠', desc: '더블보기 후 회복 속도' },
+      { key: 'weather', name: '날씨 적응력', icon: '🌤️', desc: '기상 변화 시 성적 유지율' },
+      { key: 'club', name: '클럽 일관성', icon: '🏌️', desc: '클럽별 거리 분산도' },
+      { key: 'putting', name: '퍼팅 정밀도', icon: '🎱', desc: '퍼팅 거리별 정확도 일관성' }
     ];
-    var avgEntropy = Math.round(kpis.reduce(function (s, k) { return s + k.value; }, 0) / kpis.length);
-    if (avgEntropy >= 70) unlockAchievement('sg40_entropy_low');
+    var kpiSaved = LS('entropy_kpis') || {};
+    var kpis = KPI_DEFS.map(function (d) {
+      var v = Number(kpiSaved[d.key]);
+      return { name: d.name, icon: d.icon, desc: d.desc, value: (isFinite(v) && v > 0) ? Math.min(100, v) : null };
+    });
+    var ratedKpis = kpis.filter(function (k) { return k.value !== null; });
+    var avgEntropy = ratedKpis.length ? Math.round(ratedKpis.reduce(function (s, k) { return s + k.value; }, 0) / ratedKpis.length) : null;
+    if (avgEntropy !== null && avgEntropy >= 70) unlockAchievement('sg40_entropy_low');
 
     var html = '<div class="sg40-panel"><div class="sg40-hdr"><h2><span class="sg40-hdr-icon">📐</span>라운드 엔트로피 분석기</h2><button class="sg40-x" onclick="this.closest(\'.sg40-overlay\').classList.remove(\'active\')">&times;</button></div>';
     html += '<canvas id="sg40-entropy-cv" width="620" height="400" style="width:100%;border-radius:14px;background:#0a0a1a;margin-bottom:16px"></canvas>';
     html += '<div class="sg40-card"><h4>📈 8대 일관성 지표</h4>';
+    if (!ratedKpis.length) html += '<p style="color:rgba(255,255,255,.5)">' + EMPTY_MSG + '</p>';
     kpis.forEach(function (k) {
-      var barColor = k.value >= 80 ? '#2ecc71' : (k.value >= 60 ? '#f39c12' : '#e74c3c');
-      html += '<div style="margin-bottom:10px"><div class="sg40-stat"><span>' + k.icon + ' ' + k.name + '</span><span class="sg40-stat-val" style="color:' + barColor + '">' + k.value + '%</span></div>';
-      html += '<div class="sg40-progress"><div class="sg40-progress-fill" style="width:' + k.value + '%;background:' + barColor + '"></div></div>';
+      var rated = k.value !== null;
+      var barColor = !rated ? 'rgba(255,255,255,.15)' : (k.value >= 80 ? '#2ecc71' : (k.value >= 60 ? '#f39c12' : '#e74c3c'));
+      html += '<div style="margin-bottom:10px"><div class="sg40-stat"><span>' + k.icon + ' ' + k.name + '</span><span class="sg40-stat-val" style="color:' + barColor + '">' + (rated ? k.value + '%' : '-') + '</span></div>';
+      html += '<div class="sg40-progress"><div class="sg40-progress-fill" style="width:' + (rated ? k.value : 0) + '%;background:' + barColor + '"></div></div>';
       html += '<div style="color:rgba(255,255,255,.35);font-size:10px">' + k.desc + '</div></div>';
     });
     html += '</div>';
-    html += '<div class="sg40-card"><h4>🏆 종합 엔트로피 등급</h4><div style="display:flex;align-items:center;gap:16px;margin-top:10px"><div class="sg40-grade ' + gradeClass(avgEntropy, 100) + '">' + gradeLetter(avgEntropy, 100) + '</div><div><div style="color:#fff;font-size:18px;font-weight:800">' + avgEntropy + '점</div><div style="color:rgba(255,255,255,.5);font-size:12px">낮을수록 일관적 (엔트로피 반전 점수)</div></div></div></div></div>';
+    html += '<div class="sg40-card"><h4>🏆 종합 엔트로피 등급</h4>' + (avgEntropy === null ? '<p style="color:rgba(255,255,255,.5)">' + EMPTY_MSG + '</p>' : '<div style="display:flex;align-items:center;gap:16px;margin-top:10px"><div class="sg40-grade ' + gradeClass(avgEntropy, 100) + '">' + gradeLetter(avgEntropy, 100) + '</div><div><div style="color:#fff;font-size:18px;font-weight:800">' + avgEntropy + '점</div><div style="color:rgba(255,255,255,.5);font-size:12px">기록된 ' + ratedKpis.length + '개 지표 평균</div></div></div>') + '</div></div>';
     ov.innerHTML = html;
     ov.classList.add('active');
 
@@ -879,6 +901,7 @@
       if (!cv) return;
       var ctx = cv.getContext('2d');
       var W = 620, H = 400;
+      if (!ratedKpis.length) { drawEmpty40(ctx, W, H, '8KPI 반원 게이지 대시보드'); return; }
       ctx.fillStyle = '#0a0a1a';
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = '#fff';
@@ -901,21 +924,24 @@
         ctx.arc(cx, cy, radius, Math.PI, 0);
         ctx.stroke();
 
-        // value arc
-        var pct = k.value / 100;
-        var endAngle = Math.PI + Math.PI * pct;
-        var gc = pct >= 0.8 ? '#2ecc71' : (pct >= 0.6 ? '#f39c12' : '#e74c3c');
-        ctx.strokeStyle = gc;
-        ctx.lineWidth = 10;
-        ctx.beginPath();
-        ctx.arc(cx, cy, radius, Math.PI, endAngle);
-        ctx.stroke();
+        // value arc (기록이 있을 때만)
+        var rated = k.value !== null;
+        var pct = rated ? k.value / 100 : 0;
+        if (rated) {
+          var endAngle = Math.PI + Math.PI * pct;
+          var gc = pct >= 0.8 ? '#2ecc71' : (pct >= 0.6 ? '#f39c12' : '#e74c3c');
+          ctx.strokeStyle = gc;
+          ctx.lineWidth = 10;
+          ctx.beginPath();
+          ctx.arc(cx, cy, radius, Math.PI, endAngle);
+          ctx.stroke();
+        }
 
         // value text
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = rated ? '#fff' : 'rgba(255,255,255,.35)';
         ctx.font = 'bold 16px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(k.value + '%', cx, cy + 6);
+        ctx.fillText(rated ? k.value + '%' : '-', cx, cy + 6);
 
         // label
         ctx.fillStyle = 'rgba(255,255,255,.6)';

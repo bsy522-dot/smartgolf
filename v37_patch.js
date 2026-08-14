@@ -9,7 +9,7 @@
 (function () {
   'use strict';
 
-  var LS = function(k, v) { return v === undefined ? JSON.parse(localStorage.getItem('sg37_' + k) || 'null') : localStorage.setItem('sg37_' + k, JSON.stringify(v)); };
+  var LS = function(k, v) { return v === undefined ? JSON.parse(localStorage.getItem('sg37b_' + k) || 'null') : localStorage.setItem('sg37b_' + k, JSON.stringify(v)); };
 
   // ========== SFX ENGINE ==========
   var _ac;
@@ -109,6 +109,36 @@
     return 'D';
   }
 
+  // 빈 상태 안내: 사용자가 입력한 데이터가 없을 때 캔버스 가운데에 안내문만 그린다.
+  function drawEmpty(ctx, W, H, msg) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(msg || '기록을 추가하면 표시됩니다', W / 2, H / 2);
+    ctx.restore();
+  }
+
+  // 입력창 값 읽기(비어 있거나 숫자가 아니면 null)
+  function readNum(id) {
+    var el = document.getElementById(id);
+    if (!el || el.value === '') return null;
+    var v = parseFloat(el.value);
+    return isNaN(v) ? null : v;
+  }
+
+  // 실제 사용 기록(업적 판정 근거). 패널을 실제로 열었을 때만 기록된다.
+  var usage = LS('usage') || {};
+  var FEATURE_KEYS = ['launch', 'cmgmt', 'putt', 'bell', 'energy', 'miss', 'psych', 'hcap'];
+  function markUsed(key) {
+    if (!usage[key]) { usage[key] = true; LS('usage', usage); }
+    evalAchievements();
+  }
+  function usedCount() {
+    return FEATURE_KEYS.filter(function(k) { return usage[k]; }).length;
+  }
+
   // ========================================================================
   // 1. 드라이버 발사각 최적화기 Canvas 620x400
   //    6개 발사각(8~18) x 5개 스핀량(2000~4000rpm) 히트맵
@@ -118,6 +148,7 @@
     var ov = document.getElementById('sg37-launch') || createOverlay('sg37-launch', '&#x1F680; &#xB4DC;&#xB77C;&#xC774;&#xBC84; &#xBC1C;&#xC0AC;&#xAC01; &#xCD5C;&#xC801;&#xD654;&#xAE30;', 'linear-gradient(135deg,#e74c3c,#c0392b)');
     ov.classList.add('active');
     var body = document.getElementById('sg37-launch-body');
+    markUsed('launch');
 
     var angles = [8, 10, 12, 14, 16, 18];
     var spins = [2000, 2500, 3000, 3500, 4000];
@@ -337,14 +368,15 @@
     var ov = document.getElementById('sg37-cmgmt') || createOverlay('sg37-cmgmt', '&#x1F3CC;&#xFE0F; &#xCF54;&#xC2A4; &#xB9E4;&#xB2C8;&#xC9C0;&#xBA3C;&#xD2B8; &#xC2DC;&#xB098;&#xB9AC;&#xC624;', 'linear-gradient(135deg,#27ae60,#2ecc71)');
     ov.classList.add('active');
     var body = document.getElementById('sg37-cmgmt-body');
+    markUsed('cmgmt');
 
     var scenarios = [
-      { name: '페;어;웨;이', risk: 20, reward: 85, par: 4, desc: '안;전;한 페;어;웨;이 공;략;', color: '#2ecc71', strategy: '드;라;이;버; 페;어;웨;이 → 아;이;언; 그;린;온;' },
-      { name: '러;프;', risk: 45, reward: 60, par: 4, desc: '러;프;에;서;의 회;복; 샷;', color: '#f39c12', strategy: '웨;지; 러;프;탈;출; → 안;전; 그;린;온;' },
-      { name: '벙;커;', risk: 65, reward: 45, par: 4, desc: '벙;커;샷; 탈;출; 시;나;리;오;', color: '#e67e22', strategy: '오;픈; 페;이;스;로; 탈;출; → 업;앤;다;운;' },
-      { name: '워;터;', risk: 80, reward: 30, par: 4, desc: '워;터; 해;저;드; 앞; 의;사;결;정;', color: '#e74c3c', strategy: '레;이;업; → 웨;지 그;린;온;' },
-      { name: 'OB', risk: 95, reward: 15, par: 4, desc: 'OB 위;험;지;역; 공;략;', color: '#c0392b', strategy: '안;전; 클;럽; → 페;어;웨;이 키;핑;' },
-      { name: '그;린;', risk: 30, reward: 90, par: 4, desc: '그;린;주;변; 어;프;로;치;', color: '#1abc9c', strategy: '핀; 하;이; 공;략; → 2퍼;트; 목;표;' }
+      { name: '페어웨이', risk: 20, reward: 85, par: 4, desc: '안전한 페어웨이 공략', color: '#2ecc71', strategy: '드라이버 페어웨이 → 아이언 그린온' },
+      { name: '러프', risk: 45, reward: 60, par: 4, desc: '러프에서의 회복 샷', color: '#f39c12', strategy: '웨지 러프탈출 → 안전 그린온' },
+      { name: '벙커', risk: 65, reward: 45, par: 4, desc: '벙커샷 탈출 시나리오', color: '#e67e22', strategy: '오픈 페이스로 탈출 → 업앤다운' },
+      { name: '워터', risk: 80, reward: 30, par: 4, desc: '워터 해저드 앞 의사결정', color: '#e74c3c', strategy: '레이업 → 웨지 그린온' },
+      { name: 'OB', risk: 95, reward: 15, par: 4, desc: 'OB 위험지역 공략', color: '#c0392b', strategy: '안전 클럽 → 페어웨이 키핑' },
+      { name: '그린', risk: 30, reward: 90, par: 4, desc: '그린주변 어프로치', color: '#1abc9c', strategy: '핀 하이 공략 → 2퍼트 목표' }
     ];
     var saved = LS('cmgmt') || { selected: 0, decisions: {} };
 
@@ -522,64 +554,89 @@
     ov.classList.add('active');
     var body = document.getElementById('sg37-putt-body');
 
-    var targets = [5, 10, 15, 20, 25, 30]; // meters
-    var saved = LS('putt') || { sessions: [], current: [] };
+    markUsed('putt');
 
-    function genResult(target) {
-      var dev = (Math.random() - 0.5) * target * 0.3;
-      return Math.round((target + dev) * 10) / 10;
+    var targets = [5, 10, 15, 20, 25, 30]; // meters
+    // 실제 거리는 난수로 만들지 않는다. 사용자가 직접 측정해 입력한 값만 사용한다.
+    var storedPutt = LS('putt') || {};
+    var saved = {
+      sessions: storedPutt.sessions || [],
+      current: (storedPutt.current && storedPutt.current.length === targets.length) ? storedPutt.current : targets.map(function(t) {
+        return { target: t, actual: null, deviation: null };
+      })
+    };
+
+    function enteredPutts() { return saved.current.filter(function(d) { return typeof d.actual === 'number'; }); }
+
+    function avgDeviation() {
+      var ent = enteredPutts();
+      if (!ent.length) return null;
+      var total = 0;
+      ent.forEach(function(d) { total += Math.abs(d.deviation); });
+      return Math.round(total / ent.length * 10) / 10;
     }
 
     function render() {
-      // ensure current session data
-      if (saved.current.length === 0) {
-        targets.forEach(function(t) {
-          saved.current.push({ target: t, actual: genResult(t), deviation: 0 });
-        });
-        saved.current.forEach(function(d) { d.deviation = Math.round((d.actual - d.target) * 10) / 10; });
-      }
-
-      var html = '<canvas id="sg37-putt-canvas" width="600" height="380" style="width:100%;max-width:600px;border-radius:12px;background:#1a1a2e;display:block;margin:0 auto 12px;cursor:pointer"></canvas>';
+      var html = '<canvas id="sg37-putt-canvas" width="600" height="380" style="width:100%;max-width:600px;border-radius:12px;background:#1a1a2e;display:block;margin:0 auto 12px"></canvas>';
+      html += '<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">목표 거리별로 실제 굴러간 거리(m)를 직접 입력하세요.</div>';
       html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">';
-      saved.current.forEach(function(d) {
-        var devColor = Math.abs(d.deviation) < 1 ? '#2ecc71' : Math.abs(d.deviation) < 2 ? '#f39c12' : '#e74c3c';
+      saved.current.forEach(function(d, i) {
+        var has = typeof d.actual === 'number';
+        var devColor = !has ? 'var(--text-muted)' : (Math.abs(d.deviation) < 1 ? '#2ecc71' : Math.abs(d.deviation) < 2 ? '#f39c12' : '#e74c3c');
         html += '<div class="sg37-card" style="text-align:center;padding:10px">';
-        html += '<div style="font-size:11px;color:var(--text-muted)">&#xBAA9;&#xD45C; ' + d.target + 'm</div>';
-        html += '<div style="font-size:16px;font-weight:700;color:' + devColor + '">' + d.actual + 'm</div>';
-        html += '<div style="font-size:10px;color:' + devColor + '">' + (d.deviation > 0 ? '+' : '') + d.deviation + 'm</div>';
+        html += '<div style="font-size:11px;color:var(--text-muted)">목표 ' + d.target + 'm</div>';
+        html += '<input type="number" step="0.1" id="sg37-putt-in-' + i + '" value="' + (has ? d.actual : '') + '" style="width:78px;text-align:center;font-size:15px;font-weight:700;border:2px solid #3498db;border-radius:8px;padding:3px;background:var(--bg);color:var(--text)">';
+        html += '<div style="font-size:10px;color:' + devColor + ';margin-top:2px">' + (has ? (d.deviation > 0 ? '+' : '') + d.deviation + 'm' : '미입력') + '</div>';
         html += '</div>';
       });
       html += '</div>';
 
-      // average deviation
-      var totalDev = 0;
-      saved.current.forEach(function(d) { totalDev += Math.abs(d.deviation); });
-      var avgDev = Math.round(totalDev / saved.current.length * 10) / 10;
-      var score = Math.max(0, Math.round(100 - avgDev * 15));
-
+      var avgDev = avgDeviation();
       html += '<div style="text-align:center;margin:12px 0">';
-      html += '<span class="' + gradeClass(score, 100) + '">' + gradeLabel(score, 100) + '</span>';
-      html += '<span style="margin-left:8px;font-size:14px;font-weight:600">&#xD3C9;&#xADE0; &#xD3B8;&#xCC28;: ' + avgDev + 'm (' + score + '&#xC810;)</span>';
+      if (avgDev === null) {
+        html += '<span style="font-size:13px;color:var(--text-muted)">실제 거리를 입력하면 평균 편차와 점수가 계산됩니다.</span>';
+      } else {
+        var score = Math.max(0, Math.round(100 - avgDev * 15));
+        html += '<span class="' + gradeClass(score, 100) + '">' + gradeLabel(score, 100) + '</span>';
+        html += '<span style="margin-left:8px;font-size:14px;font-weight:600">평균 편차: ' + avgDev + 'm (' + score + '점, 입력 ' + enteredPutts().length + '/' + targets.length + ')</span>';
+      }
       html += '</div>';
 
-      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-      html += '<button class="sg37-btn sg37-btn-primary" id="sg37-putt-retry">&#xC0C8; &#xC138;&#xC158; &#xC2DC;&#xC791;</button>';
-      html += '<button class="sg37-btn sg37-btn-secondary" id="sg37-putt-save">&#xC138;&#xC158; &#xC800;&#xC7A5;</button>';
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
+      html += '<button class="sg37-btn sg37-btn-primary" id="sg37-putt-apply">입력 적용</button>';
+      html += '<button class="sg37-btn sg37-btn-secondary" id="sg37-putt-save">세션 저장</button>';
+      html += '<button class="sg37-btn sg37-btn-secondary" id="sg37-putt-clear">입력 지우기</button>';
       html += '</div>';
 
       body.innerHTML = html;
 
-      document.getElementById('sg37-putt-retry').onclick = function() {
-        saved.current = [];
+      document.getElementById('sg37-putt-apply').onclick = function() {
+        var any = false;
+        saved.current = targets.map(function(t, i) {
+          var v = readNum('sg37-putt-in-' + i);
+          if (v !== null) any = true;
+          return { target: t, actual: v, deviation: v === null ? null : Math.round((v - t) * 10) / 10 };
+        });
+        if (!any) { alert('실제 거리를 하나 이상 입력하세요.'); return; }
         LS('putt', saved);
         SFX.putt_train();
         render();
       };
       document.getElementById('sg37-putt-save').onclick = function() {
-        saved.sessions.push({ date: new Date().toISOString().slice(0, 10), avg: avgDev, score: score, data: saved.current.slice() });
+        var avg = avgDeviation();
+        if (avg === null) { alert('먼저 [입력 적용]으로 실제 거리를 반영하세요.'); return; }
+        var sc = Math.max(0, Math.round(100 - avg * 15));
+        saved.sessions.push({ date: new Date().toISOString().slice(0, 10), avg: avg, score: sc, data: saved.current.slice() });
         if (saved.sessions.length > 10) saved.sessions.shift();
         LS('putt', saved);
         SFX.putt_hit();
+        evalAchievements();
+        render();
+      };
+      document.getElementById('sg37-putt-clear').onclick = function() {
+        saved.current = targets.map(function(t) { return { target: t, actual: null, deviation: null }; });
+        LS('putt', saved);
+        SFX.putt_train();
         render();
       };
 
@@ -598,68 +655,81 @@
       ctx.fillStyle = '#3498db';
       ctx.font = 'bold 14px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('퍼팅 거리감 편차 분석', W / 2, 25);
+      ctx.fillText('퍼팅 거리감 편차 (직접 입력한 기록)', W / 2, 25);
 
-      // bar chart - left half
       var barArea = { x: 50, y: 50, w: 260, h: 260 };
-      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(barArea.x, barArea.y + barArea.h);
-      ctx.lineTo(barArea.x + barArea.w, barArea.y + barArea.h);
-      ctx.stroke();
 
-      // zero line in middle
-      var zeroY = barArea.y + barArea.h / 2;
-      ctx.strokeStyle = 'rgba(253,203,110,0.4)';
-      ctx.setLineDash([4, 3]);
-      ctx.beginPath();
-      ctx.moveTo(barArea.x, zeroY);
-      ctx.lineTo(barArea.x + barArea.w, zeroY);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = 'rgba(253,203,110,0.5)';
-      ctx.font = '9px sans-serif';
-      ctx.textAlign = 'right';
-      ctx.fillText('0m', barArea.x - 4, zeroY + 3);
-
-      var barW = 32, gap = 10;
-      var maxDev = 5;
-      saved.current.forEach(function(d, i) {
-        var x = barArea.x + 12 + i * (barW + gap);
-        var devNorm = Math.max(-maxDev, Math.min(maxDev, d.deviation));
-        var barH = (Math.abs(devNorm) / maxDev) * (barArea.h / 2 - 10);
-
-        var barColor = Math.abs(d.deviation) < 1 ? '#2ecc71' : Math.abs(d.deviation) < 2 ? '#f39c12' : '#e74c3c';
-        var grad = ctx.createLinearGradient(x, zeroY, x, devNorm >= 0 ? zeroY - barH : zeroY + barH);
-        grad.addColorStop(0, barColor);
-        grad.addColorStop(1, barColor + '66');
-        ctx.fillStyle = grad;
-
-        if (devNorm >= 0) {
-          ctx.beginPath();
-          ctx.roundRect(x, zeroY - barH, barW, barH, [4, 4, 0, 0]);
-          ctx.fill();
-        } else {
-          ctx.beginPath();
-          ctx.roundRect(x, zeroY, barW, barH, [0, 0, 4, 4]);
-          ctx.fill();
-        }
-
-        // target label
-        ctx.fillStyle = '#fff';
-        ctx.font = '10px sans-serif';
+      if (!enteredPutts().length) {
+        ctx.fillStyle = 'rgba(255,255,255,0.45)';
+        ctx.font = '13px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(d.target + 'm', x + barW / 2, barArea.y + barArea.h + 16);
+        ctx.fillText('실제 거리를 입력하면', barArea.x + barArea.w / 2, barArea.y + barArea.h / 2);
+        ctx.fillText('편차 그래프가 표시됩니다', barArea.x + barArea.w / 2, barArea.y + barArea.h / 2 + 18);
+      } else {
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(barArea.x, barArea.y + barArea.h);
+        ctx.lineTo(barArea.x + barArea.w, barArea.y + barArea.h);
+        ctx.stroke();
 
-        // deviation value
-        ctx.fillStyle = barColor;
-        ctx.font = 'bold 10px sans-serif';
-        var labelY = devNorm >= 0 ? zeroY - barH - 8 : zeroY + barH + 14;
-        ctx.fillText((d.deviation > 0 ? '+' : '') + d.deviation, x + barW / 2, labelY);
-      });
+        var zeroY = barArea.y + barArea.h / 2;
+        ctx.strokeStyle = 'rgba(253,203,110,0.4)';
+        ctx.setLineDash([4, 3]);
+        ctx.beginPath();
+        ctx.moveTo(barArea.x, zeroY);
+        ctx.lineTo(barArea.x + barArea.w, zeroY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = 'rgba(253,203,110,0.5)';
+        ctx.font = '9px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText('0m', barArea.x - 4, zeroY + 3);
 
-      // session history line chart - right half
+        var barW = 32, gap = 10;
+        var maxDev = 5;
+        saved.current.forEach(function(d, i) {
+          var x = barArea.x + 12 + i * (barW + gap);
+
+          ctx.fillStyle = '#fff';
+          ctx.font = '10px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(d.target + 'm', x + barW / 2, barArea.y + barArea.h + 16);
+
+          if (typeof d.actual !== 'number') {
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.font = '9px sans-serif';
+            ctx.fillText('-', x + barW / 2, zeroY - 6);
+            return;
+          }
+
+          var devNorm = Math.max(-maxDev, Math.min(maxDev, d.deviation));
+          var barH = (Math.abs(devNorm) / maxDev) * (barArea.h / 2 - 10);
+          var barColor = Math.abs(d.deviation) < 1 ? '#2ecc71' : Math.abs(d.deviation) < 2 ? '#f39c12' : '#e74c3c';
+          var grad = ctx.createLinearGradient(x, zeroY, x, devNorm >= 0 ? zeroY - barH : zeroY + barH);
+          grad.addColorStop(0, barColor);
+          grad.addColorStop(1, barColor + '66');
+          ctx.fillStyle = grad;
+
+          if (devNorm >= 0) {
+            ctx.beginPath();
+            ctx.roundRect(x, zeroY - barH, barW, barH, [4, 4, 0, 0]);
+            ctx.fill();
+          } else {
+            ctx.beginPath();
+            ctx.roundRect(x, zeroY, barW, barH, [0, 0, 4, 4]);
+            ctx.fill();
+          }
+
+          ctx.fillStyle = barColor;
+          ctx.font = 'bold 10px sans-serif';
+          ctx.textAlign = 'center';
+          var labelY = devNorm >= 0 ? zeroY - barH - 8 : zeroY + barH + 14;
+          ctx.fillText((d.deviation > 0 ? '+' : '') + d.deviation, x + barW / 2, labelY);
+        });
+      }
+
+      // session history line chart - right half (사용자가 저장한 세션만 표시)
       var lineArea = { x: 370, y: 50, w: 200, h: 260 };
       ctx.fillStyle = 'rgba(255,255,255,0.5)';
       ctx.font = '11px sans-serif';
@@ -694,12 +764,14 @@
           ctx.fill();
           ctx.fillStyle = '#fff';
           ctx.font = '8px sans-serif';
+          ctx.textAlign = 'center';
           ctx.fillText(sess.avg + 'm', x, y - 10);
         });
       } else {
         ctx.fillStyle = 'rgba(255,255,255,0.3)';
         ctx.font = '12px sans-serif';
-        ctx.fillText('세션을 2회 이상;', lineArea.x + lineArea.w / 2, lineArea.y + lineArea.h / 2);
+        ctx.textAlign = 'center';
+        ctx.fillText('세션을 2회 이상', lineArea.x + lineArea.w / 2, lineArea.y + lineArea.h / 2);
         ctx.fillText('저장하면 그래프 표시', lineArea.x + lineArea.w / 2, lineArea.y + lineArea.h / 2 + 18);
       }
 
@@ -722,15 +794,10 @@
     ov.classList.add('active');
     var body = document.getElementById('sg37-bell-body');
 
+    markUsed('bell');
+
+    // 30라운드 표본 자동 생성 제거: 사용자가 직접 입력한 스코어만 사용한다.
     var saved = LS('bell') || { scores: [] };
-    if (saved.scores.length === 0) {
-      // generate 30 sample rounds
-      for (var i = 0; i < 30; i++) {
-        var s = Math.round(82 + (Math.random() - 0.5) * 20);
-        saved.scores.push(Math.max(68, Math.min(105, s)));
-      }
-      LS('bell', saved);
-    }
 
     function calcStats(arr) {
       var n = arr.length;
@@ -750,31 +817,38 @@
     }
 
     function render() {
-      var stats = calcStats(saved.scores);
+      var stats = saved.scores.length ? calcStats(saved.scores) : null;
       var html = '<canvas id="sg37-bell-canvas" width="620" height="400" style="width:100%;max-width:620px;border-radius:12px;background:#1a1a2e;display:block;margin:0 auto 12px;cursor:crosshair"></canvas>';
 
       html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
-      html += '<div class="sg37-card" style="text-align:center"><div style="font-size:11px;color:var(--text-muted)">&#xD3C9;&#xADE0;</div><div style="font-size:20px;font-weight:700;color:#9b59b6">' + stats.mean + '</div></div>';
-      html += '<div class="sg37-card" style="text-align:center"><div style="font-size:11px;color:var(--text-muted)">&#xD45C;&#xC900;&#xD3B8;&#xCC28;</div><div style="font-size:20px;font-weight:700;color:#e74c3c">' + stats.stddev + '</div></div>';
-      html += '<div class="sg37-card" style="text-align:center"><div style="font-size:11px;color:var(--text-muted)">&#xBCA0;&#xC2A4;&#xD2B8;</div><div style="font-size:20px;font-weight:700;color:#2ecc71">' + stats.best + '</div></div>';
-      html += '<div class="sg37-card" style="text-align:center"><div style="font-size:11px;color:var(--text-muted)">&#xBAA8;&#xB4DC;</div><div style="font-size:20px;font-weight:700;color:#3498db">' + stats.mode + '</div></div>';
-      html += '<div class="sg37-card" style="text-align:center"><div style="font-size:11px;color:var(--text-muted)">&#xC911;&#xC559;&#xAC12;</div><div style="font-size:20px;font-weight:700;color:#f39c12">' + stats.median + '</div></div>';
-      html += '<div class="sg37-card" style="text-align:center"><div style="font-size:11px;color:var(--text-muted)">&#xB77C;&#xC6B4;&#xB4DC; &#xC218;</div><div style="font-size:20px;font-weight:700">' + saved.scores.length + '</div></div>';
+      html += '<div class="sg37-card" style="text-align:center"><div style="font-size:11px;color:var(--text-muted)">평균</div><div style="font-size:20px;font-weight:700;color:#9b59b6">' + (stats ? stats.mean : '-') + '</div></div>';
+      html += '<div class="sg37-card" style="text-align:center"><div style="font-size:11px;color:var(--text-muted)">표준편차</div><div style="font-size:20px;font-weight:700;color:#e74c3c">' + (stats ? stats.stddev : '-') + '</div></div>';
+      html += '<div class="sg37-card" style="text-align:center"><div style="font-size:11px;color:var(--text-muted)">베스트</div><div style="font-size:20px;font-weight:700;color:#2ecc71">' + (stats ? stats.best : '-') + '</div></div>';
+      html += '<div class="sg37-card" style="text-align:center"><div style="font-size:11px;color:var(--text-muted)">모드</div><div style="font-size:20px;font-weight:700;color:#3498db">' + (stats ? stats.mode : '-') + '</div></div>';
+      html += '<div class="sg37-card" style="text-align:center"><div style="font-size:11px;color:var(--text-muted)">중앙값</div><div style="font-size:20px;font-weight:700;color:#f39c12">' + (stats ? stats.median : '-') + '</div></div>';
+      html += '<div class="sg37-card" style="text-align:center"><div style="font-size:11px;color:var(--text-muted)">입력한 라운드 수</div><div style="font-size:20px;font-weight:700">' + saved.scores.length + '</div></div>';
+      html += '</div>';
+
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-top:10px">';
+      html += '<span style="font-size:12px;color:var(--text-muted)">라운드 스코어</span>';
+      html += '<input type="number" id="sg37-bell-score" min="50" max="200" style="width:90px;text-align:center;font-size:15px;font-weight:700;border:2px solid #9b59b6;border-radius:8px;padding:3px;background:var(--bg);color:var(--text)">';
       html += '</div>';
 
       html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">';
-      html += '<button class="sg37-btn sg37-btn-primary" id="sg37-bell-add">&#xB77C;&#xC6B4;&#xB4DC; &#xCD94;&#xAC00;</button>';
-      html += '<button class="sg37-btn sg37-btn-secondary" id="sg37-bell-reset">&#xCD08;&#xAE30;&#xD654;</button>';
+      html += '<button class="sg37-btn sg37-btn-primary" id="sg37-bell-add">라운드 추가</button>';
+      html += '<button class="sg37-btn sg37-btn-secondary" id="sg37-bell-reset">초기화</button>';
       html += '</div>';
 
       body.innerHTML = html;
 
       document.getElementById('sg37-bell-add').onclick = function() {
-        var s = Math.round(82 + (Math.random() - 0.5) * 20);
-        saved.scores.push(Math.max(68, Math.min(105, s)));
+        var s = readNum('sg37-bell-score');
+        if (s === null) { alert('라운드 스코어를 입력하세요.'); return; }
+        saved.scores.push(Math.round(s));
         if (saved.scores.length > 50) saved.scores.shift();
         LS('bell', saved);
         SFX.bell_mark();
+        evalAchievements();
         render();
       };
       document.getElementById('sg37-bell-reset').onclick = function() {
@@ -809,7 +883,7 @@
       ctx.fillStyle = '#9b59b6';
       ctx.font = 'bold 14px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('스코어 분포 (최근 ' + saved.scores.length + '라운드)', W / 2, 25);
+      ctx.fillText('스코어 분포 (직접 입력한 ' + saved.scores.length + '라운드)', W / 2, 25);
 
       // build histogram bins
       var minScore = stats.best - 2;
@@ -939,59 +1013,106 @@
     ov.classList.add('active');
     var body = document.getElementById('sg37-energy-body');
 
-    var saved = LS('energy') || { holes: [] };
-    if (saved.holes.length === 0) {
-      for (var h = 1; h <= 18; h++) {
-        var decay = h / 18;
-        saved.holes.push({
-          hole: h,
-          stamina: Math.round(Math.max(20, 95 - decay * 55 + (Math.random() - 0.5) * 15)),
-          focus: Math.round(Math.max(15, 90 - decay * 40 + (Math.random() - 0.5) * 20)),
-          emotion: Math.round(Math.max(25, 85 - decay * 30 + (Math.random() - 0.5) * 25))
-        });
+    markUsed('energy');
+
+    // 18홀 체력/집중력/감정은 난수로 만들지 않고 사용자가 입력한 값만 사용한다.
+    var storedEnergy = LS('energy') || {};
+    var saved = { holes: (storedEnergy.holes && storedEnergy.holes.length === 18) ? storedEnergy.holes : [] };
+
+    // 보충 포인트는 일반적인 권장 타이밍 안내이며, 수치화된 효과(+15 체력 등)는 근거가 없어 삭제했다.
+    var boostPoints = [
+      { hole: 5, type: '간식', icon: '🍫' },
+      { hole: 9, type: '수분', icon: '💧' },
+      { hole: 12, type: '스트레칭', icon: '🧘' },
+      { hole: 15, type: '수분 + 간식', icon: '🍌' }
+    ];
+
+    function holeAt(i) { return saved.holes[i] || {}; }
+
+    function avgOf(key) {
+      var vals = [];
+      for (var i = 0; i < 18; i++) {
+        var v = holeAt(i)[key];
+        if (typeof v === 'number') vals.push(v);
       }
-      LS('energy', saved);
+      if (!vals.length) return null;
+      return Math.round(vals.reduce(function(a, b) { return a + b; }, 0) / vals.length);
     }
 
-    var boostPoints = [
-      { hole: 5, type: '간;식;', icon: '🍫', effect: '+15 체력;' },
-      { hole: 9, type: '수;분;', icon: '💧', effect: '+20 체력;/집;중;력;' },
-      { hole: 12, type: '스;트;레;칭;', icon: '🧘', effect: '+10 전;체;' },
-      { hole: 15, type: '수;분;+간;식;', icon: '🍌', effect: '+15 체력;/감;정;' }
-    ];
+    function pointsOf(key) {
+      var pts = [];
+      for (var i = 0; i < 18; i++) {
+        var v = holeAt(i)[key];
+        if (typeof v === 'number') pts.push({ i: i, v: v });
+      }
+      return pts;
+    }
 
     function render() {
       var html = '<canvas id="sg37-energy-canvas" width="600" height="380" style="width:100%;max-width:600px;border-radius:12px;background:#1a1a2e;display:block;margin:0 auto 12px"></canvas>';
 
-      // summary cards
-      var avgStam = 0, avgFocus = 0, avgEmo = 0;
-      saved.holes.forEach(function(h) { avgStam += h.stamina; avgFocus += h.focus; avgEmo += h.emotion; });
-      avgStam = Math.round(avgStam / 18);
-      avgFocus = Math.round(avgFocus / 18);
-      avgEmo = Math.round(avgEmo / 18);
-
+      var avgStam = avgOf('stamina'), avgFocus = avgOf('focus'), avgEmo = avgOf('emotion');
       html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
-      html += '<div class="sg37-card" style="text-align:center;border-left:4px solid #e74c3c"><div style="font-size:11px;color:var(--text-muted)">&#xCCB4;&#xB825; &#xD3C9;&#xADE0;</div><div style="font-size:20px;font-weight:700;color:#e74c3c">' + avgStam + '%</div></div>';
-      html += '<div class="sg37-card" style="text-align:center;border-left:4px solid #3498db"><div style="font-size:11px;color:var(--text-muted)">&#xC9D1;&#xC911;&#xB825; &#xD3C9;&#xADE0;</div><div style="font-size:20px;font-weight:700;color:#3498db">' + avgFocus + '%</div></div>';
-      html += '<div class="sg37-card" style="text-align:center;border-left:4px solid #2ecc71"><div style="font-size:11px;color:var(--text-muted)">&#xAC10;&#xC815; &#xD3C9;&#xADE0;</div><div style="font-size:20px;font-weight:700;color:#2ecc71">' + avgEmo + '%</div></div>';
+      html += '<div class="sg37-card" style="text-align:center;border-left:4px solid #e74c3c"><div style="font-size:11px;color:var(--text-muted)">체력 평균</div><div style="font-size:20px;font-weight:700;color:#e74c3c">' + (avgStam === null ? '-' : avgStam + '%') + '</div></div>';
+      html += '<div class="sg37-card" style="text-align:center;border-left:4px solid #3498db"><div style="font-size:11px;color:var(--text-muted)">집중력 평균</div><div style="font-size:20px;font-weight:700;color:#3498db">' + (avgFocus === null ? '-' : avgFocus + '%') + '</div></div>';
+      html += '<div class="sg37-card" style="text-align:center;border-left:4px solid #2ecc71"><div style="font-size:11px;color:var(--text-muted)">감정 평균</div><div style="font-size:20px;font-weight:700;color:#2ecc71">' + (avgEmo === null ? '-' : avgEmo + '%') + '</div></div>';
+      html += '</div>';
+
+      html += '<div style="margin-top:10px;font-size:12px;color:var(--text-muted)">홀별 체력/집중력/감정을 0~100으로 직접 입력하세요(빈칸은 미입력).</div>';
+      html += '<div style="display:grid;grid-template-columns:34px 1fr 1fr 1fr;gap:4px;margin-top:6px;font-size:10px;color:var(--text-muted);text-align:center"><div></div><div>체력</div><div>집중력</div><div>감정</div></div>';
+      for (var i = 0; i < 18; i++) {
+        var h = holeAt(i);
+        html += '<div style="display:grid;grid-template-columns:34px 1fr 1fr 1fr;gap:4px;align-items:center;margin-bottom:4px">';
+        html += '<div style="font-size:11px;font-weight:700">' + (i + 1) + 'H</div>';
+        html += '<input type="number" id="sg37-en-st-' + i + '" min="0" max="100" value="' + (typeof h.stamina === 'number' ? h.stamina : '') + '" style="width:100%;text-align:center">';
+        html += '<input type="number" id="sg37-en-fo-' + i + '" min="0" max="100" value="' + (typeof h.focus === 'number' ? h.focus : '') + '" style="width:100%;text-align:center">';
+        html += '<input type="number" id="sg37-en-em-' + i + '" min="0" max="100" value="' + (typeof h.emotion === 'number' ? h.emotion : '') + '" style="width:100%;text-align:center">';
+        html += '</div>';
+      }
+
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">';
+      html += '<button class="sg37-btn sg37-btn-primary" id="sg37-energy-save">기록 저장</button>';
+      html += '<button class="sg37-btn sg37-btn-secondary" id="sg37-energy-clear">전체 삭제</button>';
       html += '</div>';
 
       html += '<div style="margin-top:10px;padding:12px;background:var(--bg);border-radius:10px;border:1px solid var(--border)">';
-      html += '<div style="font-weight:600;margin-bottom:6px">&#x1F4A1; &#xC5D0;&#xB108;&#xC9C0; &#xBCF4;&#xCDA9; &#xD3EC;&#xC778;&#xD2B8;</div>';
+      html += '<div style="font-weight:600;margin-bottom:6px">&#x1F4A1; 에너지 보충 포인트(권장 타이밍)</div>';
       boostPoints.forEach(function(bp) {
-        html += '<div class="sg37-stat"><span>' + bp.icon + ' ' + bp.hole + '&#xBC88; &#xD640; &#xD6C4;: ' + bp.type + '</span><span style="font-weight:600;color:#f39c12">' + bp.effect + '</span></div>';
+        html += '<div class="sg37-stat"><span>' + bp.icon + ' ' + bp.hole + '번 홀 후: ' + bp.type + '</span></div>';
       });
       html += '</div>';
 
-      html += '<div style="text-align:center;margin-top:10px"><button class="sg37-btn sg37-btn-primary" id="sg37-energy-regen">&#xC0C8; &#xB77C;&#xC6B4;&#xB4DC; &#xC2DC;&#xBBAC;&#xB808;&#xC774;&#xC158;</button></div>';
-
       body.innerHTML = html;
 
-      document.getElementById('sg37-energy-regen').onclick = function() {
-        saved.holes = [];
-        LS('energy', saved);
+      document.getElementById('sg37-energy-save').onclick = function() {
+        var any = false;
+        var next = [];
+        for (var i = 0; i < 18; i++) {
+          var st = readNum('sg37-en-st-' + i);
+          var fo = readNum('sg37-en-fo-' + i);
+          var em = readNum('sg37-en-em-' + i);
+          if (st !== null || fo !== null || em !== null) any = true;
+          next.push({
+            hole: i + 1,
+            stamina: st === null ? null : Math.max(0, Math.min(100, Math.round(st))),
+            focus: fo === null ? null : Math.max(0, Math.min(100, Math.round(fo))),
+            emotion: em === null ? null : Math.max(0, Math.min(100, Math.round(em)))
+          });
+        }
+        if (!any) { alert('홀별 값을 하나 이상 입력하세요.'); return; }
+        saved.holes = next;
+        storedEnergy.holes = next;
+        LS('energy', storedEnergy);
         SFX.energy_boost();
-        openEnergyManager();
+        evalAchievements();
+        render();
+      };
+      document.getElementById('sg37-energy-clear').onclick = function() {
+        saved.holes = [];
+        storedEnergy.holes = [];
+        LS('energy', storedEnergy);
+        SFX.energy_log();
+        render();
       };
 
       drawEnergyCanvas();
@@ -1009,11 +1130,19 @@
       ctx.fillStyle = '#f39c12';
       ctx.font = 'bold 14px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('18홀 에너지 추이 (체력/집중력/감정)', W / 2, 25);
+      ctx.fillText('18홀 에너지 추이 (직접 입력한 기록)', W / 2, 25);
+
+      var lines = [
+        { key: 'stamina', color: '#e74c3c', label: '체력' },
+        { key: 'focus', color: '#3498db', label: '집중력' },
+        { key: 'emotion', color: '#2ecc71', label: '감정' }
+      ];
+
+      var hasAny = lines.some(function(l) { return pointsOf(l.key).length > 0; });
+      if (!hasAny) { drawEmpty(ctx, W, H, '홀별 체력/집중력/감정을 입력하면 표시됩니다'); return; }
 
       var chartX = 50, chartY = 50, chartW = W - 80, chartH = 260;
 
-      // grid
       ctx.strokeStyle = 'rgba(255,255,255,0.08)';
       ctx.lineWidth = 1;
       for (var i = 0; i <= 4; i++) {
@@ -1028,7 +1157,6 @@
         ctx.fillText(i * 25 + '%', chartX - 5, gy + 3);
       }
 
-      // x-axis labels
       ctx.textAlign = 'center';
       for (var h = 0; h < 18; h++) {
         var hx = chartX + (h / 17) * chartW;
@@ -1037,45 +1165,24 @@
         if (h % 3 === 0 || h === 17) ctx.fillText((h + 1) + 'H', hx, chartY + chartH + 14);
       }
 
-      // draw lines
-      var lines = [
-        { key: 'stamina', color: '#e74c3c', label: '체력' },
-        { key: 'focus', color: '#3498db', label: '집중력' },
-        { key: 'emotion', color: '#2ecc71', label: '감정' }
-      ];
-
       lines.forEach(function(line) {
-        // fill under line
-        ctx.beginPath();
-        ctx.globalAlpha = 0.08;
-        ctx.fillStyle = line.color;
-        saved.holes.forEach(function(hole, i) {
-          var x = chartX + (i / 17) * chartW;
-          var y = chartY + chartH - (hole[line.key] / 100) * chartH;
-          if (i === 0) { ctx.moveTo(x, chartY + chartH); ctx.lineTo(x, y); }
-          else ctx.lineTo(x, y);
-        });
-        ctx.lineTo(chartX + chartW, chartY + chartH);
-        ctx.closePath();
-        ctx.fill();
-        ctx.globalAlpha = 1.0;
+        var pts = pointsOf(line.key);
+        if (!pts.length) return;
 
-        // line
         ctx.beginPath();
         ctx.strokeStyle = line.color;
         ctx.lineWidth = 2.5;
-        saved.holes.forEach(function(hole, i) {
-          var x = chartX + (i / 17) * chartW;
-          var y = chartY + chartH - (hole[line.key] / 100) * chartH;
-          if (i === 0) ctx.moveTo(x, y);
+        pts.forEach(function(p, idx) {
+          var x = chartX + (p.i / 17) * chartW;
+          var y = chartY + chartH - (p.v / 100) * chartH;
+          if (idx === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         });
         ctx.stroke();
 
-        // dots
-        saved.holes.forEach(function(hole, i) {
-          var x = chartX + (i / 17) * chartW;
-          var y = chartY + chartH - (hole[line.key] / 100) * chartH;
+        pts.forEach(function(p) {
+          var x = chartX + (p.i / 17) * chartW;
+          var y = chartY + chartH - (p.v / 100) * chartH;
           ctx.fillStyle = line.color;
           ctx.beginPath();
           ctx.arc(x, y, 2.5, 0, Math.PI * 2);
@@ -1083,7 +1190,7 @@
         });
       });
 
-      // boost markers
+      // boost markers (권장 타이밍 표시)
       boostPoints.forEach(function(bp) {
         var x = chartX + ((bp.hole - 1) / 17) * chartW;
         ctx.strokeStyle = '#fdcb6e';
@@ -1113,9 +1220,9 @@
       ctx.setLineDash([]);
       ctx.fillStyle = 'rgba(255,255,255,0.3)';
       ctx.font = '9px sans-serif';
-      ctx.fillText('턴;', turnX, chartY + chartH + 26);
+      ctx.textAlign = 'center';
+      ctx.fillText('턴', turnX, chartY + chartH + 26);
 
-      // legend
       ctx.font = '10px sans-serif';
       ctx.textAlign = 'left';
       lines.forEach(function(line, i) {
@@ -1139,6 +1246,7 @@
     var ov = document.getElementById('sg37-miss') || createOverlay('sg37-miss', '&#x1F6D1; &#xD074;&#xB7FD;&#xBCC4; &#xBBF8;&#xC2A4;&#xC0F7; &#xD328;&#xD134; &#xBD84;&#xC11D;&#xAE30;', 'linear-gradient(135deg,#e74c3c,#c0392b)');
     ov.classList.add('active');
     var body = document.getElementById('sg37-miss-body');
+    markUsed('miss');
 
     var clubs = ['DR', '3W', '5W', '3I', '4I', '5I', '6I', '7I', '8I', '9I', 'PW', 'AW', 'SW'];
     var missTypes = ['슬라이스', '훅', '탑', '청크', '생크', '푸시'];
@@ -1340,31 +1448,28 @@
     var ov = document.getElementById('sg37-psych') || createOverlay('sg37-psych', '&#x1F9E0; &#xACE8;&#xD504; &#xC2EC;&#xB9AC; &#xD504;&#xB85C;&#xD30C;&#xC77C;&#xB7EC;', 'linear-gradient(135deg,#1abc9c,#16a085)');
     ov.classList.add('active');
     var body = document.getElementById('sg37-psych-body');
+    markUsed('psych');
 
     var axes = [
-      { name: '자;신;감;', key: 'confidence' },
-      { name: '집;중;력;', key: 'focus' },
-      { name: '회;복;력;', key: 'resilience' },
-      { name: '루;틴;일;관;성;', key: 'routine' },
-      { name: '압;박;대;처;', key: 'pressure' },
-      { name: '전;략;사;고;', key: 'strategy' }
+      { name: '자신감', key: 'confidence' },
+      { name: '집중력', key: 'focus' },
+      { name: '회복력', key: 'resilience' },
+      { name: '루틴일관성', key: 'routine' },
+      { name: '압박대처', key: 'pressure' },
+      { name: '전략사고', key: 'strategy' }
     ];
     var types = [
-      { name: 'Aggressive', desc: '공;격;적;인; 플;레;이;어;', color: '#e74c3c', traits: '자;신;감;+압;박;대;처; 우;세;', cond: function(d) { return d.confidence >= 75 && d.pressure >= 70; } },
-      { name: 'Conservative', desc: '안;정;적;인; 플;레;이;어;', color: '#3498db', traits: '루;틴;+전;략;사;고; 우;세;', cond: function(d) { return d.routine >= 75 && d.strategy >= 70; } },
-      { name: 'Analytical', desc: '분;석;적;인; 플;레;이;어;', color: '#2ecc71', traits: '전;략;+집;중;력; 우;세;', cond: function(d) { return d.strategy >= 75 && d.focus >= 70; } },
-      { name: 'Instinctive', desc: '직;관;적;인; 플;레;이;어;', color: '#f39c12', traits: '회;복;력;+자;신;감; 우;세;', cond: function(d) { return d.resilience >= 70 && d.confidence >= 65; } }
+      { name: 'Aggressive', desc: '공격적인 플레이어', color: '#e74c3c', traits: '자신감+압박대처 우세', cond: function(d) { return d.confidence >= 75 && d.pressure >= 70; } },
+      { name: 'Conservative', desc: '안정적인 플레이어', color: '#3498db', traits: '루틴+전략사고 우세', cond: function(d) { return d.routine >= 75 && d.strategy >= 70; } },
+      { name: 'Analytical', desc: '분석적인 플레이어', color: '#2ecc71', traits: '전략+집중력 우세', cond: function(d) { return d.strategy >= 75 && d.focus >= 70; } },
+      { name: 'Instinctive', desc: '직관적인 플레이어', color: '#f39c12', traits: '회복력+자신감 우세', cond: function(d) { return d.resilience >= 70 && d.confidence >= 65; } }
     ];
 
-    var saved = LS('psych') || {
-      confidence: Math.round(50 + Math.random() * 40),
-      focus: Math.round(50 + Math.random() * 40),
-      resilience: Math.round(50 + Math.random() * 40),
-      routine: Math.round(50 + Math.random() * 40),
-      pressure: Math.round(50 + Math.random() * 40),
-      strategy: Math.round(50 + Math.random() * 40)
-    };
-    LS('psych', saved);
+    // 난수 초기화와 즉시 영구저장을 제거했다.
+    // 평가 전에는 중립값(50)만 두고, 사용자가 슬라이더를 움직였을 때만 저장한다.
+    var storedPsych = LS('psych');
+    var hasProfile = !!storedPsych;
+    var saved = storedPsych || { confidence: 50, focus: 50, resilience: 50, routine: 50, pressure: 50, strategy: 50 };
 
     function getType() {
       for (var i = 0; i < types.length; i++) {
@@ -1378,16 +1483,20 @@
     }
 
     function render() {
-      var myType = getType();
+      var myType = hasProfile ? getType() : null;
       var html = '<canvas id="sg37-psych-canvas" width="620" height="400" style="width:100%;max-width:620px;border-radius:12px;background:#1a1a2e;display:block;margin:0 auto 12px;cursor:pointer"></canvas>';
 
-      // type card
-      html += '<div class="sg37-card" style="border-left:4px solid ' + myType.color + ';padding:14px">';
-      html += '<div style="display:flex;align-items:center;gap:10px">';
-      html += '<span class="sg37-grade" style="background:' + myType.color + '">' + myType.name + '</span>';
-      html += '<div><div style="font-weight:700;font-size:14px">' + myType.desc + '</div>';
-      html += '<div style="font-size:12px;color:var(--text-muted)">' + myType.traits + '</div></div>';
-      html += '</div></div>';
+      // type card (평가 전에는 유형을 판정하지 않는다)
+      if (myType) {
+        html += '<div class="sg37-card" style="border-left:4px solid ' + myType.color + ';padding:14px">';
+        html += '<div style="display:flex;align-items:center;gap:10px">';
+        html += '<span class="sg37-grade" style="background:' + myType.color + '">' + myType.name + '</span>';
+        html += '<div><div style="font-weight:700;font-size:14px">' + myType.desc + '</div>';
+        html += '<div style="font-size:12px;color:var(--text-muted)">' + myType.traits + '</div></div>';
+        html += '</div></div>';
+      } else {
+        html += '<div class="sg37-card" style="padding:14px;font-size:13px;color:var(--text-muted)">아직 평가 전입니다. 아래 슬라이더로 6개 축을 직접 평가하면 유형이 표시됩니다.</div>';
+      }
 
       // axis sliders
       html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">';
@@ -1407,11 +1516,13 @@
       body.querySelectorAll('input[type=range]').forEach(function(inp) {
         inp.oninput = function() {
           saved[this.dataset.key] = parseInt(this.value);
+          hasProfile = true;
           LS('psych', saved);
           drawPsychCanvas();
         };
         inp.onchange = function() {
           SFX.psych_scan();
+          evalAchievements();
           render();
         };
       });
@@ -1428,10 +1539,17 @@
       ctx.fillStyle = '#16213e';
       ctx.fillRect(0, 0, W, H);
 
-      var myType = getType();
       ctx.fillStyle = '#1abc9c';
       ctx.font = 'bold 14px sans-serif';
       ctx.textAlign = 'center';
+
+      if (!hasProfile) {
+        ctx.fillText('골프 심리 프로파일 (미평가)', W / 2, 25);
+        drawEmpty(ctx, W, H, '슬라이더로 6개 축을 평가하면 표시됩니다');
+        return;
+      }
+
+      var myType = getType();
       ctx.fillText('골프 심리 프로파일 (' + myType.name + ')', W / 2, 25);
 
       // radar chart
@@ -1542,6 +1660,7 @@
     var ov = document.getElementById('sg37-hcap') || createOverlay('sg37-hcap', '&#x1F3AF; &#xD578;&#xB514;&#xCE61; &#xC2DC;&#xBBAC;&#xB808;&#xC774;&#xD130;', 'linear-gradient(135deg,#2980b9,#3498db)');
     ov.classList.add('active');
     var body = document.getElementById('sg37-hcap-body');
+    markUsed('hcap');
 
     var saved = LS('hcap') || { current: 24, target: 15, weekly: 2 };
 
@@ -1627,7 +1746,7 @@
       ctx.fillStyle = '#3498db';
       ctx.font = 'bold 14px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('핸디칡 개선 시뮬레이션', W / 2, 25);
+      ctx.fillText('핸디캡 개선 시뮬레이션', W / 2, 25);
 
       var proj = calcProjection();
 
@@ -1808,14 +1927,14 @@
       { q: '라운드 중 체력 관리에서 가장 중요한 시점은?', a: ['1번 홀', '9번 홀 이후', '18번 홀', '연습 스윙'], c: 1 },
       { q: '슬라이스 미스샷의 주요 원인은?', a: ['오픈 클럽페이스', '볼 위치 문제', '그립 문제', '스윙 스피드 문제'], c: 0 },
       { q: '골프 심리에서 프리샷 루틴의 목적은?', a: ['시간 끌기', '집중력 유지와 일관성', '상대 선수 압박', '체력 절약'], c: 1 },
-      { q: '핸디칡 인덱스 계산 시 Slope Rating이 높을수록?', a: ['코스가 쉬움', '보기 골퍼에게 더 어려움', '코스가 짧음', '그린이 느림'], c: 1 },
+      { q: '핸디캡 인덱스 계산 시 Slope Rating이 높을수록?', a: ['코스가 쉬움', '보기 골퍼에게 더 어려움', '코스가 짧음', '그린이 느림'], c: 1 },
       { q: '청크 미스샷 교정을 위한 핵심 드릴은?', a: ['스윙 스피드 높이기', '체중 이동 선행 연습', '그립 강화', '백스윙 늘리기'], c: 1 },
       { q: '라운드 에너지 관리에서 간식 섭취 최적 시점은?', a: ['1번 홀 전', '5번 홀과 12번 홀 전후', '18번 홀 전', '9번 홀만'], c: 1 },
       { q: '레이더 차트에서 6축 평가 중 회복력이란?', a: ['미스샷 후 평정심을 유지하는 능력', '체력 회복', '드라이버 비거리', '퍼팅 성공률'], c: 0 },
       { q: '반원 게이지(gauge)는 어떤 데이터를 표현할 때 적합한가?', a: ['시계열 데이터', '목표 대비 진행률', '카테고리 비교', '산점도'], c: 1 },
       { q: 'Aggressive 플레이 유형의 특징은?', a: ['안전한 플레이 선호', '리스크를 감수하고 공격적으로 공략', '데이터 분석 중심', '직관에 의존'], c: 1 },
       { q: '벨커브(정규분포)에서 1표준편차 범위에 들어갈 확률은?', a: ['약 50%', '약 68%', '약 95%', '약 99%'], c: 1 },
-      { q: '핸디칡 개선 속도가 가장 빠른 구간은?', a: ['0~5 구간', '5~10 구간', '20~30 구간 (초보자)', '모든 구간 동일'], c: 2 }
+      { q: '핸디캡 개선 속도가 가장 빠른 구간은?', a: ['0~5 구간', '5~10 구간', '20~30 구간 (초보자)', '모든 구간 동일'], c: 2 }
     ];
 
     var saved = LS('iq21') || { answers: {}, score: 0 };
@@ -1890,23 +2009,25 @@
     { id: 'energy_manager', name: '에너지 매니저', desc: '라운드 에너지 매니저 사용', check: function() { return LS('energy'); } },
     { id: 'miss_shot_analyst', name: '미스샷 분석가', desc: '클럽별 미스샷 패턴 분석 사용', check: function() { return LS('miss'); } },
     { id: 'psych_profiler', name: '심리 프로파일러', desc: '골프 심리 프로파일러 사용', check: function() { return LS('psych'); } },
-    { id: 'handicap_sim', name: '핸디칡 시뮬레이터', desc: '핸디칡 시뮬레이터 사용', check: function() { return LS('hcap'); } },
+    { id: 'handicap_sim', name: '핸디캡 시뮬레이터', desc: '핸디캡 시뮬레이터 사용', check: function() { return LS('hcap'); } },
     { id: 'golf_iq_v21', name: 'Golf IQ v21 도전자', desc: 'Golf IQ v21 퍼즐 응답', check: function() { return LS('iq21'); } },
     { id: 'golf_iq_v21_master', name: 'Golf IQ v21 마스터', desc: 'Golf IQ v21 12문항 이상 정답', check: function() { var s = LS('iq21'); if (!s) return false; var c = 0; for (var k in s.answers) { if (typeof s.answers[k] === 'boolean' && s.answers[k]) c++; } return c >= 12; } },
-    { id: 'v37_explorer', name: 'v37 탐험가', desc: 'v37 기능 3개 이상 사용', check: function() { return true; } },
-    { id: 'v37_complete', name: 'v37 컴플리트', desc: 'v37 모든 기능 확인', check: function() { return true; } },
+    { id: 'v37_explorer', name: 'v37 탐험가', desc: 'v37 기능 3개 이상 사용', check: function() { return usedCount() >= 3; } },
+    { id: 'v37_complete', name: 'v37 컴플리트', desc: 'v37 8개 기능 모두 확인', check: function() { return usedCount() >= FEATURE_KEYS.length; } },
     { id: 'putt_pro', name: '퍼팅 프로', desc: '퍼팅 세션 3회 이상 저장', check: function() { var s = LS('putt'); return s && s.sessions && s.sessions.length >= 3; } },
-    { id: 'hcap_planner', name: '핸디칡 플래너', desc: '핸디칡 목표 설정 완료', check: function() { return LS('hcap'); } },
+    { id: 'hcap_planner', name: '핸디캡 플래너', desc: '핸디캡 목표 설정 완료', check: function() { return LS('hcap'); } },
     { id: 'psych_master', name: '심리 마스터', desc: '심리 프로파일 4축 80이상 달성', check: function() { var s = LS('psych'); if (!s) return false; var high = 0; for (var k in s) { if (s[k] >= 80) high++; } return high >= 4; } }
   ];
 
   var savedAch = LS('achievements') || {};
-  achievements.forEach(function(a) {
-    if (!savedAch[a.id] && a.check()) {
-      savedAch[a.id] = true;
-      LS('achievements', savedAch);
-    }
-  });
+  function evalAchievements() {
+    var changed = false;
+    achievements.forEach(function(a) {
+      if (!savedAch[a.id] && a.check()) { savedAch[a.id] = true; changed = true; }
+    });
+    if (changed) LS('achievements', savedAch);
+  }
+  evalAchievements();
 
   // ========================================================================
   // NAVIGATION - append to existing bar

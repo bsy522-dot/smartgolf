@@ -114,12 +114,13 @@
     SFX.club_life();
     const clubs = ['Driver','3W','5W','3H','4I','5I','6I','7I','8I','9I','PW','AW','SW','LW'];
     const maxRounds = [300,350,400,400,500,500,500,500,500,500,600,600,600,600];
-    let data = LS('clublife') || clubs.map((c,i) => ({ name: c, rounds: Math.floor(Math.random() * maxRounds[i] * 0.7), max: maxRounds[i], purchased: '2024-01' }));
+    // 저장된 사용자 기록이 없으면 0라운드에서 시작한다 (임의 사용량 생성 금지)
+    let data = LS('clublife_v2') || clubs.map((c,i) => ({ name: c, rounds: 0, max: maxRounds[i], purchased: '' }));
 
     const html = '<canvas id="sg33-clublife-cv" width="620" height="380" style="width:100%;max-width:620px;border-radius:10px;background:#f9f9f9;margin-bottom:10px"></canvas>' +
       '<div class="sg33-row" style="justify-content:center;gap:6px;flex-wrap:wrap">' +
       '<button class="sg33-btn sg33-btn-primary" onclick="window._sg33_cl_add()">+10 Rounds</button>' +
-      '<button class="sg33-btn sg33-btn-outline" onclick="window._sg33_cl_rand()">Random</button>' +
+      '<button class="sg33-btn sg33-btn-outline" onclick="window._sg33_cl_save()">&#x1F4BE; Save</button>' +
       '<button class="sg33-btn sg33-btn-outline" onclick="window._sg33_cl_reset()">Reset</button>' +
       '</div>' +
       '<div class="sg33-grid" style="grid-template-columns:repeat(3,1fr);margin-top:10px">' +
@@ -145,8 +146,12 @@
       ctx.textAlign = 'center';
       ctx.fillText('Club Lifespan Tracker (Rounds)', W / 2, 24);
 
+      // 빈 상태 가드: 기록된 라운드가 하나도 없으면 통계를 만들지 않는다
+      const clTotal = data.reduce((s, d) => s + ((d && d.rounds) || 0), 0);
+
       clubs.forEach((c, i) => {
         const x = ml + i * (bw + 4);
+        if (!data[i]) data[i] = { name: c, rounds: 0, max: maxRounds[i], purchased: '' };
         const pct = Math.min(data[i].rounds / data[i].max, 1);
         const bh = pct * ch;
         const color = pct >= 0.9 ? '#c62828' : pct >= 0.7 ? '#ef6c00' : pct >= 0.5 ? '#f9a825' : '#2e7d32';
@@ -198,21 +203,33 @@
       ctx.fillStyle = '#c62828'; ctx.font = '9px Segoe UI, sans-serif'; ctx.textAlign = 'left';
       ctx.fillText('Replace Zone (80%)', ml + 5, warnY - 4);
 
-      const needReplace = data.filter(d => d.rounds / d.max >= 0.8).length;
-      const avgLife = Math.round(data.reduce((s, d) => s + d.rounds / d.max, 0) / data.length * 100);
-      const oldest = data.reduce((a, b) => a.rounds / a.max > b.rounds / b.max ? a : b);
       const nEl = document.getElementById('sg33-cl-need');
       const aEl = document.getElementById('sg33-cl-avg');
       const oEl = document.getElementById('sg33-cl-oldest');
+
+      if (!data.length || clTotal === 0) {
+        ctx.fillStyle = isDark ? '#999' : '#888';
+        ctx.font = '13px Segoe UI, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('기록을 추가하면 표시됩니다', W / 2, mt + ch / 2);
+        if (nEl) nEl.textContent = '-';
+        if (aEl) aEl.textContent = '-';
+        if (oEl) oEl.textContent = '-';
+        return;
+      }
+
+      const needReplace = data.filter(d => d.rounds / d.max >= 0.8).length;
+      const avgLife = Math.round(data.reduce((s, d) => s + d.rounds / d.max, 0) / data.length * 100);
+      const oldest = data.reduce((a, b) => a.rounds / a.max > b.rounds / b.max ? a : b);
       if (nEl) nEl.textContent = needReplace;
       if (aEl) aEl.textContent = avgLife + '%';
       if (oEl) oEl.textContent = oldest.name;
-      LS('clublife', data);
+      // 자동 저장 제거: 저장은 Save 버튼에서만
     }
 
-    window._sg33_cl_add = () => { data.forEach(d => { d.rounds = Math.min(d.rounds + 10, d.max); }); SFX.club_life(); draw(); };
-    window._sg33_cl_rand = () => { data = clubs.map((c, i) => ({ name: c, rounds: Math.floor(Math.random() * maxRounds[i]), max: maxRounds[i], purchased: '2024-01' })); SFX.club_life(); draw(); };
-    window._sg33_cl_reset = () => { data = clubs.map((c, i) => ({ name: c, rounds: 0, max: maxRounds[i], purchased: '2024-01' })); SFX.club_life(); draw(); };
+    window._sg33_cl_add = () => { data.forEach(d => { d.rounds = Math.min((d.rounds || 0) + 10, d.max); }); SFX.club_life(); draw(); };
+    window._sg33_cl_save = () => { LS('clublife_v2', data); SFX.club_life(); };
+    window._sg33_cl_reset = () => { data = clubs.map((c, i) => ({ name: c, rounds: 0, max: maxRounds[i], purchased: '' })); SFX.club_life(); draw(); };
 
     setTimeout(draw, 80);
     _checkAchievementsV33('club_life_opened');
@@ -745,17 +762,24 @@
   // ===============================================================
   function openRoundPaceComparator() {
     SFX.pace_check();
-    let data = LS('roundPace') || Array.from({ length: 18 }, (_, i) => ({
+    // actual(실제 소요시간)은 사용자가 입력할 때만 채워진다. ideal은 코스 기준값(고정 참고치).
+    let data = LS('roundPace_v2') || Array.from({ length: 18 }, (_, i) => ({
       hole: i + 1,
-      actual: 12 + Math.floor(Math.random() * 8),
+      actual: null,
       ideal: i < 4 ? 13 : i < 9 ? 14 : i < 13 ? 14 : 15
     }));
 
+    let holeOpts = '';
+    for (let i = 1; i <= 18; i++) holeOpts += '<option value="' + i + '">' + i + 'H</option>';
+
     const html = '<canvas id="sg33-pace-cv" width="600" height="360" style="width:100%;max-width:600px;border-radius:10px;background:#f9f9f9;margin-bottom:10px"></canvas>' +
-      '<div class="sg33-row" style="justify-content:center;gap:6px">' +
-      '<button class="sg33-btn sg33-btn-primary" onclick="window._sg33_pace_rand()">Simulate Round</button>' +
-      '<button class="sg33-btn sg33-btn-outline" onclick="window._sg33_pace_fast()">Fast Round</button>' +
-      '<button class="sg33-btn sg33-btn-outline" onclick="window._sg33_pace_slow()">Slow Round</button></div>' +
+      '<div class="sg33-row" style="justify-content:center;gap:6px;flex-wrap:wrap">' +
+      '<span class="sg33-label">Hole</span><select id="sg33-pace-hole" style="padding:4px 8px;border-radius:6px;border:1px solid var(--border,#ddd)">' + holeOpts + '</select>' +
+      '<span class="sg33-label">Minutes</span><input type="number" id="sg33-pace-min" min="1" max="60" step="1" placeholder="-" style="width:70px;padding:4px 8px;border-radius:6px;border:1px solid var(--border,#ddd)">' +
+      '<button class="sg33-btn sg33-btn-primary" onclick="window._sg33_pace_record()">&#x2795; Record</button></div>' +
+      '<div class="sg33-row" style="justify-content:center;gap:6px;margin-top:6px">' +
+      '<button class="sg33-btn sg33-btn-outline" onclick="window._sg33_pace_save()">&#x1F4BE; Save</button>' +
+      '<button class="sg33-btn sg33-btn-outline" onclick="window._sg33_pace_reset()">Reset</button></div>' +
       '<div class="sg33-grid" style="grid-template-columns:repeat(4,1fr);margin-top:10px">' +
       '<div class="sg33-stat"><div class="sg33-stat-val" id="sg33-pace-total">-</div><div class="sg33-stat-label">Total min</div></div>' +
       '<div class="sg33-stat"><div class="sg33-stat-val" id="sg33-pace-ideal">-</div><div class="sg33-stat-label">Ideal min</div></div>' +
@@ -793,13 +817,17 @@
         ctx.fillText(v + 'm', ml - 5, y + 3);
       });
 
+      const paceEntered = data.filter(d => typeof d.actual === 'number' && !isNaN(d.actual));
+
       data.forEach((d, i) => {
         const x = ml + i * (bw + 3);
-        const ah = (d.actual / maxMin) * ch;
         const ih = (d.ideal / maxMin) * ch;
 
-        ctx.fillStyle = d.actual > d.ideal + 2 ? '#c62828' : d.actual > d.ideal ? '#f9a825' : '#2e7d32';
-        ctx.fillRect(x, mt + ch - ah, bw / 2 - 1, ah);
+        if (typeof d.actual === 'number' && !isNaN(d.actual)) {
+          const ah = (d.actual / maxMin) * ch;
+          ctx.fillStyle = d.actual > d.ideal + 2 ? '#c62828' : d.actual > d.ideal ? '#f9a825' : '#2e7d32';
+          ctx.fillRect(x, mt + ch - ah, bw / 2 - 1, ah);
+        }
 
         ctx.fillStyle = isDark ? '#555' : '#bbb';
         ctx.fillRect(x + bw / 2, mt + ch - ih, bw / 2 - 1, ih);
@@ -827,21 +855,50 @@
       ctx.stroke();
       ctx.setLineDash([]);
 
-      const totalActual = data.reduce((s, d) => s + d.actual, 0);
-      const totalIdeal = data.reduce((s, d) => s + d.ideal, 0);
-      const diff = totalActual - totalIdeal;
-      const grade = diff <= -5 ? 'S' : diff <= 0 ? 'A' : diff <= 10 ? 'B' : diff <= 20 ? 'C' : 'D';
+      const tEl = document.getElementById('sg33-pace-total');
+      const iEl = document.getElementById('sg33-pace-ideal');
+      const dEl = document.getElementById('sg33-pace-diff');
+      const gEl = document.getElementById('sg33-pace-grade');
 
-      document.getElementById('sg33-pace-total').textContent = totalActual;
-      document.getElementById('sg33-pace-ideal').textContent = totalIdeal;
-      document.getElementById('sg33-pace-diff').textContent = (diff >= 0 ? '+' : '') + diff;
-      document.getElementById('sg33-pace-grade').textContent = grade;
-      LS('roundPace', data);
+      if (!paceEntered.length) {
+        ctx.fillStyle = isDark ? '#999' : '#888';
+        ctx.font = '13px Segoe UI, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('기록을 추가하면 표시됩니다 (회색 = 기준 페이스)', W / 2, mt + 22);
+        if (tEl) tEl.textContent = '-';
+        if (iEl) iEl.textContent = '-';
+        if (dEl) dEl.textContent = '-';
+        if (gEl) gEl.textContent = '-';
+        return;
+      }
+
+      // 입력된 홀만 비교한다 (기록 없는 홀을 0분으로 계산하지 않는다)
+      const totalActual = paceEntered.reduce((s, d) => s + d.actual, 0);
+      const totalIdeal = paceEntered.reduce((s, d) => s + d.ideal, 0);
+      const diff = totalActual - totalIdeal;
+      const grade = paceEntered.length < 18 ? '-' : (diff <= -5 ? 'S' : diff <= 0 ? 'A' : diff <= 10 ? 'B' : diff <= 20 ? 'C' : 'D');
+
+      if (tEl) tEl.textContent = totalActual + ' (' + paceEntered.length + 'H)';
+      if (iEl) iEl.textContent = totalIdeal;
+      if (dEl) dEl.textContent = (diff >= 0 ? '+' : '') + diff;
+      if (gEl) gEl.textContent = grade;
+      // 자동 저장 제거: 저장은 Save 버튼에서만
     }
 
-    window._sg33_pace_rand = () => { data = Array.from({ length: 18 }, (_, i) => ({ hole: i + 1, actual: 10 + Math.floor(Math.random() * 10), ideal: i < 4 ? 13 : i < 9 ? 14 : i < 13 ? 14 : 15 })); SFX.pace_check(); draw(); };
-    window._sg33_pace_fast = () => { data = Array.from({ length: 18 }, (_, i) => ({ hole: i + 1, actual: 9 + Math.floor(Math.random() * 5), ideal: i < 4 ? 13 : i < 9 ? 14 : i < 13 ? 14 : 15 })); SFX.pace_fast(); draw(); };
-    window._sg33_pace_slow = () => { data = Array.from({ length: 18 }, (_, i) => ({ hole: i + 1, actual: 15 + Math.floor(Math.random() * 8), ideal: i < 4 ? 13 : i < 9 ? 14 : i < 13 ? 14 : 15 })); SFX.pace_check(); draw(); };
+    window._sg33_pace_record = () => {
+      const hSel = document.getElementById('sg33-pace-hole');
+      const mIn = document.getElementById('sg33-pace-min');
+      if (!hSel || !mIn) return;
+      const h = parseInt(hSel.value);
+      const m = parseInt(mIn.value);
+      if (isNaN(h) || isNaN(m) || m < 1 || m > 60) return;
+      const row = data.find(d => d.hole === h);
+      if (row) row.actual = m;
+      SFX.pace_check();
+      draw();
+    };
+    window._sg33_pace_save = () => { LS('roundPace_v2', data); SFX.pace_fast(); };
+    window._sg33_pace_reset = () => { data.forEach(d => { d.actual = null; }); SFX.pace_check(); draw(); };
 
     setTimeout(draw, 80);
     _checkAchievementsV33('pace_opened');
@@ -986,18 +1043,25 @@
   // ===============================================================
   function openRoundRhythmAnalyzer() {
     SFX.rhythm_beat();
-    let data = LS('roundRhythm') || Array.from({ length: 18 }, (_, i) => ({
+    // score는 사용자가 입력할 때만 채워진다. par는 코스 기준값(고정 참고치).
+    const rhPar = i => (i < 4 ? 4 : i === 4 ? 3 : i < 8 ? 4 : i === 8 ? 5 : i < 13 ? 4 : i === 13 ? 3 : i < 17 ? 4 : 5);
+    let data = LS('roundRhythm_v2') || Array.from({ length: 18 }, (_, i) => ({
       hole: i + 1,
-      score: (i % 3 === 0 ? 5 : i % 3 === 1 ? 4 : 3) + Math.floor(Math.random() * 3) - 1,
-      par: i < 4 ? 4 : i === 4 ? 3 : i < 8 ? 4 : i === 8 ? 5 : i < 13 ? 4 : i === 13 ? 3 : i < 17 ? 4 : 5,
-      tempo: 60 + Math.floor(Math.random() * 40)
+      score: null,
+      par: rhPar(i)
     }));
 
+    let rhHoleOpts = '';
+    for (let i = 1; i <= 18; i++) rhHoleOpts += '<option value="' + i + '">' + i + 'H</option>';
+
     const html = '<canvas id="sg33-rhythm-cv" width="580" height="360" style="width:100%;max-width:580px;border-radius:10px;background:#f9f9f9;margin-bottom:10px"></canvas>' +
-      '<div class="sg33-row" style="justify-content:center;gap:6px">' +
-      '<button class="sg33-btn sg33-btn-primary" onclick="window._sg33_rh_rand()">Simulate</button>' +
-      '<button class="sg33-btn sg33-btn-outline" onclick="window._sg33_rh_steady()">Steady Round</button>' +
-      '<button class="sg33-btn sg33-btn-outline" onclick="window._sg33_rh_collapse()">Back 9 Collapse</button></div>' +
+      '<div class="sg33-row" style="justify-content:center;gap:6px;flex-wrap:wrap">' +
+      '<span class="sg33-label">Hole</span><select id="sg33-rh-hole" style="padding:4px 8px;border-radius:6px;border:1px solid var(--border,#ddd)">' + rhHoleOpts + '</select>' +
+      '<span class="sg33-label">Score</span><input type="number" id="sg33-rh-score" min="1" max="12" step="1" placeholder="-" style="width:70px;padding:4px 8px;border-radius:6px;border:1px solid var(--border,#ddd)">' +
+      '<button class="sg33-btn sg33-btn-primary" onclick="window._sg33_rh_record()">&#x2795; Record</button></div>' +
+      '<div class="sg33-row" style="justify-content:center;gap:6px;margin-top:6px">' +
+      '<button class="sg33-btn sg33-btn-outline" onclick="window._sg33_rh_save()">&#x1F4BE; Save</button>' +
+      '<button class="sg33-btn sg33-btn-outline" onclick="window._sg33_rh_reset()">Reset</button></div>' +
       '<div class="sg33-grid" style="grid-template-columns:repeat(4,1fr);margin-top:10px">' +
       '<div class="sg33-stat"><div class="sg33-stat-val" id="sg33-rh-front">-</div><div class="sg33-stat-label">Front 9</div></div>' +
       '<div class="sg33-stat"><div class="sg33-stat-val" id="sg33-rh-back">-</div><div class="sg33-stat-label">Back 9</div></div>' +
@@ -1051,64 +1115,92 @@
       ctx.fillText('Back 9', ml + 3 * cw / 4, mt + ch + 30);
 
       const stepW = cw / 18;
-      const grd = ctx.createLinearGradient(ml, 0, ml + cw, 0);
-      grd.addColorStop(0, '#2e7d32');
-      grd.addColorStop(0.5, '#1565c0');
-      grd.addColorStop(1, '#c62828');
+      const hasSc = d => d && typeof d.score === 'number' && !isNaN(d.score);
+      const rhEntered = data.filter(hasSc);
 
-      ctx.fillStyle = isDark ? 'rgba(255,107,53,0.15)' : 'rgba(255,107,53,0.08)';
-      ctx.beginPath();
-      ctx.moveTo(ml, midY);
+      // 홀 번호는 항상 표시
       data.forEach((d, i) => {
-        const x = ml + i * stepW + stepW / 2;
-        const diff = d.score - d.par;
-        const y = midY - diff * (ch / 6);
-        ctx.lineTo(x, y);
-      });
-      ctx.lineTo(ml + 17 * stepW + stepW / 2, midY);
-      ctx.fill();
-
-      ctx.strokeStyle = '#ff6b35';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      data.forEach((d, i) => {
-        const x = ml + i * stepW + stepW / 2;
-        const diff = d.score - d.par;
-        const y = midY - diff * (ch / 6);
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      });
-      ctx.stroke();
-
-      data.forEach((d, i) => {
-        const x = ml + i * stepW + stepW / 2;
-        const diff = d.score - d.par;
-        const y = midY - diff * (ch / 6);
-        const dotColor = diff <= -1 ? '#2e7d32' : diff === 0 ? '#1565c0' : diff === 1 ? '#f9a825' : '#c62828';
-        ctx.fillStyle = dotColor;
-        ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = isDark ? '#ddd' : '#333';
         ctx.font = '8px Segoe UI, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(d.hole, x, mt + ch + 14);
+        ctx.fillText(d.hole, ml + i * stepW + stepW / 2, mt + ch + 14);
       });
 
-      const front = data.slice(0, 9).reduce((s, d) => s + d.score, 0);
-      const back = data.slice(9).reduce((s, d) => s + d.score, 0);
-      const diffs = data.map(d => d.score - d.par);
-      const mean = diffs.reduce((s, v) => s + v, 0) / diffs.length;
-      const variance = Math.round(diffs.reduce((s, v) => s + (v - mean) ** 2, 0) / diffs.length * 100) / 100;
-      const rhythm = variance <= 0.5 ? 'S' : variance <= 1.0 ? 'A' : variance <= 1.5 ? 'B' : variance <= 2.5 ? 'C' : 'D';
+      const fEl = document.getElementById('sg33-rh-front');
+      const bEl = document.getElementById('sg33-rh-back');
+      const vEl = document.getElementById('sg33-rh-variance');
+      const gEl = document.getElementById('sg33-rh-rhythm');
 
-      document.getElementById('sg33-rh-front').textContent = front;
-      document.getElementById('sg33-rh-back').textContent = back;
-      document.getElementById('sg33-rh-variance').textContent = variance;
-      document.getElementById('sg33-rh-rhythm').textContent = rhythm;
-      LS('roundRhythm', data);
+      if (!rhEntered.length) {
+        ctx.fillStyle = isDark ? '#999' : '#888';
+        ctx.font = '13px Segoe UI, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('기록을 추가하면 표시됩니다', W / 2, midY - 10);
+        if (fEl) fEl.textContent = '-';
+        if (bEl) bEl.textContent = '-';
+        if (vEl) vEl.textContent = '-';
+        if (gEl) gEl.textContent = '-';
+        return;
+      }
+
+      const pts = [];
+      data.forEach((d, i) => {
+        if (!hasSc(d)) return;
+        pts.push({ x: ml + i * stepW + stepW / 2, y: midY - (d.score - d.par) * (ch / 6), diff: d.score - d.par });
+      });
+
+      if (pts.length >= 2) {
+        ctx.fillStyle = isDark ? 'rgba(255,107,53,0.15)' : 'rgba(255,107,53,0.08)';
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, midY);
+        pts.forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.lineTo(pts[pts.length - 1].x, midY);
+        ctx.fill();
+
+        ctx.strokeStyle = '#ff6b35';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        pts.forEach((p, i) => { i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y); });
+        ctx.stroke();
+      }
+
+      pts.forEach(p => {
+        const dotColor = p.diff <= -1 ? '#2e7d32' : p.diff === 0 ? '#1565c0' : p.diff === 1 ? '#f9a825' : '#c62828';
+        ctx.fillStyle = dotColor;
+        ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); ctx.fill();
+      });
+
+      // 입력된 홀만 집계한다 (기록 없는 홀을 0타로 계산하지 않는다)
+      const frontList = data.slice(0, 9).filter(hasSc);
+      const backList = data.slice(9).filter(hasSc);
+      const front = frontList.reduce((s, d) => s + d.score, 0);
+      const back = backList.reduce((s, d) => s + d.score, 0);
+      const diffs = rhEntered.map(d => d.score - d.par);
+      const mean = diffs.reduce((s, v) => s + v, 0) / diffs.length;
+      const variance = Math.round(diffs.reduce((s, v) => s + (v - mean) * (v - mean), 0) / diffs.length * 100) / 100;
+      const rhythm = rhEntered.length < 18 ? '-' : (variance <= 0.5 ? 'S' : variance <= 1.0 ? 'A' : variance <= 1.5 ? 'B' : variance <= 2.5 ? 'C' : 'D');
+
+      if (fEl) fEl.textContent = frontList.length ? front + ' (' + frontList.length + 'H)' : '-';
+      if (bEl) bEl.textContent = backList.length ? back + ' (' + backList.length + 'H)' : '-';
+      if (vEl) vEl.textContent = rhEntered.length >= 2 ? variance : '-';
+      if (gEl) gEl.textContent = rhythm;
+      // 자동 저장 제거: 저장은 Save 버튼에서만
     }
 
-    window._sg33_rh_rand = () => { data = Array.from({ length: 18 }, (_, i) => ({ hole: i + 1, score: (i % 3 === 0 ? 5 : 4) + Math.floor(Math.random() * 3) - 1, par: [4,4,3,5,4,4,3,4,5,4,4,3,5,4,4,3,4,5][i], tempo: 60 + Math.floor(Math.random() * 40) })); SFX.rhythm_beat(); draw(); };
-    window._sg33_rh_steady = () => { data = Array.from({ length: 18 }, (_, i) => ({ hole: i + 1, score: [4,4,3,5,4,4,3,4,5,4,4,3,5,4,4,3,4,5][i] + (Math.random() > 0.7 ? 1 : 0), par: [4,4,3,5,4,4,3,4,5,4,4,3,5,4,4,3,4,5][i], tempo: 70 + Math.floor(Math.random() * 10) })); SFX.rhythm_beat(); draw(); };
-    window._sg33_rh_collapse = () => { data = Array.from({ length: 18 }, (_, i) => ({ hole: i + 1, score: [4,4,3,5,4,4,3,4,5,4,4,3,5,4,4,3,4,5][i] + (i >= 9 ? Math.floor(Math.random() * 3) + 1 : Math.random() > 0.8 ? 1 : 0), par: [4,4,3,5,4,4,3,4,5,4,4,3,5,4,4,3,4,5][i], tempo: i >= 9 ? 80 + Math.floor(Math.random() * 20) : 65 + Math.floor(Math.random() * 10) })); SFX.rhythm_beat(); draw(); };
+    window._sg33_rh_record = () => {
+      const hSel = document.getElementById('sg33-rh-hole');
+      const sIn = document.getElementById('sg33-rh-score');
+      if (!hSel || !sIn) return;
+      const h = parseInt(hSel.value);
+      const s = parseInt(sIn.value);
+      if (isNaN(h) || isNaN(s) || s < 1 || s > 12) return;
+      const row = data.find(d => d.hole === h);
+      if (row) row.score = s;
+      SFX.rhythm_beat();
+      draw();
+    };
+    window._sg33_rh_save = () => { LS('roundRhythm_v2', data); SFX.rhythm_beat(); };
+    window._sg33_rh_reset = () => { data.forEach(d => { d.score = null; }); SFX.rhythm_beat(); draw(); };
 
     setTimeout(draw, 80);
     _checkAchievementsV33('rhythm_opened');

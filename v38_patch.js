@@ -4,8 +4,8 @@
   // ===== LOCALSTORAGE HELPER =====
   var LS = function (k, v) {
     return v === undefined
-      ? JSON.parse(localStorage.getItem('sg38_' + k) || 'null')
-      : localStorage.setItem('sg38_' + k, JSON.stringify(v));
+      ? JSON.parse(localStorage.getItem('sg38b_' + k) || 'null')
+      : localStorage.setItem('sg38b_' + k, JSON.stringify(v));
   };
 
   // ===== SFX ENGINE (16 new SFX, 300->316) =====
@@ -132,6 +132,20 @@
     return 'D';
   }
 
+  // ===== 빈 상태 안내 (캔버스 가운데 회색 텍스트) =====
+  var EMPTY_MSG = '기록을 추가하면 표시됩니다';
+  function drawEmpty38(ctx, w, h, bg, msg) {
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = bg || '#161625';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = 'rgba(255,255,255,.45)';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(msg || EMPTY_MSG, w / 2, h / 2);
+    ctx.textBaseline = 'alphabetic';
+  }
+
   // ===== ACHIEVEMENTS =====
   var sg38Achievements = [
     { id: 'consistency_analyst', name: '일관성 분석가', desc: '스윙 일관성 인덱스를 처음 확인', icon: '📊' },
@@ -181,11 +195,8 @@
     if (used.length >= 8) unlockAchieve('v38_complete');
   }
 
-  // ===== SIMULATED DATA =====
+  // ===== 클럽 라벨 (표시용) =====
   var CLUBS = ['DR', '3W', '5W', '4H', '5I', '6I', '7I', '8I', '9I', 'PW', 'GW', 'SW', 'LW', 'PT'];
-  var CLUB_MEANS = [245, 225, 210, 195, 185, 175, 165, 155, 143, 130, 115, 95, 75, 0];
-  var CLUB_STDDEVS = [18, 15, 14, 13, 12, 10, 9, 8, 7, 6, 6, 5, 5, 0];
-  var PARS = [4, 4, 3, 5, 4, 4, 3, 4, 5, 4, 3, 4, 5, 4, 4, 3, 4, 5];
 
   // ===== 1. SWING CONSISTENCY INDEX =====
   function openSwingConsistencyIndex() {
@@ -196,19 +207,12 @@
     var o = createOverlay('sg38ConsistOv', '스윙 일관성 인덱스', 'linear-gradient(135deg,#2ecc71,#27ae60)', '📊');
     var body = o.body;
 
-    var saved = LS('consist_data');
-    var cvData = saved || CLUBS.map(function (c, i) {
-      if (i === 13) return { club: c, cv: +(3 + Math.random() * 10).toFixed(1), mean: 1.8, std: 0.15 };
-      var mean = CLUB_MEANS[i] + (Math.random() - 0.5) * 10;
-      var std = CLUB_STDDEVS[i] * (0.7 + Math.random() * 0.6);
-      return { club: c, cv: +(std / mean * 100).toFixed(1), mean: +mean.toFixed(0), std: +std.toFixed(1) };
-    });
-    if (!saved) LS('consist_data', cvData);
+    var cvData = LS('consist_data') || [];
+    var hasConsist = cvData.length > 0;
+    var totalCV = hasConsist ? cvData.reduce(function (s, d) { return s + d.cv; }, 0) / cvData.length : 0;
+    var overallScore = hasConsist ? Math.max(0, Math.min(100, Math.round(100 - totalCV * 5))) : null;
 
-    var totalCV = cvData.reduce(function (s, d) { return s + d.cv; }, 0) / cvData.length;
-    var overallScore = Math.max(0, Math.min(100, Math.round(100 - totalCV * 5)));
-
-    body.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div><span style="color:rgba(255,255,255,.5);font-size:12px">종합 일관성 점수</span><div style="font-size:28px;font-weight:900;color:#fff">' + overallScore + '<span style="font-size:14px;color:rgba(255,255,255,.5)">/100</span></div></div><div class="sg38-grade ' + gradeClass(overallScore, 100) + '">' + gradeLabel(overallScore, 100) + '</div></div>' +
+    body.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div><span style="color:rgba(255,255,255,.5);font-size:12px">종합 일관성 점수</span><div style="font-size:28px;font-weight:900;color:#fff">' + (hasConsist ? overallScore + '<span style="font-size:14px;color:rgba(255,255,255,.5)">/100</span>' : '<span style="font-size:15px;color:rgba(255,255,255,.45)">' + EMPTY_MSG + '</span>') + '</div></div>' + (hasConsist ? '<div class="sg38-grade ' + gradeClass(overallScore, 100) + '">' + gradeLabel(overallScore, 100) + '</div>' : '') + '</div>' +
       '<div class="sg38-canvas-wrap"><canvas id="sg38ConsistCanvas" width="620" height="400"></canvas></div>' +
       '<div class="sg38-card" style="margin-top:10px"><h4>범례</h4><div style="display:flex;gap:16px;font-size:11px;color:rgba(255,255,255,.6)"><span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:12px;height:12px;background:#2ecc71;border-radius:3px"></span> 우수 (CV < 8%)</span><span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:12px;height:12px;background:#f1c40f;border-radius:3px"></span> 보통 (8-15%)</span><span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:12px;height:12px;background:#e74c3c;border-radius:3px"></span> 주의 (> 15%)</span></div></div>' +
       '<div id="sg38ConsistDetail" class="sg38-card" style="display:none;margin-top:10px"></div>';
@@ -220,6 +224,7 @@
     var hoverIdx = -1;
 
     function drawChart() {
+      if (!cvData.length) { drawEmpty38(ctx, 620, 400, '#161625'); return; }
       ctx.clearRect(0, 0, 620, 400);
       // Background
       ctx.fillStyle = '#161625';
@@ -317,11 +322,7 @@
     var o = createOverlay('sg38RiskOv', '리스크-리워드 매트릭스', 'linear-gradient(135deg,#e74c3c,#c0392b)', '⚖️');
     var body = o.body;
 
-    var saved = LS('risk_data');
-    var holes = saved || Array.from({ length: 18 }, function (_, i) {
-      return { hole: i + 1, risk: +(1 + Math.random() * 9).toFixed(1), reward: +(1 + Math.random() * 9).toFixed(1), par: PARS[i], score: PARS[i] + Math.floor(Math.random() * 3 - 1) };
-    });
-    if (!saved) LS('risk_data', holes);
+    var holes = LS('risk_data') || [];
 
     body.innerHTML = '<div class="sg38-canvas-wrap"><canvas id="sg38RiskCanvas" width="640" height="400"></canvas></div>' +
       '<div id="sg38RiskDetail" class="sg38-card" style="display:none;margin-top:10px"></div>' +
@@ -329,14 +330,15 @@
 
     var aggressive = holes.filter(function (h) { return h.risk > 5 && h.reward > 5; }).map(function (h) { return h.hole; });
     var efficient = holes.filter(function (h) { return h.risk <= 5 && h.reward > 5; }).map(function (h) { return h.hole; });
-    document.getElementById('sg38Aggressive').textContent = aggressive.length > 0 ? aggressive.join(', ') + '번 홀' : '없음';
-    document.getElementById('sg38Efficient').textContent = efficient.length > 0 ? efficient.join(', ') + '번 홀' : '없음';
+    document.getElementById('sg38Aggressive').textContent = !holes.length ? EMPTY_MSG : (aggressive.length > 0 ? aggressive.join(', ') + '번 홀' : '없음');
+    document.getElementById('sg38Efficient').textContent = !holes.length ? EMPTY_MSG : (efficient.length > 0 ? efficient.join(', ') + '번 홀' : '없음');
 
     var canvas = document.getElementById('sg38RiskCanvas');
     var ctx = canvas.getContext('2d');
     var hoverHole = -1;
 
     function drawRisk() {
+      if (!holes.length) { drawEmpty38(ctx, 640, 400, '#1a1a2e'); return; }
       ctx.clearRect(0, 0, 640, 400);
       ctx.fillStyle = '#1a1a2e';
       ctx.fillRect(0, 0, 640, 400);
@@ -464,12 +466,15 @@
     var body = o.body;
 
     var distances = [3, 6, 10, 15, 20, 30];
-    var optimalBackswing = [2, 4, 7, 11, 15, 22]; // inches
-    var currentBackswing = optimalBackswing.map(function (v) { return +(v + (Math.random() - 0.5) * v * 0.4).toFixed(1); });
-    var tempoData = distances.map(function () { return +(0.8 + Math.random() * 0.6).toFixed(2); });
+    var optimalBackswing = [2, 4, 7, 11, 15, 22]; // inches (참고 가이드 라인)
+    var strokeSaved = LS('stroke_data');
+    var currentBackswing = (strokeSaved && Array.isArray(strokeSaved.backswing) && strokeSaved.backswing.length === distances.length)
+      ? strokeSaved.backswing.map(function (v) { return Number(v) || 0; }) : null;
+    var tempoData = (strokeSaved && Array.isArray(strokeSaved.tempo) && strokeSaved.tempo.length === distances.length)
+      ? strokeSaved.tempo.map(function (v) { return Number(v) || 0; }) : null;
 
     body.innerHTML = '<div class="sg38-canvas-wrap"><canvas id="sg38StrokeCanvas" width="600" height="380"></canvas></div>' +
-      '<div class="sg38-card" style="margin-top:10px"><h4>템포 분석</h4><p>백스윙:임팩트 비율이 2:1에 가까울수록 안정적입니다.</p></div>';
+      '<div class="sg38-card" style="margin-top:10px"><h4>템포 분석</h4><p>' + ((currentBackswing || tempoData) ? '백스윙:임팩트 비율이 2:1에 가까울수록 안정적입니다.' : '내 스트로크 기록이 없습니다. ' + EMPTY_MSG + ' (초록 점선은 참고용 가이드 라인입니다)') + '</p></div>';
 
     var canvas = document.getElementById('sg38StrokeCanvas');
     var ctx = canvas.getContext('2d');
@@ -518,24 +523,31 @@
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Current data points
-      for (var p = 0; p < distances.length; p++) {
-        var px = left + (p / (distances.length - 1)) * w;
-        var py = top + h - (currentBackswing[p] / 25) * h;
+      // Current data points (내 기록이 있을 때만)
+      if (currentBackswing) {
+        for (var p = 0; p < distances.length; p++) {
+          var px = left + (p / (distances.length - 1)) * w;
+          var py = top + h - (currentBackswing[p] / 25) * h;
 
-        ctx.fillStyle = '#00d2ff';
-        ctx.shadowColor = '#00d2ff';
-        ctx.shadowBlur = 10;
-        ctx.beginPath();
-        ctx.arc(px, py, 7, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
+          ctx.fillStyle = '#00d2ff';
+          ctx.shadowColor = '#00d2ff';
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.arc(px, py, 7, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
 
-        // Label
-        ctx.fillStyle = '#fff';
-        ctx.font = '10px sans-serif';
+          // Label
+          ctx.fillStyle = '#fff';
+          ctx.font = '10px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(currentBackswing[p] + '"', px, py - 12);
+        }
+      } else {
+        ctx.fillStyle = 'rgba(255,255,255,.45)';
+        ctx.font = '13px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(currentBackswing[p] + '"', px, py - 12);
+        ctx.fillText(EMPTY_MSG, left + w / 2, top + h / 2);
       }
 
       // Axis labels
@@ -568,9 +580,11 @@
       ctx.font = '11px sans-serif';
       ctx.textAlign = 'left';
       ctx.fillStyle = '#2ecc71'; ctx.fillRect(left, top + h + 48, 12, 12);
-      ctx.fillStyle = 'rgba(255,255,255,.6)'; ctx.fillText('최적 라인', left + 18, top + h + 58);
-      ctx.fillStyle = '#00d2ff'; ctx.beginPath(); ctx.arc(left + 120, top + h + 54, 5, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = 'rgba(255,255,255,.6)'; ctx.fillText('현재 데이터', left + 130, top + h + 58);
+      ctx.fillStyle = 'rgba(255,255,255,.6)'; ctx.fillText('참고 가이드 라인', left + 18, top + h + 58);
+      if (currentBackswing) {
+        ctx.fillStyle = '#00d2ff'; ctx.beginPath(); ctx.arc(left + 140, top + h + 54, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,.6)'; ctx.fillText('내 기록', left + 150, top + h + 58);
+      }
 
       // Tempo bar chart at bottom
       var tempoTop = 280, tempoH = 70, barW = 50;
@@ -578,6 +592,14 @@
       ctx.font = 'bold 12px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('스트로크 템포', 300, tempoTop);
+
+      if (!tempoData) {
+        ctx.fillStyle = 'rgba(255,255,255,.45)';
+        ctx.font = '13px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(EMPTY_MSG, 300, tempoTop + 15 + tempoH / 2);
+        return;
+      }
 
       for (var t = 0; t < tempoData.length; t++) {
         var bx = left + 30 + t * (barW + 20);
@@ -611,11 +633,13 @@
     var o = createOverlay('sg38RotateOv', '클럽 로테이션 최적화', 'linear-gradient(135deg,#9b59b6,#8e44ad)', '🔄');
     var body = o.body;
 
-    var currentUsage = [18, 8, 5, 4, 6, 7, 10, 12, 11, 8, 4, 3, 2, 22]; // percent (sum ~120, normalize)
-    var optimalUsage = [12, 6, 5, 5, 7, 8, 10, 10, 10, 9, 6, 5, 3, 14];
-    var totalCur = currentUsage.reduce(function (a, b) { return a + b; }, 0);
+    var usageSaved = LS('rotation_usage');
+    var currentUsage = (Array.isArray(usageSaved) && usageSaved.length === CLUBS.length)
+      ? usageSaved.map(function (v) { return Number(v) || 0; }) : null;
+    var optimalUsage = [12, 6, 5, 5, 7, 8, 10, 10, 10, 9, 6, 5, 3, 14]; // 참고 배분
+    var totalCur = currentUsage ? currentUsage.reduce(function (a, b) { return a + b; }, 0) : 0;
     var totalOpt = optimalUsage.reduce(function (a, b) { return a + b; }, 0);
-    var curNorm = currentUsage.map(function (v) { return +(v / totalCur * 100).toFixed(1); });
+    var curNorm = (currentUsage && totalCur > 0) ? currentUsage.map(function (v) { return +(v / totalCur * 100).toFixed(1); }) : null;
     var optNorm = optimalUsage.map(function (v) { return +(v / totalOpt * 100).toFixed(1); });
 
     body.innerHTML = '<div class="sg38-canvas-wrap"><canvas id="sg38RotateCanvas" width="620" height="380"></canvas></div>' +
@@ -627,6 +651,7 @@
     var purpleColors = ['#9b59b6', '#8e44ad', '#7d3c98', '#6c3483', '#5b2c6f', '#4a235a', '#a569bd', '#bb8fce', '#d2b4de', '#c39bd3', '#af7ac5', '#884ea0', '#76448a', '#633974'];
 
     function drawRotation() {
+      if (!curNorm) { drawEmpty38(ctx, 620, 380, '#1e1025'); return; }
       ctx.clearRect(0, 0, 620, 380);
       ctx.fillStyle = '#1e1025';
       ctx.fillRect(0, 0, 620, 380);
@@ -746,12 +771,14 @@
 
     // Recommendations
     var recs = [];
-    for (var r = 0; r < CLUBS.length; r++) {
-      var d = curNorm[r] - optNorm[r];
-      if (d > 3) recs.push(CLUBS[r] + ' 사용 줄이기 (' + d.toFixed(1) + '% 초과)');
-      else if (d < -3) recs.push(CLUBS[r] + ' 사용 늘리기 (' + Math.abs(d).toFixed(1) + '% 부족)');
+    if (curNorm) {
+      for (var r = 0; r < CLUBS.length; r++) {
+        var d = curNorm[r] - optNorm[r];
+        if (d > 3) recs.push(CLUBS[r] + ' 사용 줄이기 (' + d.toFixed(1) + '% 초과)');
+        else if (d < -3) recs.push(CLUBS[r] + ' 사용 늘리기 (' + Math.abs(d).toFixed(1) + '% 부족)');
+      }
     }
-    document.getElementById('sg38RotateRecs').textContent = recs.length > 0 ? recs.join(' / ') : '현재 로테이션이 최적에 가깝습니다!';
+    document.getElementById('sg38RotateRecs').textContent = !curNorm ? ('클럽 사용 기록이 없습니다. ' + EMPTY_MSG) : (recs.length > 0 ? recs.join(' / ') : '현재 로테이션이 참고 배분에 가깝습니다!');
     sg38sfx('rotation_rec');
   }
 
@@ -765,9 +792,8 @@
     var body = o.body;
 
     var axes = ['집중력', '자신감', '회복력', '인내심', '압박대처', '긍정사고'];
-    var saved = LS('mental_scores');
-    var scores = saved || axes.map(function () { return Math.floor(50 + Math.random() * 40); });
-    if (!saved) LS('mental_scores', scores);
+    var scores = LS('mental_scores') || [];
+    var hasMental = scores.length === axes.length;
 
     var scenarios = [
       '더블보기 직후 다음 홀 전략은?',
@@ -782,25 +808,35 @@
       '전반 9홀이 좋지 않았을 때는?'
     ];
 
-    var sessionData = LS('mental_sessions') || [
-      scores.reduce(function (a, b) { return a + b; }, 0) / axes.length - 10,
-      scores.reduce(function (a, b) { return a + b; }, 0) / axes.length - 5,
-      scores.reduce(function (a, b) { return a + b; }, 0) / axes.length - 2,
-      scores.reduce(function (a, b) { return a + b; }, 0) / axes.length,
-      scores.reduce(function (a, b) { return a + b; }, 0) / axes.length + 3
-    ];
-    LS('mental_sessions', sessionData);
+    var sessionData = LS('mental_sessions') || [];
 
     body.innerHTML = '<div class="sg38-canvas-wrap"><canvas id="sg38MentalCanvas" width="620" height="400"></canvas></div>' +
-      '<div class="sg38-card" style="margin-top:10px"><h4>스트레스 시나리오 점수</h4><div id="sg38ScenarioList"></div></div>' +
-      '<div style="margin-top:10px;text-align:center"><button class="sg38-btn" style="background:linear-gradient(135deg,#00b894,#00a884)" onclick="(function(){var s=JSON.parse(localStorage.getItem(\'sg38_mental_scores\')||\'[60,60,60,60,60,60]\');for(var i=0;i<s.length;i++){s[i]=Math.min(100,s[i]+Math.floor(Math.random()*5));}localStorage.setItem(\'sg38_mental_scores\',JSON.stringify(s));document.getElementById(\'sg38MentalOv\').classList.remove(\'active\');})()">멘탈 훈련 완료</button></div>';
+      '<div class="sg38-card" style="margin-top:10px"><h4>스트레스 시나리오 점수</h4>' + (!hasMental ? '<p style="margin-bottom:6px">아직 평가하지 않은 항목입니다. ' + EMPTY_MSG + '</p>' : '') + '<div id="sg38ScenarioList"></div></div>' +
+      '<div style="margin-top:10px;text-align:center"><button class="sg38-btn" id="sg38MentalTrainBtn" style="background:linear-gradient(135deg,#00b894,#00a884)">멘탈 훈련 완료</button></div>';
 
-    // Scenario buttons
+    // 훈련 완료: 저장된 내 점수의 평균만 세션 기록에 추가 (임의 가산 없음)
+    var trainBtn = document.getElementById('sg38MentalTrainBtn');
+    if (trainBtn) {
+      trainBtn.addEventListener('click', function () {
+        if (hasMental) {
+          var avgNow = Math.round(scores.reduce(function (a, b) { return a + b; }, 0) / axes.length);
+          sessionData.push(avgNow);
+          LS('mental_sessions', sessionData);
+        }
+        var ovEl = document.getElementById('sg38MentalOv');
+        if (ovEl) ovEl.classList.remove('active');
+      });
+    }
+
+    // Scenario list (사용자가 답한 기록이 없으면 점수 표기 없음)
     var scenList = document.getElementById('sg38ScenarioList');
+    var scenScores = LS('mental_scenarios') || [];
     scenarios.forEach(function (sc, idx) {
       var row = document.createElement('div');
       row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:12px;color:rgba(255,255,255,.7)';
-      row.innerHTML = '<span>' + (idx + 1) + '. ' + sc + '</span><span style="color:#00b894;font-weight:700">' + (60 + Math.floor(Math.random() * 30)) + '점</span>';
+      var val = Number(scenScores[idx]);
+      var label = isFinite(val) && val > 0 ? val + '점' : '미평가';
+      row.innerHTML = '<span>' + (idx + 1) + '. ' + sc + '</span><span style="color:' + (label === '미평가' ? 'rgba(255,255,255,.35)' : '#00b894') + ';font-weight:700">' + label + '</span>';
       scenList.appendChild(row);
     });
 
@@ -852,35 +888,42 @@
         ctx.fillText(axes[ai], lx, ly + 4);
         ctx.fillStyle = 'rgba(255,255,255,.4)';
         ctx.font = '9px sans-serif';
-        ctx.fillText(scores[ai], lx, ly + 16);
+        ctx.fillText(hasMental ? scores[ai] : '-', lx, ly + 16);
       }
 
-      // Data polygon
-      ctx.fillStyle = 'rgba(0,184,148,.2)';
-      ctx.strokeStyle = '#00b894';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      for (var di = 0; di <= n; di++) {
-        var da = -Math.PI / 2 + (di % n / n) * Math.PI * 2;
-        var dr = rr * (scores[di % n] / 100);
-        var dxx = rcx + Math.cos(da) * dr;
-        var dyy = rcy + Math.sin(da) * dr;
-        if (di === 0) ctx.moveTo(dxx, dyy); else ctx.lineTo(dxx, dyy);
-      }
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-
-      // Data points
-      for (var pi = 0; pi < n; pi++) {
-        var pa = -Math.PI / 2 + (pi / n) * Math.PI * 2;
-        var pr = rr * (scores[pi] / 100);
-        var ppx = rcx + Math.cos(pa) * pr;
-        var ppy = rcy + Math.sin(pa) * pr;
-        ctx.fillStyle = '#00b894';
+      if (hasMental) {
+        // Data polygon
+        ctx.fillStyle = 'rgba(0,184,148,.2)';
+        ctx.strokeStyle = '#00b894';
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(ppx, ppy, 4, 0, Math.PI * 2);
+        for (var di = 0; di <= n; di++) {
+          var da = -Math.PI / 2 + (di % n / n) * Math.PI * 2;
+          var dr = rr * (scores[di % n] / 100);
+          var dxx = rcx + Math.cos(da) * dr;
+          var dyy = rcy + Math.sin(da) * dr;
+          if (di === 0) ctx.moveTo(dxx, dyy); else ctx.lineTo(dxx, dyy);
+        }
+        ctx.closePath();
         ctx.fill();
+        ctx.stroke();
+
+        // Data points
+        for (var pi = 0; pi < n; pi++) {
+          var pa = -Math.PI / 2 + (pi / n) * Math.PI * 2;
+          var pr = rr * (scores[pi] / 100);
+          var ppx = rcx + Math.cos(pa) * pr;
+          var ppy = rcy + Math.sin(pa) * pr;
+          ctx.fillStyle = '#00b894';
+          ctx.beginPath();
+          ctx.arc(ppx, ppy, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else {
+        ctx.fillStyle = 'rgba(255,255,255,.45)';
+        ctx.font = '13px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(EMPTY_MSG, rcx, rcy);
       }
 
       // Session growth curve (right side)
@@ -897,51 +940,65 @@
         ctx.beginPath(); ctx.moveTo(gLeft, gy2); ctx.lineTo(gLeft + gW, gy2); ctx.stroke();
       }
 
-      // Line
-      ctx.strokeStyle = '#00b894';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      for (var si = 0; si < sessionData.length; si++) {
-        var sx = gLeft + (si / (sessionData.length - 1)) * gW;
-        var sy = gTop + gH - ((sessionData[si] - 30) / 70) * gH;
-        if (si === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
-      }
-      ctx.stroke();
-
-      // Points
-      for (var si2 = 0; si2 < sessionData.length; si2++) {
-        var sx2 = gLeft + (si2 / (sessionData.length - 1)) * gW;
-        var sy2 = gTop + gH - ((sessionData[si2] - 30) / 70) * gH;
-        ctx.fillStyle = '#00b894';
-        ctx.beginPath();
-        ctx.arc(sx2, sy2, 5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#fff';
-        ctx.font = '10px sans-serif';
+      var sDenom = Math.max(1, sessionData.length - 1);
+      if (!sessionData.length) {
+        ctx.fillStyle = 'rgba(255,255,255,.45)';
+        ctx.font = '12px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(Math.round(sessionData[si2]), sx2, sy2 - 10);
-      }
+        ctx.fillText(EMPTY_MSG, gLeft + gW / 2, gTop + gH / 2);
+      } else {
+        // Line
+        ctx.strokeStyle = '#00b894';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        for (var si = 0; si < sessionData.length; si++) {
+          var sx = gLeft + (si / sDenom) * gW;
+          var sy = gTop + gH - ((sessionData[si] - 30) / 70) * gH;
+          if (si === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+        }
+        ctx.stroke();
 
-      // X labels
-      ctx.fillStyle = 'rgba(255,255,255,.4)';
-      ctx.font = '10px sans-serif';
-      for (var sl = 0; sl < sessionData.length; sl++) {
-        var slx = gLeft + (sl / (sessionData.length - 1)) * gW;
-        ctx.fillText('S' + (sl + 1), slx, gTop + gH + 16);
+        // Points
+        for (var si2 = 0; si2 < sessionData.length; si2++) {
+          var sx2 = gLeft + (si2 / sDenom) * gW;
+          var sy2 = gTop + gH - ((sessionData[si2] - 30) / 70) * gH;
+          ctx.fillStyle = '#00b894';
+          ctx.beginPath();
+          ctx.arc(sx2, sy2, 5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#fff';
+          ctx.font = '10px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(Math.round(sessionData[si2]), sx2, sy2 - 10);
+        }
+
+        // X labels
+        ctx.fillStyle = 'rgba(255,255,255,.4)';
+        ctx.font = '10px sans-serif';
+        for (var sl = 0; sl < sessionData.length; sl++) {
+          var slx = gLeft + (sl / sDenom) * gW;
+          ctx.fillText('S' + (sl + 1), slx, gTop + gH + 16);
+        }
       }
 
       // Overall score (bottom right)
-      var avgScore = Math.round(scores.reduce(function (a, b) { return a + b; }, 0) / axes.length);
+      var avgScore = hasMental ? Math.round(scores.reduce(function (a, b) { return a + b; }, 0) / axes.length) : null;
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 14px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('종합 멘탈 점수', gLeft + gW / 2, gTop + gH + 55);
-      ctx.font = 'bold 36px sans-serif';
-      ctx.fillStyle = avgScore >= 80 ? '#00b894' : avgScore >= 60 ? '#f1c40f' : '#e74c3c';
-      ctx.fillText(avgScore, gLeft + gW / 2, gTop + gH + 95);
-      ctx.font = '12px sans-serif';
-      ctx.fillStyle = 'rgba(255,255,255,.4)';
-      ctx.fillText('/ 100', gLeft + gW / 2 + 30, gTop + gH + 95);
+      if (avgScore === null) {
+        ctx.font = '12px sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,.45)';
+        ctx.fillText(EMPTY_MSG, gLeft + gW / 2, gTop + gH + 85);
+      } else {
+        ctx.font = 'bold 36px sans-serif';
+        ctx.fillStyle = avgScore >= 80 ? '#00b894' : avgScore >= 60 ? '#f1c40f' : '#e74c3c';
+        ctx.fillText(avgScore, gLeft + gW / 2, gTop + gH + 95);
+        ctx.font = '12px sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,.4)';
+        ctx.fillText('/ 100', gLeft + gW / 2 + 30, gTop + gH + 95);
+      }
 
       sg38sfx('mental_grow');
     }
@@ -958,25 +1015,25 @@
     var o = createOverlay('sg38SGOv', 'Strokes Gained by Hole', 'linear-gradient(135deg,#1a7a3a,#0f5a28)', '📈');
     var body = o.body;
 
-    var saved = LS('sg_data');
-    var sgData = saved || Array.from({ length: 18 }, function (_, i) {
-      return { hole: i + 1, sg: +((Math.random() - 0.45) * 1.5).toFixed(2), par: PARS[i] };
-    });
-    if (!saved) LS('sg_data', sgData);
+    var sgData = LS('sg_data') || [];
+    var hasSG = sgData.length > 0;
 
     var totalSG = sgData.reduce(function (s, d) { return s + d.sg; }, 0);
     var sorted = sgData.slice().sort(function (a, b) { return b.sg - a.sg; });
-    var top3 = sorted.slice(0, 3).map(function (d) { return d.hole; });
-    var bottom3 = sorted.slice(-3).map(function (d) { return d.hole; });
+    var topEntries = sorted.slice(0, 3);
+    var bottomEntries = sorted.slice(-3);
+    var top3 = topEntries.map(function (d) { return d.hole; });
+    var bottom3 = bottomEntries.map(function (d) { return d.hole; });
 
-    body.innerHTML = '<div style="text-align:center;margin-bottom:12px"><span style="color:rgba(255,255,255,.5);font-size:12px">Total Strokes Gained</span><div style="font-size:32px;font-weight:900;color:' + (totalSG >= 0 ? '#2ecc71' : '#e74c3c') + '">' + (totalSG >= 0 ? '+' : '') + totalSG.toFixed(2) + '</div></div>' +
+    body.innerHTML = '<div style="text-align:center;margin-bottom:12px"><span style="color:rgba(255,255,255,.5);font-size:12px">Total Strokes Gained</span><div style="font-size:' + (hasSG ? '32px' : '15px') + ';font-weight:900;color:' + (!hasSG ? 'rgba(255,255,255,.45)' : (totalSG >= 0 ? '#2ecc71' : '#e74c3c')) + '">' + (hasSG ? (totalSG >= 0 ? '+' : '') + totalSG.toFixed(2) : EMPTY_MSG) + '</div></div>' +
       '<div class="sg38-canvas-wrap"><canvas id="sg38SGCanvas" width="620" height="400"></canvas></div>' +
-      '<div class="sg38-grid2" style="margin-top:12px"><div class="sg38-card"><h4 style="color:#2ecc71">강점 홀 (Top 3)</h4><p>' + top3.map(function (h) { return h + '번 홀 (+' + sgData[h - 1].sg.toFixed(2) + ')'; }).join(', ') + '</p></div><div class="sg38-card"><h4 style="color:#e74c3c">약점 홀 (Bottom 3)</h4><p>' + bottom3.map(function (h) { return h + '번 홀 (' + sgData[h - 1].sg.toFixed(2) + ')'; }).join(', ') + '</p></div></div>';
+      '<div class="sg38-grid2" style="margin-top:12px"><div class="sg38-card"><h4 style="color:#2ecc71">강점 홀 (Top 3)</h4><p>' + (hasSG ? topEntries.map(function (d) { return d.hole + '번 홀 (' + (d.sg >= 0 ? '+' : '') + d.sg.toFixed(2) + ')'; }).join(', ') : EMPTY_MSG) + '</p></div><div class="sg38-card"><h4 style="color:#e74c3c">약점 홀 (Bottom 3)</h4><p>' + (hasSG ? bottomEntries.map(function (d) { return d.hole + '번 홀 (' + (d.sg >= 0 ? '+' : '') + d.sg.toFixed(2) + ')'; }).join(', ') : EMPTY_MSG) + '</p></div></div>';
 
     var canvas = document.getElementById('sg38SGCanvas');
     var ctx = canvas.getContext('2d');
 
     function drawSG() {
+      if (!sgData.length) { drawEmpty38(ctx, 620, 400, '#161625'); return; }
       ctx.clearRect(0, 0, 620, 400);
       ctx.fillStyle = '#161625';
       ctx.fillRect(0, 0, 620, 400);
@@ -1072,14 +1129,8 @@
 
     var bands = ['50-75', '75-100', '100-125', '125-150', '150-175', '175-200', '200-225', '225-250'];
     var metrics = ['GIR%', 'Up&Down%', '평균퍼트', '스코어링효율'];
-    var data = bands.map(function () {
-      return [
-        Math.floor(30 + Math.random() * 60),   // GIR%
-        Math.floor(25 + Math.random() * 55),   // Up&Down%
-        +(1.5 + Math.random() * 0.8).toFixed(1), // Avg putts
-        Math.floor(40 + Math.random() * 50)    // Scoring efficiency
-      ];
-    });
+    var ySaved = LS('yardage_data');
+    var data = (Array.isArray(ySaved) && ySaved.length === bands.length && ySaved.every(function (r) { return Array.isArray(r) && r.length === metrics.length; })) ? ySaved : null;
 
     body.innerHTML = '<div class="sg38-canvas-wrap"><canvas id="sg38YardageCanvas" width="600" height="380"></canvas></div>' +
       '<div id="sg38YardageDetail" class="sg38-card" style="display:none;margin-top:10px"></div>';
@@ -1103,6 +1154,7 @@
     }
 
     function drawHeatmap() {
+      if (!data) { drawEmpty38(ctx, 600, 380, '#1a2520'); return; }
       ctx.clearRect(0, 0, 600, 380);
       ctx.fillStyle = '#1a2520';
       ctx.fillRect(0, 0, 600, 380);
@@ -1165,6 +1217,7 @@
     drawHeatmap();
 
     canvas.addEventListener('mousemove', function (e) {
+      if (!data) return;
       var rect = canvas.getBoundingClientRect();
       var sx = 600 / rect.width, sy = 380 / rect.height;
       var mx = (e.clientX - rect.left) * sx;
@@ -1183,7 +1236,7 @@
     });
 
     canvas.addEventListener('click', function () {
-      if (hoverCell.r >= 0 && hoverCell.c >= 0) {
+      if (data && hoverCell.r >= 0 && hoverCell.c >= 0) {
         var det = document.getElementById('sg38YardageDetail');
         det.style.display = 'block';
         var val = data[hoverCell.r][hoverCell.c];
@@ -1206,21 +1259,23 @@
     var body = o.body;
 
     var categories = ['드라이빙', '아이언', '숏게임', '퍼팅', '코스전략', '멘탈', '체력', '종합'];
-    var saved = LS('growth_scores');
-    var currentScores = saved || categories.map(function () { return Math.floor(40 + Math.random() * 50); });
-    if (!saved) LS('growth_scores', currentScores);
-    var prevScores = currentScores.map(function (s) { return Math.max(0, s - Math.floor(Math.random() * 15 - 3)); });
-    var overall = currentScores[7];
+    var currentScores = LS('growth_scores') || [];
+    var hasGrowth = currentScores.length === categories.length;
+    var prevSaved = LS('growth_prev_scores');
+    var hasPrev = Array.isArray(prevSaved) && prevSaved.length === categories.length;
+    var prevScores = hasPrev ? prevSaved : null;
+    var overall = hasGrowth ? currentScores[7] : null;
 
-    if (overall >= 60) unlockAchieve('growth_achiever');
+    if (overall !== null && overall >= 60) unlockAchieve('growth_achiever');
 
-    body.innerHTML = '<div style="text-align:center;margin-bottom:14px"><span style="color:rgba(255,255,255,.5);font-size:12px">종합 등급</span><div class="sg38-grade ' + gradeClass(overall, 100) + '" style="width:56px;height:56px;font-size:24px;margin:8px auto">' + gradeLabel(overall, 100) + '</div></div>' +
+    body.innerHTML = '<div style="text-align:center;margin-bottom:14px"><span style="color:rgba(255,255,255,.5);font-size:12px">종합 등급</span>' + (hasGrowth ? '<div class="sg38-grade ' + gradeClass(overall, 100) + '" style="width:56px;height:56px;font-size:24px;margin:8px auto">' + gradeLabel(overall, 100) + '</div>' : '<div style="margin:8px auto;font-size:15px;color:rgba(255,255,255,.45)">' + EMPTY_MSG + '</div>') + '</div>' +
       '<div class="sg38-canvas-wrap"><canvas id="sg38GrowthCanvas" width="620" height="400"></canvas></div>';
 
     var canvas = document.getElementById('sg38GrowthCanvas');
     var ctx = canvas.getContext('2d');
 
     function drawGrowth() {
+      if (!hasGrowth) { drawEmpty38(ctx, 620, 400, '#1a1a30'); return; }
       ctx.clearRect(0, 0, 620, 400);
       ctx.fillStyle = '#1a1a30';
       ctx.fillRect(0, 0, 620, 400);
@@ -1238,8 +1293,8 @@
         var r = 52;
 
         var score = currentScores[i];
-        var prev = prevScores[i];
-        var diff = score - prev;
+        var prev = prevScores ? prevScores[i] : null;
+        var diff = prev === null ? null : score - prev;
 
         // Half-circle gauge background
         ctx.strokeStyle = 'rgba(255,255,255,.1)';
@@ -1281,12 +1336,14 @@
         ctx.font = 'bold 12px sans-serif';
         ctx.fillText(categories[i], cx, cy - r - 16);
 
-        // Diff arrow
-        var arrowColor = diff > 0 ? '#2ecc71' : diff < 0 ? '#e74c3c' : '#f1c40f';
-        var arrowText = diff > 0 ? '+' + diff : diff === 0 ? '=' : '' + diff;
-        ctx.fillStyle = arrowColor;
-        ctx.font = 'bold 12px sans-serif';
-        ctx.fillText((diff > 0 ? '▲' : diff < 0 ? '▼' : '●') + ' ' + arrowText, cx, cy + r - 16);
+        // Diff arrow (이전 기록이 있을 때만)
+        if (diff !== null) {
+          var arrowColor = diff > 0 ? '#2ecc71' : diff < 0 ? '#e74c3c' : '#f1c40f';
+          var arrowText = diff > 0 ? '+' + diff : diff === 0 ? '=' : '' + diff;
+          ctx.fillStyle = arrowColor;
+          ctx.font = 'bold 12px sans-serif';
+          ctx.fillText((diff > 0 ? '▲' : diff < 0 ? '▼' : '●') + ' ' + arrowText, cx, cy + r - 16);
+        }
 
         // Grade label
         ctx.fillStyle = 'rgba(255,255,255,.4)';

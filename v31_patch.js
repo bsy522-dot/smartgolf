@@ -126,11 +126,15 @@
   // ========== 1. ROUND REPLAY ANALYZER ==========
   function openReplayAnalyzer() {
     SFX.replay_open();
-    const saved = LS('replay') || {};
+    const saved = LS('replay_v2') || {};
     const holes = [];
     for (let i = 1; i <= 18; i++) {
-      holes.push(saved[i] || { score: (i <= 9 ? (i % 2 === 0 ? 4 : 5) : (i % 3 === 0 ? 3 : 4)), par: (i % 4 === 0 ? 3 : (i % 4 === 3 ? 5 : 4)), putts: 2, fir: i % 3 !== 0, gir: i % 2 === 0 });
+      const s = saved[i];
+      // 저장된 사용자 기록이 없으면 빈 상태로 시작한다 (점수를 임의로 만들지 않는다)
+      holes.push(s ? s : { score: null, par: 4, putts: null, fir: false, gir: false });
     }
+    const hasScore = h => h && h.score !== null && h.score !== undefined && !isNaN(h.score);
+    const enteredHoles = () => holes.filter(hasScore);
 
     let html = '<div class="sg31-canvas-wrap"><canvas id="sg31ReplayCanvas" width="560" height="340"></canvas></div>';
     html += '<div class="sg31-tabs" id="sg31ReplayTabs"></div>';
@@ -148,8 +152,12 @@
       for (let i = 1; i <= 18; i++) {
         const t = document.createElement('button');
         t.className = 'sg31-tab' + (i === selHole ? ' active' : '');
-        const diff = holes[i - 1].score - holes[i - 1].par;
-        const sym = diff <= -2 ? '&#x1F985;' : diff === -1 ? '&#x1F426;' : diff === 0 ? '' : diff === 1 ? '&#x25B2;' : '&#x25B2;&#x25B2;';
+        const hh = holes[i - 1];
+        let sym = '';
+        if (hasScore(hh)) {
+          const diff = hh.score - hh.par;
+          sym = diff <= -2 ? '&#x1F985;' : diff === -1 ? '&#x1F426;' : diff === 0 ? '' : diff === 1 ? '&#x25B2;' : '&#x25B2;&#x25B2;';
+        }
         t.innerHTML = i + 'H ' + sym;
         t.onclick = () => { selHole = i; renderTabs(); renderDetail(); renderCanvas(); SFX.replay_play(); };
         tabsEl.appendChild(t);
@@ -162,8 +170,8 @@
       det.innerHTML = '<div class="sg31-grid sg31-grid-2">' +
         '<div class="sg31-row"><span class="sg31-label">Par</span><select id="sg31RPar" style="padding:4px 8px;border-radius:6px;border:1px solid var(--border)">' +
         [3,4,5].map(p => '<option value="' + p + '"' + (h.par === p ? ' selected' : '') + '>' + p + '</option>').join('') + '</select></div>' +
-        '<div class="sg31-row"><span class="sg31-label">Score</span><input type="number" id="sg31RScore" min="1" max="12" value="' + h.score + '" style="width:60px;padding:4px 8px;border-radius:6px;border:1px solid var(--border)"></div>' +
-        '<div class="sg31-row"><span class="sg31-label">Putts</span><input type="number" id="sg31RPutts" min="0" max="6" value="' + h.putts + '" style="width:60px;padding:4px 8px;border-radius:6px;border:1px solid var(--border)"></div>' +
+        '<div class="sg31-row"><span class="sg31-label">Score</span><input type="number" id="sg31RScore" min="1" max="12" placeholder="-" value="' + (h.score == null ? '' : h.score) + '" style="width:60px;padding:4px 8px;border-radius:6px;border:1px solid var(--border)"></div>' +
+        '<div class="sg31-row"><span class="sg31-label">Putts</span><input type="number" id="sg31RPutts" min="0" max="6" placeholder="-" value="' + (h.putts == null ? '' : h.putts) + '" style="width:60px;padding:4px 8px;border-radius:6px;border:1px solid var(--border)"></div>' +
         '<div class="sg31-row"><span class="sg31-label">FIR</span><label style="font-size:13px"><input type="checkbox" id="sg31RFIR"' + (h.fir ? ' checked' : '') + '> &#xD398;&#xC5B4;&#xC6E8;&#xC774;</label></div>' +
         '<div class="sg31-row"><span class="sg31-label">GIR</span><label style="font-size:13px"><input type="checkbox" id="sg31RGIR"' + (h.gir ? ' checked' : '') + '> &#xADF8;&#xB9B0;&#xC801;&#xC911;</label></div>' +
         '</div>';
@@ -171,12 +179,15 @@
       ['sg31RPar', 'sg31RScore', 'sg31RPutts', 'sg31RFIR', 'sg31RGIR'].forEach(id => {
         const el = det.querySelector('#' + id);
         if (el) el.onchange = () => {
-          h.par = parseInt(det.querySelector('#sg31RPar').value);
-          h.score = parseInt(det.querySelector('#sg31RScore').value);
-          h.putts = parseInt(det.querySelector('#sg31RPutts').value);
+          const pv = parseInt(det.querySelector('#sg31RPar').value);
+          const sv = parseInt(det.querySelector('#sg31RScore').value);
+          const uv = parseInt(det.querySelector('#sg31RPutts').value);
+          h.par = isNaN(pv) ? 4 : pv;
+          h.score = isNaN(sv) ? null : sv;
+          h.putts = isNaN(uv) ? null : uv;
           h.fir = det.querySelector('#sg31RFIR').checked;
           h.gir = det.querySelector('#sg31RGIR').checked;
-          renderCanvas(); renderStats();
+          renderCanvas(); renderStats(); renderTabs();
         };
       });
       renderStats();
@@ -184,19 +195,25 @@
 
     function renderStats() {
       const stats = body.querySelector('#sg31ReplayStats');
-      const total = holes.reduce((a, h) => a + h.score, 0);
-      const totalPar = holes.reduce((a, h) => a + h.par, 0);
-      const totalPutts = holes.reduce((a, h) => a + h.putts, 0);
-      const firCount = holes.filter(h => h.fir).length;
-      const girCount = holes.filter(h => h.gir).length;
+      const list = enteredHoles();
+      if (!list.length) {
+        stats.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted,#666);font-size:13px;padding:12px">&#xAE30;&#xB85D;&#xC744; &#xCD94;&#xAC00;&#xD558;&#xBA74; &#xD45C;&#xC2DC;&#xB429;&#xB2C8;&#xB2E4;</div>';
+        return;
+      }
+      const total = list.reduce((a, h) => a + h.score, 0);
+      const totalPar = list.reduce((a, h) => a + h.par, 0);
+      const totalPutts = list.reduce((a, h) => a + (h.putts || 0), 0);
+      const firEligible = list.filter(h => h.par >= 4).length;
+      const firCount = list.filter(h => h.fir).length;
+      const girCount = list.filter(h => h.gir).length;
       const diff = total - totalPar;
       stats.innerHTML =
-        '<div class="sg31-stat"><div class="sg31-stat-num">' + total + '</div><div class="sg31-stat-label">Total (' + (diff >= 0 ? '+' : '') + diff + ')</div></div>' +
+        '<div class="sg31-stat"><div class="sg31-stat-num">' + total + '</div><div class="sg31-stat-label">Total (' + (diff >= 0 ? '+' : '') + diff + ') / ' + list.length + 'H</div></div>' +
         '<div class="sg31-stat"><div class="sg31-stat-num">' + totalPutts + '</div><div class="sg31-stat-label">Total Putts</div></div>' +
-        '<div class="sg31-stat"><div class="sg31-stat-num">' + Math.round(firCount / 14 * 100) + '%</div><div class="sg31-stat-label">FIR (14H)</div></div>' +
-        '<div class="sg31-stat"><div class="sg31-stat-num">' + Math.round(girCount / 18 * 100) + '%</div><div class="sg31-stat-label">GIR</div></div>' +
-        '<div class="sg31-stat"><div class="sg31-stat-num">' + (totalPutts / 18).toFixed(1) + '</div><div class="sg31-stat-label">Avg Putts</div></div>' +
-        '<div class="sg31-stat"><div class="sg31-stat-num">' + (total / 18).toFixed(1) + '</div><div class="sg31-stat-label">Avg Score</div></div>';
+        '<div class="sg31-stat"><div class="sg31-stat-num">' + (firEligible ? Math.round(firCount / firEligible * 100) + '%' : '-') + '</div><div class="sg31-stat-label">FIR (' + firEligible + 'H)</div></div>' +
+        '<div class="sg31-stat"><div class="sg31-stat-num">' + Math.round(girCount / list.length * 100) + '%</div><div class="sg31-stat-label">GIR (' + list.length + 'H)</div></div>' +
+        '<div class="sg31-stat"><div class="sg31-stat-num">' + (totalPutts / list.length).toFixed(1) + '</div><div class="sg31-stat-label">Avg Putts</div></div>' +
+        '<div class="sg31-stat"><div class="sg31-stat-num">' + (total / list.length).toFixed(1) + '</div><div class="sg31-stat-label">Avg Score</div></div>';
     }
 
     function renderCanvas() {
@@ -219,13 +236,34 @@
       ctx.textAlign = 'center';
       ctx.fillText('18홀 스코어 리플레이', W / 2, 18);
 
+      if (!enteredHoles().length) {
+        ctx.font = '14px sans-serif';
+        ctx.fillStyle = isDark ? '#999' : '#888';
+        ctx.textAlign = 'center';
+        ctx.fillText('기록을 추가하면 표시됩니다', W / 2, H / 2);
+        return;
+      }
+
       const maxDiff = 4;
       for (let i = 0; i < 18; i++) {
         const h = holes[i];
-        const diff = h.score - h.par;
         const x = marginL + i * barW;
-        const barH = Math.min(Math.abs(diff) + 1, maxDiff + 1) / (maxDiff + 1) * plotH * 0.6;
         const baseY = marginT + plotH * 0.5;
+
+        if (i === selHole - 1) {
+          ctx.fillStyle = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
+          ctx.fillRect(x, marginT, barW, plotH);
+        }
+
+        ctx.fillStyle = isDark ? '#aaa' : '#666';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText((i + 1) + '', x + barW / 2, H - marginB + 14);
+
+        if (!hasScore(h)) continue;
+
+        const diff = h.score - h.par;
+        const barH = Math.min(Math.abs(diff) + 1, maxDiff + 1) / (maxDiff + 1) * plotH * 0.6;
 
         let color;
         if (diff <= -2) color = '#e91e63';
@@ -234,22 +272,12 @@
         else if (diff === 1) color = '#ff9800';
         else color = '#f44336';
 
-        if (i === selHole - 1) {
-          ctx.fillStyle = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
-          ctx.fillRect(x, marginT, barW, plotH);
-        }
-
         ctx.fillStyle = color;
         if (diff <= 0) {
           ctx.fillRect(x + 3, baseY - barH, barW - 6, barH);
         } else {
           ctx.fillRect(x + 3, baseY, barW - 6, barH);
         }
-
-        ctx.fillStyle = isDark ? '#aaa' : '#666';
-        ctx.font = '10px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText((i + 1) + '', x + barW / 2, H - marginB + 14);
 
         ctx.fillStyle = color;
         ctx.font = 'bold 10px sans-serif';
@@ -277,7 +305,7 @@
     body.querySelector('#sg31ReplaySave').onclick = () => {
       const obj = {};
       holes.forEach((h, i) => obj[i + 1] = h);
-      LS('replay', obj);
+      LS('replay_v2', obj);
       SFX.replay_play();
     };
     checkAchievements();
@@ -470,13 +498,16 @@
     SFX.fairway_open();
     const clubs = ['DR', '3W', '5W', '4H', '5I', '6I', '7I', '8I', '9I', 'PW', 'AW', 'SW', 'LW', 'PT'];
     let selClub = LS('hitmap_club') || 0;
-    const hitmapData = LS('hitmap_data') || {};
+    const hitmapData = LS('hitmap_data_v2') || {};
 
     let html = '<div class="sg31-canvas-wrap"><canvas id="sg31HitmapCanvas" width="600" height="380"></canvas></div>';
     html += '<div class="sg31-tabs" id="sg31HitmapTabs"></div>';
-    html += '<div class="sg31-grid sg31-grid-3" style="margin-top:8px">';
+    html += '<div class="sg31-row" style="margin-top:8px">';
+    html += '<span class="sg31-label">&#xC88C;&#xC6B0;(&#xC88C;-/&#xC6B0;+)</span><input type="number" id="sg31HitmapX" min="-120" max="120" step="1" value="0" style="width:70px;padding:4px 8px;border-radius:6px;border:1px solid var(--border)">';
+    html += '<span class="sg31-label">&#xC804;&#xD6C4;(&#xAE38;-/&#xC9E7;+)</span><input type="number" id="sg31HitmapY" min="-150" max="150" step="1" value="0" style="width:70px;padding:4px 8px;border-radius:6px;border:1px solid var(--border)">';
+    html += '</div>';
+    html += '<div class="sg31-grid sg31-grid-2" style="margin-top:8px">';
     html += '<button class="sg31-btn sg31-btn-primary" id="sg31HitmapAdd">&#x2795; &#xC0F7; &#xCD94;&#xAC00;</button>';
-    html += '<button class="sg31-btn sg31-btn-outline" id="sg31HitmapRandom">&#x1F3B2; &#xB79C;&#xB364; &#xC0DD;&#xC131;</button>';
     html += '<button class="sg31-btn sg31-btn-outline" id="sg31HitmapReset">&#x1F5D1;&#xFE0F; &#xCD08;&#xAE30;&#xD654;</button>';
     html += '</div>';
     html += '<div id="sg31HitmapStats" style="margin-top:10px"></div>';
@@ -574,13 +605,20 @@
       ctx.fillText(labels[0], cx - gridW / 2 - 15, cy);
       ctx.fillText(labels[1], cx + gridW / 2 + 15, cy);
 
+      if (!shots.length) {
+        ctx.font = '13px sans-serif';
+        ctx.fillStyle = isDark ? '#999' : '#888';
+        ctx.textAlign = 'center';
+        ctx.fillText('기록을 추가하면 표시됩니다', cx, cy);
+      }
+
       renderStats(shots);
     }
 
     function renderStats(shots) {
       const statsEl = body.querySelector('#sg31HitmapStats');
       if (shots.length === 0) {
-        statsEl.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:13px">샷 데이터가 없습니다. 추가 버튼을 눌러주세요.</div>';
+        statsEl.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:13px">기록을 추가하면 표시됩니다</div>';
         return;
       }
       const avgX = shots.reduce((a, s) => a + s.x, 0) / shots.length;
@@ -600,34 +638,24 @@
         '</div>';
     }
 
+    // 사용자가 입력한 좌우/전후 편차만 기록한다 (임의 생성 없음)
     body.querySelector('#sg31HitmapAdd').onclick = () => {
+      const xi = parseInt(body.querySelector('#sg31HitmapX').value);
+      const yi = parseInt(body.querySelector('#sg31HitmapY').value);
+      if (isNaN(xi) || isNaN(yi)) return;
+      const x = Math.max(-120, Math.min(120, xi));
+      const y = Math.max(-150, Math.min(150, yi));
       SFX.fairway_gen();
       const key = clubs[selClub];
       if (!hitmapData[key]) hitmapData[key] = [];
-      const x = (Math.random() - 0.5) * 180;
-      const y = (Math.random() - 0.7) * 200;
-      hitmapData[key].push({ x: Math.round(x), y: Math.round(y) });
-      LS('hitmap_data', hitmapData);
-      renderCanvas();
-    };
-
-    body.querySelector('#sg31HitmapRandom').onclick = () => {
-      SFX.fairway_gen();
-      const key = clubs[selClub];
-      hitmapData[key] = [];
-      for (let i = 0; i < 20; i++) {
-        const bias = (Math.random() - 0.5) * 0.3;
-        const x = (Math.random() - 0.5 + bias) * 160;
-        const y = (Math.random() - 0.7) * 220;
-        hitmapData[key].push({ x: Math.round(x), y: Math.round(y) });
-      }
-      LS('hitmap_data', hitmapData);
+      hitmapData[key].push({ x: x, y: y });
+      LS('hitmap_data_v2', hitmapData);
       renderCanvas();
     };
 
     body.querySelector('#sg31HitmapReset').onclick = () => {
       hitmapData[clubs[selClub]] = [];
-      LS('hitmap_data', hitmapData);
+      LS('hitmap_data_v2', hitmapData);
       renderCanvas();
     };
 
@@ -639,7 +667,7 @@
   // ========== 4. SCORE DISTRIBUTION BELL CURVE ==========
   function openScoreDist() {
     SFX.score_dist();
-    let scores = LS('scoredist') || [82, 85, 79, 88, 90, 84, 86, 81, 87, 83, 91, 78, 85, 89, 80, 84, 86, 82, 88, 85];
+    let scores = LS('scoredist_v2') || [];
 
     let html = '<div class="sg31-canvas-wrap"><canvas id="sg31DistCanvas" width="560" height="320"></canvas></div>';
     html += '<div class="sg31-row"><span class="sg31-label">스코어 추가</span><input type="number" id="sg31DistInput" min="60" max="130" value="85" style="width:70px;padding:4px 8px;border-radius:6px;border:1px solid var(--border)"> ';
@@ -661,9 +689,13 @@
 
       if (scores.length < 3) {
         ctx.font = '14px sans-serif';
-        ctx.fillStyle = isDark ? '#aaa' : '#666';
+        ctx.fillStyle = isDark ? '#999' : '#888';
         ctx.textAlign = 'center';
-        ctx.fillText('최소 3개 이상의 스코어가 필요합니다', W / 2, H / 2);
+        ctx.fillText('기록을 추가하면 표시됩니다 (스코어 3개 이상)', W / 2, H / 2 - 8);
+        ctx.font = '12px sans-serif';
+        ctx.fillText('현재 ' + scores.length + '개 입력됨', W / 2, H / 2 + 14);
+        const emptyStats = body.querySelector('#sg31DistStats');
+        if (emptyStats) emptyStats.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted,#666);font-size:13px;padding:12px">&#xAE30;&#xB85D;&#xC744; &#xCD94;&#xAC00;&#xD558;&#xBA74; &#xD45C;&#xC2DC;&#xB429;&#xB2C8;&#xB2E4;</div>';
         return;
       }
 
@@ -693,19 +725,21 @@
         ctx.fillRect(x - 6, marginT + plotH - barH, 12, barH);
       });
 
-      ctx.beginPath();
-      ctx.strokeStyle = '#e91e63';
-      ctx.lineWidth = 2.5;
-      for (let px = 0; px <= plotW; px++) {
-        const s = minS + (px / plotW) * range;
-        const z = (s - mean) / stddev;
-        const y = Math.exp(-0.5 * z * z) / (stddev * Math.sqrt(2 * Math.PI));
-        const maxY = 1 / (stddev * Math.sqrt(2 * Math.PI));
-        const py = marginT + plotH - (y / maxY) * plotH * 0.85;
-        if (px === 0) ctx.moveTo(marginL + px, py);
-        else ctx.lineTo(marginL + px, py);
+      if (stddev > 0) {
+        ctx.beginPath();
+        ctx.strokeStyle = '#e91e63';
+        ctx.lineWidth = 2.5;
+        for (let px = 0; px <= plotW; px++) {
+          const s = minS + (px / plotW) * range;
+          const z = (s - mean) / stddev;
+          const y = Math.exp(-0.5 * z * z) / (stddev * Math.sqrt(2 * Math.PI));
+          const maxY = 1 / (stddev * Math.sqrt(2 * Math.PI));
+          const py = marginT + plotH - (y / maxY) * plotH * 0.85;
+          if (px === 0) ctx.moveTo(marginL + px, py);
+          else ctx.lineTo(marginL + px, py);
+        }
+        ctx.stroke();
       }
-      ctx.stroke();
 
       ctx.setLineDash([4, 4]);
       ctx.strokeStyle = '#4caf50';
@@ -771,7 +805,7 @@
       const v = parseInt(body.querySelector('#sg31DistInput').value);
       if (v >= 60 && v <= 130) {
         scores.push(v);
-        LS('scoredist', scores);
+        LS('scoredist_v2', scores);
         renderCanvas();
         SFX.score_dist();
       }
@@ -779,7 +813,7 @@
 
     body.querySelector('#sg31DistClear').onclick = () => {
       scores = [];
-      LS('scoredist', scores);
+      LS('scoredist_v2', scores);
       renderCanvas();
     };
 
@@ -934,8 +968,10 @@
       { name: '회복력', key: 'recovery', color: '#00bcd4' }
     ];
 
-    const saved = LS('mental') || {};
-    axes.forEach(a => { if (saved[a.key] === undefined) saved[a.key] = 50 + Math.floor(Math.random() * 40); });
+    const saved = LS('mental_v2') || {};
+    // 저장된 값이 하나도 없으면 빈 상태 (슬라이더는 중립 50에서 시작하되 기록으로 표시하지 않는다)
+    let mentalHasData = axes.some(a => typeof saved[a.key] === 'number');
+    axes.forEach(a => { if (typeof saved[a.key] !== 'number') saved[a.key] = 50; });
 
     let html = '<div class="sg31-canvas-wrap"><canvas id="sg31MentalCanvas" width="520" height="340"></canvas></div>';
     html += '<div id="sg31MentalSliders"></div>';
@@ -954,6 +990,7 @@
       slidersEl.appendChild(row);
       row.querySelector('input').oninput = function () {
         saved[a.key] = parseInt(this.value);
+        mentalHasData = true;
         body.querySelector('#sg31MV_' + a.key).textContent = this.value;
         renderCanvas();
         renderAdvice();
@@ -1004,6 +1041,17 @@
         ctx.fillText(a.name, cx + labelR * Math.cos(angle), cy + labelR * Math.sin(angle) + 4);
       });
 
+      if (!mentalHasData) {
+        ctx.font = 'bold 13px sans-serif';
+        ctx.fillStyle = isDark ? '#e0e0e0' : '#333';
+        ctx.textAlign = 'center';
+        ctx.fillText('멘탈 에너지 미터', W / 2, 18);
+        ctx.font = '13px sans-serif';
+        ctx.fillStyle = isDark ? '#999' : '#888';
+        ctx.fillText('슬라이더로 기록을 추가하면 표시됩니다', cx, cy + 4);
+        return;
+      }
+
       ctx.beginPath();
       axes.forEach((a, i) => {
         const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
@@ -1045,6 +1093,11 @@
     }
 
     function renderAdvice() {
+      if (!mentalHasData) {
+        body.querySelector('#sg31MentalAdvice').innerHTML =
+          '<div class="sg31-card" style="cursor:default"><div class="sg31-card-desc" style="text-align:center">&#xAE30;&#xB85D;&#xC744; &#xCD94;&#xAC00;&#xD558;&#xBA74; &#xD45C;&#xC2DC;&#xB429;&#xB2C8;&#xB2E4;</div></div>';
+        return;
+      }
       const weakest = axes.reduce((min, a) => saved[a.key] < saved[min.key] ? a : min, axes[0]);
       const advices = {
         conf: '성공 경험을 떠올려 보세요. 지난 베스트 샷을 시각화하고, 프리샷 루틴을 반복하세요.',
@@ -1064,7 +1117,7 @@
     renderAdvice();
 
     body.querySelector('#sg31MentalSave').onclick = () => {
-      LS('mental', saved);
+      LS('mental_v2', saved);
       SFX.mental_open();
     };
     checkAchievements();
@@ -1226,8 +1279,9 @@
       { name: '핸디칡 2 개선', target: 2, unit: '타', icon: '&#x1F4C9;' }
     ];
 
-    const saved = LS('goals') || {};
-    goals.forEach((g, i) => { if (saved[i] === undefined) saved[i] = Math.floor(Math.random() * g.target * 0.8); });
+    const saved = LS('goals_v2') || {};
+    // 저장된 진행도가 없으면 0에서 시작한다 (임의 진행도 생성 금지)
+    goals.forEach((g, i) => { if (typeof saved[i] !== 'number') saved[i] = 0; });
 
     let html = '<div class="sg31-canvas-wrap"><canvas id="sg31GoalCanvas" width="600" height="360"></canvas></div>';
     html += '<div id="sg31GoalList"></div>';
@@ -1312,14 +1366,21 @@
       ctx.font = 'bold 13px sans-serif';
       ctx.fillStyle = isDark ? '#e0e0e0' : '#333';
       ctx.textAlign = 'center';
-      ctx.fillText('시즘 목표 달성 (' + achieved + '/' + goals.length + ' 완료)', W / 2, 20);
+      ctx.fillText('시즌 목표 달성 (' + achieved + '/' + goals.length + ' 완료)', W / 2, 20);
+
+      const totalProgress = goals.reduce((a, g, i) => a + (saved[i] || 0), 0);
+      if (totalProgress === 0) {
+        ctx.font = '13px sans-serif';
+        ctx.fillStyle = isDark ? '#999' : '#888';
+        ctx.fillText('기록을 추가하면 표시됩니다 (+1 버튼)', W / 2, H - 10);
+      }
     }
 
     renderList();
     renderCanvas();
 
     body.querySelector('#sg31GoalSave').onclick = () => {
-      LS('goals', saved);
+      LS('goals_v2', saved);
       SFX.goal_open();
     };
     checkAchievements();
@@ -1392,21 +1453,21 @@
   // ========== ACHIEVEMENTS ==========
   function checkAchievements() {
     const achs = [
-      { id: 'v31_replay', name: '라운드 리플레이어', desc: '라운드 리플레이 분석기 열기', check: () => LS('replay') !== null },
+      { id: 'v31_replay', name: '라운드 리플레이어', desc: '라운드 리플레이 분석기 열기', check: () => LS('replay_v2') !== null },
       { id: 'v31_green', name: '그린 공략가', desc: '그린 어택 각도 분석 사용', check: () => LS('greenatk_dist') !== null },
-      { id: 'v31_hitmap', name: '페어웨이 분석가', desc: '페어웨이 히트맵 20샷 기록', check: () => { const d = LS('hitmap_data'); return d && Object.values(d).some(v => v && v.length >= 20); } },
-      { id: 'v31_bell', name: '통계 분석가', desc: '스코어 벨커브 분석 사용', check: () => { const s = LS('scoredist'); return s && s.length >= 5; } },
+      { id: 'v31_hitmap', name: '페어웨이 분석가', desc: '페어웨이 히트맵 20샷 기록', check: () => { const d = LS('hitmap_data_v2'); return d && Object.values(d).some(v => v && v.length >= 20); } },
+      { id: 'v31_bell', name: '통계 분석가', desc: '스코어 벨커브 분석 사용', check: () => { const s = LS('scoredist_v2'); return s && s.length >= 5; } },
       { id: 'v31_par3', name: '파3 전략가', desc: '파3 전략 시뮬레이터 전체 확인', check: () => !!document.getElementById('sg31par3') },
-      { id: 'v31_mental', name: '멘탈 코치', desc: '멘탈 에너지 미터 저장', check: () => LS('mental') !== null },
+      { id: 'v31_mental', name: '멘탈 코치', desc: '멘탈 에너지 미터 저장', check: () => LS('mental_v2') !== null },
       { id: 'v31_miss', name: '미스샷 닥터', desc: '미스샷 패턴 코렉터 전체 확인', check: () => !!document.getElementById('sg31miss') },
-      { id: 'v31_goal5', name: '목표 달성자', desc: '시즘 목표 5개 이상 달성', check: () => { const g = LS('goals'); return g && Object.values(g).filter((v, i) => v >= [1,3,50,60,50,32,8,20,5,2][i]).length >= 5; } },
+      { id: 'v31_goal5', name: '목표 달성자', desc: '시즘 목표 5개 이상 달성', check: () => { const g = LS('goals_v2'); return g && Object.values(g).filter((v, i) => v >= [1,3,50,60,50,32,8,20,5,2][i]).length >= 5; } },
       { id: 'v31_iq15s', name: 'Golf IQ v15 S등급', desc: 'Golf IQ v15에서 S등급 획득', check: () => { const s = LS('iq_v15'); return s !== null && s >= 14; } },
       { id: 'v31_iq15', name: 'Golf IQ v15 클리어', desc: 'Golf IQ v15 완료', check: () => LS('iq_v15') !== null },
-      { id: 'v31_hitmap3', name: '멀티 클럽 분석', desc: '히트맵 3개 클럽 이상 데이터 입력', check: () => { const d = LS('hitmap_data'); return d && Object.values(d).filter(v => v && v.length > 0).length >= 3; } },
-      { id: 'v31_goal10', name: '목표 완주자', desc: '시즘 목표 10개 전부 달성', check: () => { const g = LS('goals'); return g && Object.values(g).filter((v, i) => v >= [1,3,50,60,50,32,8,20,5,2][i]).length >= 10; } },
-      { id: 'v31_score30', name: '리플레이 수집가', desc: '스코어 30개 이상 기록', check: () => { const s = LS('scoredist'); return s && s.length >= 30; } },
-      { id: 'v31_mentalS', name: '멘탈 챔피언', desc: '멘탈 에너지 전체 80이상', check: () => { const m = LS('mental'); return m && Object.values(m).every(v => v >= 80); } },
-      { id: 'v31_complete', name: 'v31 컴플리트', desc: 'v31 전체 기능 탐험 완료', check: () => LS('replay') !== null && LS('greenatk_dist') !== null && LS('mental') !== null && LS('iq_v15') !== null && LS('goals') !== null }
+      { id: 'v31_hitmap3', name: '멀티 클럽 분석', desc: '히트맵 3개 클럽 이상 데이터 입력', check: () => { const d = LS('hitmap_data_v2'); return d && Object.values(d).filter(v => v && v.length > 0).length >= 3; } },
+      { id: 'v31_goal10', name: '목표 완주자', desc: '시즘 목표 10개 전부 달성', check: () => { const g = LS('goals_v2'); return g && Object.values(g).filter((v, i) => v >= [1,3,50,60,50,32,8,20,5,2][i]).length >= 10; } },
+      { id: 'v31_score30', name: '리플레이 수집가', desc: '스코어 30개 이상 기록', check: () => { const s = LS('scoredist_v2'); return s && s.length >= 30; } },
+      { id: 'v31_mentalS', name: '멘탈 챔피언', desc: '멘탈 에너지 전체 80이상', check: () => { const m = LS('mental_v2'); return m && Object.values(m).every(v => v >= 80); } },
+      { id: 'v31_complete', name: 'v31 컴플리트', desc: 'v31 전체 기능 탐험 완료', check: () => LS('replay_v2') !== null && LS('greenatk_dist') !== null && LS('mental_v2') !== null && LS('iq_v15') !== null && LS('goals_v2') !== null }
     ];
 
     achs.forEach(a => {

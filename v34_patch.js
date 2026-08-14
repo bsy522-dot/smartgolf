@@ -122,22 +122,48 @@
     return { g: 'D', c: '#9e9e9e', cls: 'sg34-grade-d' };
   }
 
+  // ---- 빈 상태 / 입력 헬퍼 (v34: 데이터는 사용자가 입력한 것만 사용한다) ----
+  const IST = 'padding:4px 8px;border-radius:6px;border:1px solid var(--border,#e0e0e0);background:var(--card-bg,#fff);color:var(--text,#1a1a1a);font-family:inherit;font-size:12px';
+  const EMPTY_MSG = '기록을 추가하면 표시됩니다';
+  function drawEmpty(ctx, W, H, msg) {
+    ctx.save();
+    ctx.fillStyle = isDark() ? '#999' : '#888';
+    ctx.font = '13px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(msg || EMPTY_MSG, W / 2, H / 2);
+    ctx.restore();
+  }
+  function holeOptions(n) {
+    let s = '';
+    for (let i = 1; i <= n; i++) s += '<option value="' + i + '">' + i + 'H</option>';
+    return s;
+  }
+  function numVal(id, min, max) {
+    const el = document.getElementById(id);
+    if (!el) return null;
+    const v = parseFloat(el.value);
+    if (isNaN(v)) return null;
+    if (typeof min === 'number' && v < min) return null;
+    if (typeof max === 'number' && v > max) return null;
+    return v;
+  }
+
   // ===============================================================
   // 1. TEE SHOT SUCCESS ANALYZER - Canvas 620x380
   // ===============================================================
   function openTeeShotAnalyzer() {
     SFX.tee_hit();
+    // result/club 은 사용자가 기록할 때만 채워진다 (임의 생성 금지)
     const holes = [];
     for (let i = 0; i < 14; i++) {
       holes.push({
         hole: i < 10 ? 'H' + (i + 1) : 'H' + (i + 4),
         par: i < 4 ? 4 : (i < 8 ? 5 : 4),
-        fairway: Math.random() > 0.35 ? 1 : 0,
-        missDir: Math.random() > 0.5 ? 'L' : 'R',
-        club: ['DR', 'DR', '3W', 'DR', 'DR', '3W', 'DR', 'DR', 'DR', '3W', 'DR', 'DR', 'DR', '3W'][i]
+        result: null,
+        club: ''
       });
     }
-    let data = LS('tee_data') || holes;
+    let data = LS('tee_data_v2') || holes;
 
     function render(d) {
       const cid = 'sg34-canvas-tee';
@@ -149,13 +175,14 @@
       const W = 620, H = 380;
       ctx.fillStyle = cBg(); ctx.fillRect(0, 0, W, H);
 
-      const hitCount = d.filter(h => h.fairway).length;
-      const hitPct = Math.round(hitCount / d.length * 100);
-      const leftMiss = d.filter(h => !h.fairway && h.missDir === 'L').length;
-      const rightMiss = d.filter(h => !h.fairway && h.missDir === 'R').length;
+      const rec = d.filter(h => h.result === 'FW' || h.result === 'L' || h.result === 'R');
+      const hitCount = rec.filter(h => h.result === 'FW').length;
+      const hitPct = rec.length ? Math.round(hitCount / rec.length * 100) : 0;
+      const leftMiss = rec.filter(h => h.result === 'L').length;
+      const rightMiss = rec.filter(h => h.result === 'R').length;
 
       ctx.fillStyle = cText(); ctx.font = 'bold 15px sans-serif';
-      ctx.fillText('Tee Shot Success Rate: ' + hitPct + '% (' + hitCount + '/' + d.length + ')', 20, 30);
+      ctx.fillText(rec.length ? ('Tee Shot Success Rate: ' + hitPct + '% (' + hitCount + '/' + rec.length + ')') : 'Tee Shot Success Rate: -', 20, 30);
 
       const barW = 30, gap = 10, startX = 50, startY = 340;
       const maxH = 250;
@@ -163,15 +190,26 @@
       d.forEach((h, i) => {
         const x = startX + i * (barW + gap);
         const barH = maxH * 0.7;
-        ctx.fillStyle = h.fairway ? '#4caf50' : (h.missDir === 'L' ? '#f44336' : '#ff9800');
-        ctx.fillRect(x, startY - barH, barW, barH);
+        const has = h.result === 'FW' || h.result === 'L' || h.result === 'R';
+        if (has) {
+          ctx.fillStyle = h.result === 'FW' ? '#4caf50' : (h.result === 'L' ? '#f44336' : '#ff9800');
+          ctx.fillRect(x, startY - barH, barW, barH);
+        } else {
+          ctx.strokeStyle = cGrid(); ctx.lineWidth = 1;
+          ctx.strokeRect(x, startY - barH, barW, barH);
+        }
         ctx.fillStyle = cText(); ctx.font = '10px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(h.hole, x + barW / 2, startY + 14);
-        ctx.fillText(h.club, x + barW / 2, startY + 26);
-        ctx.fillText(h.fairway ? 'FW' : h.missDir, x + barW / 2, startY - barH - 6);
+        ctx.fillText(h.club || '-', x + barW / 2, startY + 26);
+        ctx.fillText(has ? h.result : '', x + barW / 2, startY - barH - 6);
       });
       ctx.textAlign = 'left';
+
+      if (!rec.length) {
+        drawEmpty(ctx, W, H);
+        return;
+      }
 
       ctx.font = 'bold 12px sans-serif';
       ctx.fillStyle = '#4caf50';
@@ -184,24 +222,44 @@
       ctx.fillRect(W - 200, 56, 12, 12); ctx.fillStyle = cText();
       ctx.fillText('Right Miss: ' + rightMiss, W - 184, 67);
 
-      const g = grade(hitPct);
-      ctx.font = 'bold 22px sans-serif'; ctx.fillStyle = g.c;
-      ctx.fillText('Grade: ' + g.g, W - 200, 100);
+      // 표본이 5홀 미만이면 등급을 매기지 않는다
+      if (rec.length >= 5) {
+        const g = grade(hitPct);
+        ctx.font = 'bold 22px sans-serif'; ctx.fillStyle = g.c;
+        ctx.fillText('Grade: ' + g.g, W - 200, 100);
+      } else {
+        ctx.font = 'bold 12px sans-serif'; ctx.fillStyle = cMuted();
+        ctx.fillText('Grade: - (5홀 이상 기록 필요)', W - 200, 100);
+      }
     }
 
     const html = '<div class="sg34-row"><span class="sg34-badge sg34-badge-green">Canvas 620x380</span> <span class="sg34-badge sg34-badge-blue">14 Par4/5 Holes</span></div>' +
       '<p class="sg34-card-desc">14개 Par4/5 홀의 티샷 페어웨이 적중률을 분석합니다. 좌/우 미스 비율, 클럽별 성공률을 시각화합니다.</p>' +
-      '<div class="sg34-row" style="margin-top:10px"><button class="sg34-btn sg34-btn-primary" onclick="window._sg34_tee_randomize()">&#x1F3B2; Randomize</button> <button class="sg34-btn sg34-btn-outline" onclick="window._sg34_tee_reset()">&#x21BB; Reset</button></div>' +
+      '<div class="sg34-row" style="margin-top:10px">' +
+      '<span class="sg34-label">Hole</span><select id="sg34-tee-hole" style="' + IST + '">' + data.map((h, i) => '<option value="' + i + '">' + h.hole + ' (Par ' + h.par + ')</option>').join('') + '</select>' +
+      '<span class="sg34-label">Result</span><select id="sg34-tee-result" style="' + IST + '"><option value="FW">Fairway</option><option value="L">Left Miss</option><option value="R">Right Miss</option></select>' +
+      '<span class="sg34-label">Club</span><select id="sg34-tee-club" style="' + IST + '"><option value="DR">DR</option><option value="3W">3W</option><option value="5W">5W</option><option value="HY">HY</option><option value="IR">IR</option></select>' +
+      '<button class="sg34-btn sg34-btn-primary" onclick="window._sg34_tee_record()">&#x2795; Record</button></div>' +
+      '<div class="sg34-row"><button class="sg34-btn sg34-btn-outline" onclick="window._sg34_tee_save()">&#x1F4BE; Save</button> <button class="sg34-btn sg34-btn-outline" onclick="window._sg34_tee_reset()">&#x21BB; Reset</button></div>' +
       '<div id="sg34-canvas-tee-wrap" class="sg34-canvas-wrap"></div>';
 
-    window._sg34_tee_randomize = () => {
-      data = [];
-      for (let i = 0; i < 14; i++) {
-        data.push({ hole: i < 10 ? 'H' + (i + 1) : 'H' + (i + 4), par: i < 4 ? 4 : (i < 8 ? 5 : 4), fairway: Math.random() > 0.35 ? 1 : 0, missDir: Math.random() > 0.5 ? 'L' : 'R', club: ['DR','DR','3W','DR','DR','3W','DR','DR','DR','3W','DR','DR','DR','3W'][i] });
-      }
-      LS('tee_data', data); SFX.tee_hit(); render(data);
+    window._sg34_tee_record = () => {
+      const hEl = document.getElementById('sg34-tee-hole');
+      const rEl = document.getElementById('sg34-tee-result');
+      const cEl = document.getElementById('sg34-tee-club');
+      if (!hEl || !rEl || !cEl) return;
+      const idx = parseInt(hEl.value);
+      if (isNaN(idx) || !data[idx]) return;
+      data[idx].result = rEl.value;
+      data[idx].club = cEl.value;
+      SFX.tee_hit(); render(data);
     };
-    window._sg34_tee_reset = () => { localStorage.removeItem('sg34_tee_data'); location.reload(); };
+    window._sg34_tee_save = () => { LS('tee_data_v2', data); SFX.tee_hit(); };
+    // 이 패널만 초기화한다 (페이지 새로고침 금지)
+    window._sg34_tee_reset = () => {
+      data.forEach(h => { h.result = null; h.club = ''; });
+      render(data);
+    };
 
     makeOverlay('sg34-tee', 'linear-gradient(135deg,#2e7d32,#66bb6a)', '&#x1F3CC;&#xFE0F; Tee Shot Analyzer', html);
     setTimeout(() => render(data), 100);
@@ -215,7 +273,8 @@
     SFX.emotion_log();
     const EMOTIONS = ['Confident', 'Focused', 'Relaxed', 'Excited', 'Nervous', 'Frustrated', 'Calm', 'Determined'];
     const COLORS = ['#e91e63', '#2196f3', '#4caf50', '#ff9800', '#9c27b0', '#f44336', '#00bcd4', '#ff5722'];
-    let holeEmotions = LS('emotions') || Array.from({length: 18}, () => Math.floor(Math.random() * 8));
+    // 홀별 감정은 사용자가 기록할 때만 채워진다 (null = 미기록)
+    let holeEmotions = LS('emotions_v2') || Array.from({length: 18}, () => null);
 
     function render(d) {
       const cid = 'sg34-canvas-emotion';
@@ -242,42 +301,62 @@
       }
       ctx.textAlign = 'left';
 
-      ctx.strokeStyle = '#1a7a3a'; ctx.lineWidth = 2.5;
-      ctx.beginPath();
+      // 홀 라벨은 항상 표시
       d.forEach((e, i) => {
         const x = startX + i * stepX;
-        const y = startY + (endY - startY) * e / 7;
-        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      });
-      ctx.stroke();
-
-      d.forEach((e, i) => {
-        const x = startX + i * stepX;
-        const y = startY + (endY - startY) * e / 7;
-        ctx.fillStyle = COLORS[e];
-        ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = cText(); ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
         ctx.fillText('H' + (i + 1), x, endY + 18);
       });
       ctx.textAlign = 'left';
 
+      const pts = [];
+      d.forEach((e, i) => {
+        if (typeof e !== 'number' || isNaN(e)) return;
+        pts.push({ x: startX + i * stepX, y: startY + (endY - startY) * e / 7, e: e });
+      });
+
+      if (!pts.length) {
+        drawEmpty(ctx, W, H);
+        return;
+      }
+
+      if (pts.length >= 2) {
+        ctx.strokeStyle = '#1a7a3a'; ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        pts.forEach((p, i) => { if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+        ctx.stroke();
+      }
+
+      pts.forEach(p => {
+        ctx.fillStyle = COLORS[p.e];
+        ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI * 2); ctx.fill();
+      });
+
       const counts = {};
-      d.forEach(e => { counts[e] = (counts[e] || 0) + 1; });
+      pts.forEach(p => { counts[p.e] = (counts[p.e] || 0) + 1; });
       const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
       ctx.font = 'bold 12px sans-serif'; ctx.fillStyle = COLORS[dominant[0]];
-      ctx.fillText('Dominant: ' + EMOTIONS[dominant[0]] + ' (' + dominant[1] + ' holes)', 20, H - 15);
+      ctx.fillText('Dominant: ' + EMOTIONS[dominant[0]] + ' (' + dominant[1] + '/' + pts.length + ' holes)', 20, H - 15);
     }
 
     const html = '<div class="sg34-row"><span class="sg34-badge sg34-badge-pink">Canvas 580x360</span> <span class="sg34-badge sg34-badge-purple">8 Emotions</span></div>' +
       '<p class="sg34-card-desc">18홀 라운드 중 각 홀에서의 감정 변화를 추적합니다. 감정 곡선으로 멘탈 패턴을 파악하세요.</p>' +
-      '<div class="sg34-row" style="margin-top:10px"><button class="sg34-btn sg34-btn-primary" onclick="window._sg34_emotion_randomize()">&#x1F3B2; Simulate</button> <button class="sg34-btn sg34-btn-outline" onclick="window._sg34_emotion_reset()">&#x21BB; Reset</button></div>' +
+      '<div class="sg34-row" style="margin-top:10px">' +
+      '<span class="sg34-label">Hole</span><select id="sg34-emo-hole" style="' + IST + '">' + holeOptions(18) + '</select>' +
+      '<span class="sg34-label">Emotion</span><select id="sg34-emo-val" style="' + IST + '">' + EMOTIONS.map((e, i) => '<option value="' + i + '">' + e + '</option>').join('') + '</select>' +
+      '<button class="sg34-btn sg34-btn-primary" onclick="window._sg34_emotion_record()">&#x2795; Record</button></div>' +
+      '<div class="sg34-row"><button class="sg34-btn sg34-btn-outline" onclick="window._sg34_emotion_save()">&#x1F4BE; Save</button> <button class="sg34-btn sg34-btn-outline" onclick="window._sg34_emotion_reset()">&#x21BB; Reset</button></div>' +
       '<div id="sg34-canvas-emotion-wrap" class="sg34-canvas-wrap"></div>';
 
-    window._sg34_emotion_randomize = () => {
-      holeEmotions = Array.from({length: 18}, () => Math.floor(Math.random() * 8));
-      LS('emotions', holeEmotions); SFX.emotion_up(); render(holeEmotions);
+    window._sg34_emotion_record = () => {
+      const h = numVal('sg34-emo-hole', 1, 18);
+      const e = numVal('sg34-emo-val', 0, 7);
+      if (h === null || e === null) return;
+      holeEmotions[h - 1] = e;
+      SFX.emotion_up(); render(holeEmotions);
     };
-    window._sg34_emotion_reset = () => { holeEmotions = Array.from({length: 18}, () => 0); LS('emotions', holeEmotions); render(holeEmotions); };
+    window._sg34_emotion_save = () => { LS('emotions_v2', holeEmotions); SFX.emotion_log(); };
+    window._sg34_emotion_reset = () => { holeEmotions = Array.from({length: 18}, () => null); render(holeEmotions); };
 
     makeOverlay('sg34-emotion', 'linear-gradient(135deg,#ad1457,#f06292)', '&#x1F60C; Round Emotion Tracker', html);
     setTimeout(() => render(holeEmotions), 100);
@@ -291,7 +370,8 @@
     SFX.par_save();
     const SITUATIONS = ['Green Miss', 'Bunker', 'Rough', 'Water Adj', 'Deep Rough', 'Fringe', 'Fairway Bunker', 'Downhill Lie'];
     const COLORS_PS = ['#4caf50', '#ff9800', '#8bc34a', '#2196f3', '#795548', '#00bcd4', '#ffc107', '#9c27b0'];
-    let saveData = LS('par_saves') || SITUATIONS.map(() => ({ attempts: 5 + Math.floor(Math.random() * 15), saves: Math.floor(Math.random() * 10) + 1 }));
+    // 시도/세이브는 사용자가 입력할 때만 채워진다 (임의 생성 금지)
+    let saveData = LS('par_saves_v2') || SITUATIONS.map(() => ({ attempts: 0, saves: 0 }));
 
     function render(d) {
       const cid = 'sg34-canvas-parsave';
@@ -310,7 +390,7 @@
       const totalSaves = d.reduce((s, v) => s + v.saves, 0);
       const totalPct = totalAttempts > 0 ? Math.round(totalSaves / totalAttempts * 100) : 0;
       ctx.font = '12px sans-serif'; ctx.fillStyle = cMuted();
-      ctx.fillText('Overall: ' + totalSaves + '/' + totalAttempts + ' (' + totalPct + '%)', 20, 45);
+      ctx.fillText(totalAttempts > 0 ? ('Overall: ' + totalSaves + '/' + totalAttempts + ' (' + totalPct + '%)') : 'Overall: -', 20, 45);
 
       const barH = 28, gap = 8, startY = 65, startX = 130, maxBarW = 400;
 
@@ -331,8 +411,19 @@
 
         ctx.fillStyle = barW > 60 ? '#fff' : cText();
         ctx.font = 'bold 11px sans-serif';
-        ctx.fillText(Math.round(pct * 100) + '% (' + item.saves + '/' + item.attempts + ')', startX + (barW > 60 ? 8 : barW + 8), y + barH / 2 + 4);
+        ctx.fillText(item.attempts > 0 ? (Math.round(pct * 100) + '% (' + item.saves + '/' + item.attempts + ')') : '-', startX + (barW > 60 ? 8 : barW + 8), y + barH / 2 + 4);
       });
+
+      if (totalAttempts === 0) {
+        drawEmpty(ctx, W, H, EMPTY_MSG);
+        ctx.font = 'bold 24px sans-serif'; ctx.fillStyle = cMuted();
+        ctx.textAlign = 'center';
+        ctx.fillText('-', W - 60, H - 40);
+        ctx.font = '11px sans-serif';
+        ctx.fillText('Overall Grade', W - 60, H - 22);
+        ctx.textAlign = 'left';
+        return;
+      }
 
       const g = grade(totalPct);
       ctx.font = 'bold 24px sans-serif'; ctx.fillStyle = g.c;
@@ -360,15 +451,25 @@
 
     const html = '<div class="sg34-row"><span class="sg34-badge sg34-badge-green">Canvas 620x400</span> <span class="sg34-badge sg34-badge-orange">8 Situations</span></div>' +
       '<p class="sg34-card-desc">그린미스/벙커/러프 등 상황별 파세이브 성공률을 분석합니다. 취약 상황을 파악하고 연습 계획을 세우세요.</p>' +
-      '<div class="sg34-row" style="margin-top:10px"><button class="sg34-btn sg34-btn-primary" onclick="window._sg34_parsave_sim()">&#x1F3B2; Simulate</button> <button class="sg34-btn sg34-btn-outline" onclick="window._sg34_parsave_reset()">&#x21BB; Reset</button></div>' +
+      '<div class="sg34-row" style="margin-top:10px">' +
+      '<span class="sg34-label">Situation</span><select id="sg34-ps-sit" style="' + IST + '">' + SITUATIONS.map((s, i) => '<option value="' + i + '">' + s + '</option>').join('') + '</select>' +
+      '<span class="sg34-label">Attempts</span><input type="number" id="sg34-ps-att" min="0" max="200" step="1" placeholder="-" style="width:70px;' + IST + '">' +
+      '<span class="sg34-label">Saves</span><input type="number" id="sg34-ps-sav" min="0" max="200" step="1" placeholder="-" style="width:70px;' + IST + '">' +
+      '<button class="sg34-btn sg34-btn-primary" onclick="window._sg34_parsave_record()">&#x2795; Record</button></div>' +
+      '<div class="sg34-row"><button class="sg34-btn sg34-btn-outline" onclick="window._sg34_parsave_save()">&#x1F4BE; Save</button> <button class="sg34-btn sg34-btn-outline" onclick="window._sg34_parsave_reset()">&#x21BB; Reset</button></div>' +
       '<div id="sg34-canvas-parsave-wrap" class="sg34-canvas-wrap"></div>';
 
-    window._sg34_parsave_sim = () => {
-      saveData = SITUATIONS.map(() => ({ attempts: 5 + Math.floor(Math.random() * 15), saves: Math.floor(Math.random() * 12) + 1 }));
-      saveData.forEach(d => { if (d.saves > d.attempts) d.saves = d.attempts; });
-      LS('par_saves', saveData); SFX.par_save(); render(saveData);
+    window._sg34_parsave_record = () => {
+      const i = numVal('sg34-ps-sit', 0, SITUATIONS.length - 1);
+      const att = numVal('sg34-ps-att', 0, 200);
+      const sav = numVal('sg34-ps-sav', 0, 200);
+      if (i === null || att === null || sav === null) return;
+      if (sav > att) return; // 세이브가 시도보다 많을 수 없다
+      saveData[i] = { attempts: Math.round(att), saves: Math.round(sav) };
+      SFX.par_save(); render(saveData);
     };
-    window._sg34_parsave_reset = () => { saveData = SITUATIONS.map(() => ({ attempts: 0, saves: 0 })); LS('par_saves', saveData); render(saveData); };
+    window._sg34_parsave_save = () => { LS('par_saves_v2', saveData); SFX.par_save(); };
+    window._sg34_parsave_reset = () => { saveData = SITUATIONS.map(() => ({ attempts: 0, saves: 0 })); render(saveData); };
 
     makeOverlay('sg34-parsave', 'linear-gradient(135deg,#1b5e20,#43a047)', '&#x1F3AF; Par Save Analyzer', html);
     setTimeout(() => render(saveData), 100);
@@ -381,11 +482,12 @@
   function openGolfSeasonCalendar() {
     SFX.season_view();
     const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    let seasonData = LS('season_cal') || MONTHS.map((m, i) => ({
+    // 월별 라운드/평균스코어/핸디캡은 사용자가 입력할 때만 채워진다
+    let seasonData = LS('season_cal_v2') || MONTHS.map(m => ({
       month: m,
-      rounds: i >= 3 && i <= 10 ? Math.floor(Math.random() * 8) + 1 : Math.floor(Math.random() * 3),
-      avgScore: 80 + Math.floor(Math.random() * 20),
-      hcp: 12 + Math.random() * 10
+      rounds: 0,
+      avgScore: null,
+      hcp: null
     }));
 
     function render(d) {
@@ -421,15 +523,24 @@
         ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'center';
         ctx.fillText(m.month, x + (cellW + 80) / 2, y + 18);
         ctx.font = '10px sans-serif';
-        ctx.fillText(m.rounds + 'R / Avg ' + m.avgScore, x + (cellW + 80) / 2, y + 34);
-        ctx.fillText('HCP ' + m.hcp.toFixed(1), x + (cellW + 80) / 2, y + 44);
+        const avgTxt = (typeof m.avgScore === 'number' && !isNaN(m.avgScore)) ? m.avgScore : '-';
+        const hcpTxt = (typeof m.hcp === 'number' && !isNaN(m.hcp)) ? m.hcp.toFixed(1) : '-';
+        ctx.fillText((m.rounds || 0) + 'R / Avg ' + avgTxt, x + (cellW + 80) / 2, y + 34);
+        ctx.fillText('HCP ' + hcpTxt, x + (cellW + 80) / 2, y + 44);
       });
       ctx.textAlign = 'left';
 
       // Summary
-      const totalRounds = d.reduce((s, m) => s + m.rounds, 0);
+      const totalRounds = d.reduce((s, m) => s + (m.rounds || 0), 0);
       const playedMonths = d.filter(m => m.rounds > 0);
-      const overallAvg = playedMonths.length > 0 ? (playedMonths.reduce((s, m) => s + m.avgScore, 0) / playedMonths.length).toFixed(1) : '-';
+      const scored = playedMonths.filter(m => typeof m.avgScore === 'number' && !isNaN(m.avgScore));
+      const overallAvg = scored.length > 0 ? (scored.reduce((s, m) => s + m.avgScore, 0) / scored.length).toFixed(1) : '-';
+
+      if (totalRounds === 0) {
+        ctx.fillStyle = cMuted(); ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(EMPTY_MSG, 20, H - 20);
+        return;
+      }
 
       ctx.fillStyle = cText(); ctx.font = 'bold 12px sans-serif';
       ctx.fillText('Total Rounds: ' + totalRounds + ' | Avg Score: ' + overallAvg + ' | Active Months: ' + playedMonths.length + '/12', 20, H - 20);
@@ -437,16 +548,29 @@
 
     const html = '<div class="sg34-row"><span class="sg34-badge sg34-badge-teal">Canvas 620x380</span> <span class="sg34-badge sg34-badge-amber">12 Months</span></div>' +
       '<p class="sg34-card-desc">12개월 시즌 히트맵으로 라운드 빈도, 평균 스코어, 핸디캡 추이를 한눈에 파악합니다.</p>' +
-      '<div class="sg34-row" style="margin-top:10px"><button class="sg34-btn sg34-btn-primary" onclick="window._sg34_season_sim()">&#x1F3B2; Simulate</button> <button class="sg34-btn sg34-btn-outline" onclick="window._sg34_season_reset()">&#x21BB; Reset</button></div>' +
+      '<div class="sg34-row" style="margin-top:10px">' +
+      '<span class="sg34-label">Month</span><select id="sg34-se-month" style="' + IST + '">' + MONTHS.map((m, i) => '<option value="' + i + '">' + m + '</option>').join('') + '</select>' +
+      '<span class="sg34-label">Rounds</span><input type="number" id="sg34-se-rounds" min="0" max="31" step="1" placeholder="-" style="width:66px;' + IST + '">' +
+      '<span class="sg34-label">Avg Score</span><input type="number" id="sg34-se-avg" min="50" max="150" step="1" placeholder="-" style="width:70px;' + IST + '">' +
+      '<span class="sg34-label">HCP</span><input type="number" id="sg34-se-hcp" min="0" max="54" step="0.1" placeholder="-" style="width:70px;' + IST + '">' +
+      '<button class="sg34-btn sg34-btn-primary" onclick="window._sg34_season_record()">&#x2795; Record</button></div>' +
+      '<div class="sg34-row"><button class="sg34-btn sg34-btn-outline" onclick="window._sg34_season_save()">&#x1F4BE; Save</button> <button class="sg34-btn sg34-btn-outline" onclick="window._sg34_season_reset()">&#x21BB; Reset</button></div>' +
       '<div id="sg34-canvas-season-wrap" class="sg34-canvas-wrap"></div>';
 
-    window._sg34_season_sim = () => {
-      seasonData = MONTHS.map((m, i) => ({ month: m, rounds: i >= 3 && i <= 10 ? Math.floor(Math.random() * 8) + 1 : Math.floor(Math.random() * 3), avgScore: 78 + Math.floor(Math.random() * 22), hcp: 10 + Math.random() * 14 }));
-      LS('season_cal', seasonData); SFX.season_view(); render(seasonData);
+    window._sg34_season_record = () => {
+      const i = numVal('sg34-se-month', 0, 11);
+      if (i === null) return;
+      const r = numVal('sg34-se-rounds', 0, 31);
+      if (r === null) return; // 라운드 수는 필수
+      const a = numVal('sg34-se-avg', 50, 150);
+      const h = numVal('sg34-se-hcp', 0, 54);
+      seasonData[i] = { month: MONTHS[i], rounds: Math.round(r), avgScore: a === null ? null : Math.round(a), hcp: h };
+      SFX.season_view(); render(seasonData);
     };
+    window._sg34_season_save = () => { LS('season_cal_v2', seasonData); SFX.season_view(); };
     window._sg34_season_reset = () => {
-      seasonData = MONTHS.map(m => ({ month: m, rounds: 0, avgScore: 0, hcp: 0 }));
-      LS('season_cal', seasonData); render(seasonData);
+      seasonData = MONTHS.map(m => ({ month: m, rounds: 0, avgScore: null, hcp: null }));
+      render(seasonData);
     };
 
     makeOverlay('sg34-season', 'linear-gradient(135deg,#00695c,#26a69a)', '&#x1F4C5; Golf Season Calendar', html);
@@ -578,12 +702,13 @@
     SFX.dist_scan();
     const CLUBS = ['DR', '3W', '5W', '3H', '4I', '5I', '6I', '7I', '8I', '9I', 'PW', 'GW', 'SW', 'LW'];
     const BASE_DIST = [250, 230, 215, 200, 190, 180, 170, 160, 145, 135, 125, 110, 95, 75];
-    let distData = LS('club_dist') || CLUBS.map((c, i) => ({
+    // 클럽별 거리는 사용자가 입력할 때만 채워진다 (BASE_DIST는 입력 폼의 참고 힌트로만 사용)
+    let distData = LS('club_dist_v2') || CLUBS.map(c => ({
       club: c,
-      avg: BASE_DIST[i] + Math.floor(Math.random() * 20 - 10),
-      min: BASE_DIST[i] - 15 - Math.floor(Math.random() * 10),
-      max: BASE_DIST[i] + 15 + Math.floor(Math.random() * 10),
-      stdev: 5 + Math.floor(Math.random() * 8)
+      avg: null,
+      min: null,
+      max: null,
+      stdev: null
     }));
 
     function render(d) {
@@ -600,7 +725,9 @@
       ctx.fillText('Club Distance Distribution', 20, 25);
 
       const barW = 32, gap = 8, startX = 45, startY = H - 60;
-      const maxDist = Math.max(...d.map(c => c.max), 280);
+      const hasDist = c => typeof c.avg === 'number' && !isNaN(c.avg);
+      const distRec = d.filter(hasDist);
+      const maxDist = Math.max.apply(null, distRec.map(c => (typeof c.max === 'number' ? c.max : c.avg)).concat([280]));
       const scaleY = (startY - 50) / maxDist;
 
       // Y axis
@@ -615,13 +742,22 @@
 
       d.forEach((c, i) => {
         const x = startX + i * (barW + gap);
-        const avgH = c.avg * scaleY;
-        const minY = startY - c.min * scaleY;
-        const maxY = startY - c.max * scaleY;
 
-        // Range bar (min-max)
-        ctx.fillStyle = isDark() ? 'rgba(76,175,80,0.3)' : 'rgba(76,175,80,0.15)';
-        ctx.fillRect(x + barW / 4, maxY, barW / 2, minY - maxY);
+        // Labels (클럽명은 항상 표시)
+        ctx.fillStyle = cText(); ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText(c.club, x + barW / 2, startY + 14);
+
+        if (!hasDist(c)) return;
+
+        const avgH = c.avg * scaleY;
+
+        // Range bar (min-max) - 입력된 경우만
+        if (typeof c.min === 'number' && typeof c.max === 'number') {
+          const minY = startY - c.min * scaleY;
+          const maxY = startY - c.max * scaleY;
+          ctx.fillStyle = isDark() ? 'rgba(76,175,80,0.3)' : 'rgba(76,175,80,0.15)';
+          ctx.fillRect(x + barW / 4, maxY, barW / 2, minY - maxY);
+        }
 
         // Average bar
         const gradient = ctx.createLinearGradient(0, startY - avgH, 0, startY);
@@ -630,20 +766,24 @@
         ctx.fillStyle = gradient;
         ctx.fillRect(x, startY - avgH, barW, avgH);
 
-        // Stdev markers
-        ctx.strokeStyle = '#ff9800'; ctx.lineWidth = 2;
-        const sdTop = startY - (c.avg + c.stdev) * scaleY;
-        const sdBot = startY - (c.avg - c.stdev) * scaleY;
-        ctx.beginPath(); ctx.moveTo(x, sdTop); ctx.lineTo(x + barW, sdTop); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x, sdBot); ctx.lineTo(x + barW, sdBot); ctx.stroke();
+        // Stdev markers - 입력된 경우만
+        if (typeof c.stdev === 'number' && !isNaN(c.stdev)) {
+          ctx.strokeStyle = '#ff9800'; ctx.lineWidth = 2;
+          const sdTop = startY - (c.avg + c.stdev) * scaleY;
+          const sdBot = startY - (c.avg - c.stdev) * scaleY;
+          ctx.beginPath(); ctx.moveTo(x, sdTop); ctx.lineTo(x + barW, sdTop); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(x, sdBot); ctx.lineTo(x + barW, sdBot); ctx.stroke();
+        }
 
-        // Labels
-        ctx.fillStyle = cText(); ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText(c.club, x + barW / 2, startY + 14);
-        ctx.font = '8px sans-serif'; ctx.fillStyle = cMuted();
+        ctx.font = '8px sans-serif'; ctx.fillStyle = cMuted(); ctx.textAlign = 'center';
         ctx.fillText(c.avg + 'y', x + barW / 2, startY - avgH - 6);
       });
       ctx.textAlign = 'left';
+
+      if (!distRec.length) {
+        drawEmpty(ctx, W, H);
+        return;
+      }
 
       // Legend
       ctx.fillStyle = '#2e7d32'; ctx.fillRect(W - 200, 15, 10, 10);
@@ -658,14 +798,29 @@
 
     const html = '<div class="sg34-row"><span class="sg34-badge sg34-badge-green">Canvas 620x400</span> <span class="sg34-badge sg34-badge-blue">14 Clubs</span></div>' +
       '<p class="sg34-card-desc">14클럽의 거리 분포를 히스토그램으로 표시합니다. 평균, 최소-최대 범위, 표준편차를 시각화합니다.</p>' +
-      '<div class="sg34-row" style="margin-top:10px"><button class="sg34-btn sg34-btn-primary" onclick="window._sg34_dist_randomize()">&#x1F3B2; Randomize</button> <button class="sg34-btn sg34-btn-outline" onclick="window._sg34_dist_reset()">&#x21BB; Reset</button></div>' +
+      '<div class="sg34-row" style="margin-top:10px">' +
+      '<span class="sg34-label">Club</span><select id="sg34-cd-club" style="' + IST + '">' + CLUBS.map((c, i) => '<option value="' + i + '">' + c + ' (' + BASE_DIST[i] + 'y 참고)</option>').join('') + '</select>' +
+      '<span class="sg34-label">Avg(y)</span><input type="number" id="sg34-cd-avg" min="10" max="400" step="1" placeholder="-" style="width:70px;' + IST + '">' +
+      '<span class="sg34-label">Min</span><input type="number" id="sg34-cd-min" min="10" max="400" step="1" placeholder="-" style="width:66px;' + IST + '">' +
+      '<span class="sg34-label">Max</span><input type="number" id="sg34-cd-max" min="10" max="400" step="1" placeholder="-" style="width:66px;' + IST + '">' +
+      '<span class="sg34-label">Stdev</span><input type="number" id="sg34-cd-sd" min="0" max="50" step="1" placeholder="-" style="width:62px;' + IST + '">' +
+      '<button class="sg34-btn sg34-btn-primary" onclick="window._sg34_dist_record()">&#x2795; Record</button></div>' +
+      '<div class="sg34-row"><button class="sg34-btn sg34-btn-outline" onclick="window._sg34_dist_save()">&#x1F4BE; Save</button> <button class="sg34-btn sg34-btn-outline" onclick="window._sg34_dist_reset()">&#x21BB; Reset</button></div>' +
       '<div id="sg34-canvas-dist-wrap" class="sg34-canvas-wrap"></div>';
 
-    window._sg34_dist_randomize = () => {
-      distData = CLUBS.map((c, i) => ({ club: c, avg: BASE_DIST[i] + Math.floor(Math.random() * 20 - 10), min: BASE_DIST[i] - 15 - Math.floor(Math.random() * 10), max: BASE_DIST[i] + 15 + Math.floor(Math.random() * 10), stdev: 5 + Math.floor(Math.random() * 8) }));
-      LS('club_dist', distData); SFX.dist_scan(); render(distData);
+    window._sg34_dist_record = () => {
+      const i = numVal('sg34-cd-club', 0, CLUBS.length - 1);
+      const avg = numVal('sg34-cd-avg', 10, 400);
+      if (i === null || avg === null) return; // 평균 거리는 필수
+      let mn = numVal('sg34-cd-min', 10, 400);
+      let mx = numVal('sg34-cd-max', 10, 400);
+      if (mn !== null && mx !== null && mn > mx) { const t = mn; mn = mx; mx = t; }
+      const sd = numVal('sg34-cd-sd', 0, 50);
+      distData[i] = { club: CLUBS[i], avg: Math.round(avg), min: mn === null ? null : Math.round(mn), max: mx === null ? null : Math.round(mx), stdev: sd === null ? null : Math.round(sd) };
+      SFX.dist_scan(); render(distData);
     };
-    window._sg34_dist_reset = () => { distData = CLUBS.map((c, i) => ({ club: c, avg: BASE_DIST[i], min: BASE_DIST[i] - 15, max: BASE_DIST[i] + 15, stdev: 8 })); LS('club_dist', distData); render(distData); };
+    window._sg34_dist_save = () => { LS('club_dist_v2', distData); SFX.dist_scan(); };
+    window._sg34_dist_reset = () => { distData = CLUBS.map(c => ({ club: c, avg: null, min: null, max: null, stdev: null })); render(distData); };
 
     makeOverlay('sg34-dist', 'linear-gradient(135deg,#1b5e20,#4caf50)', '&#x1F4CF; Club Distance Histogram', html);
     setTimeout(() => render(distData), 100);
@@ -677,11 +832,12 @@
   // ===============================================================
   function openRoundEnergyManager() {
     SFX.energy_check();
-    let energyData = LS('energy') || Array.from({length: 18}, (_, i) => ({
+    // 에너지/수분/영양은 사용자가 홀마다 입력할 때만 채워진다
+    let energyData = LS('energy_v2') || Array.from({length: 18}, (_, i) => ({
       hole: i + 1,
-      energy: Math.max(20, 100 - i * 4 + Math.floor(Math.random() * 15 - 7)),
-      hydration: Math.max(15, 90 - i * 3 + Math.floor(Math.random() * 10)),
-      nutrition: Math.max(25, 95 - i * 2.5 + Math.floor(Math.random() * 10))
+      energy: null,
+      hydration: null,
+      nutrition: null
     }));
 
     function render(d) {
@@ -724,24 +880,28 @@
         { key: 'nutrition', color: '#ff9800', label: 'Nutrition' }
       ];
 
+      const hasVal = v => typeof v === 'number' && !isNaN(v);
+      const anyEntry = d.some(h => hasVal(h.energy) || hasVal(h.hydration) || hasVal(h.nutrition));
+
       lines.forEach(line => {
-        ctx.strokeStyle = line.color; ctx.lineWidth = 2.5;
-        ctx.beginPath();
+        const pts = [];
         d.forEach((h, i) => {
-          const x = startX + i * stepX;
+          if (!hasVal(h[line.key])) return;
           const val = Math.min(100, Math.max(0, h[line.key]));
-          const y = endY - (endY - startY) * val / 100;
-          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          pts.push({ x: startX + i * stepX, y: endY - (endY - startY) * val / 100, val: val });
         });
-        ctx.stroke();
+
+        if (pts.length >= 2) {
+          ctx.strokeStyle = line.color; ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          pts.forEach((p, i) => { if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+          ctx.stroke();
+        }
 
         // Dots
-        d.forEach((h, i) => {
-          const x = startX + i * stepX;
-          const val = Math.min(100, Math.max(0, h[line.key]));
-          const y = endY - (endY - startY) * val / 100;
-          ctx.fillStyle = val < 30 ? '#f44336' : line.color;
-          ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill();
+        pts.forEach(p => {
+          ctx.fillStyle = p.val < 30 ? '#f44336' : line.color;
+          ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI * 2); ctx.fill();
         });
       });
 
@@ -761,27 +921,48 @@
         ctx.fillText(line.label, lx + 14, H - 16);
       });
 
-      // Recommendations
-      const lastEnergy = d[17].energy;
-      const lastHydration = d[17].hydration;
-      if (lastEnergy < 30 || lastHydration < 30) {
+      if (!anyEntry) {
+        drawEmpty(ctx, W, H);
+        return;
+      }
+
+      // Recommendations - 마지막으로 기록된 홀 기준
+      const lastRec = d.slice().reverse().find(h => hasVal(h.energy) || hasVal(h.hydration));
+      if (lastRec && ((hasVal(lastRec.energy) && lastRec.energy < 30) || (hasVal(lastRec.hydration) && lastRec.hydration < 30))) {
         ctx.fillStyle = '#f44336'; ctx.font = 'bold 10px sans-serif';
-        ctx.fillText('Warning: Low levels detected! Refuel at turn.', W - 280, 25);
+        ctx.fillText('Warning: Low levels detected! (H' + lastRec.hole + ')', W - 280, 25);
       }
     }
 
     const html = '<div class="sg34-row"><span class="sg34-badge sg34-badge-orange">Canvas 580x360</span> <span class="sg34-badge sg34-badge-red">3 Metrics</span></div>' +
       '<p class="sg34-card-desc">18홀 동안의 에너지/수분/영양 레벨을 추적합니다. 위험 구간을 감지하고 보급 타이밍을 최적화하세요.</p>' +
-      '<div class="sg34-row" style="margin-top:10px"><button class="sg34-btn sg34-btn-primary" onclick="window._sg34_energy_sim()">&#x1F3B2; Simulate</button> <button class="sg34-btn sg34-btn-outline" onclick="window._sg34_energy_reset()">&#x21BB; Reset</button></div>' +
+      '<div class="sg34-row" style="margin-top:10px">' +
+      '<span class="sg34-label">Hole</span><select id="sg34-en-hole" style="' + IST + '">' + holeOptions(18) + '</select>' +
+      '<span class="sg34-label">Energy%</span><input type="number" id="sg34-en-e" min="0" max="100" step="1" placeholder="-" style="width:66px;' + IST + '">' +
+      '<span class="sg34-label">Hydration%</span><input type="number" id="sg34-en-h" min="0" max="100" step="1" placeholder="-" style="width:66px;' + IST + '">' +
+      '<span class="sg34-label">Nutrition%</span><input type="number" id="sg34-en-n" min="0" max="100" step="1" placeholder="-" style="width:66px;' + IST + '">' +
+      '<button class="sg34-btn sg34-btn-primary" onclick="window._sg34_energy_record()">&#x2795; Record</button></div>' +
+      '<div class="sg34-row"><button class="sg34-btn sg34-btn-outline" onclick="window._sg34_energy_save()">&#x1F4BE; Save</button> <button class="sg34-btn sg34-btn-outline" onclick="window._sg34_energy_reset()">&#x21BB; Reset</button></div>' +
       '<div id="sg34-canvas-energy-wrap" class="sg34-canvas-wrap"></div>';
 
-    window._sg34_energy_sim = () => {
-      energyData = Array.from({length: 18}, (_, i) => ({ hole: i + 1, energy: Math.max(15, 100 - i * 4 + Math.floor(Math.random() * 15 - 7)), hydration: Math.max(10, 90 - i * 3 + Math.floor(Math.random() * 12)), nutrition: Math.max(20, 95 - i * 2.5 + Math.floor(Math.random() * 10)) }));
-      LS('energy', energyData); SFX.energy_check(); render(energyData);
+    window._sg34_energy_record = () => {
+      const h = numVal('sg34-en-hole', 1, 18);
+      if (h === null) return;
+      const e = numVal('sg34-en-e', 0, 100);
+      const hy = numVal('sg34-en-h', 0, 100);
+      const n = numVal('sg34-en-n', 0, 100);
+      if (e === null && hy === null && n === null) return;
+      const row = energyData[h - 1];
+      if (!row) return;
+      if (e !== null) row.energy = Math.round(e);
+      if (hy !== null) row.hydration = Math.round(hy);
+      if (n !== null) row.nutrition = Math.round(n);
+      SFX.energy_check(); render(energyData);
     };
+    window._sg34_energy_save = () => { LS('energy_v2', energyData); SFX.energy_check(); };
     window._sg34_energy_reset = () => {
-      energyData = Array.from({length: 18}, (_, i) => ({ hole: i + 1, energy: 100, hydration: 100, nutrition: 100 }));
-      LS('energy', energyData); render(energyData);
+      energyData = Array.from({length: 18}, (_, i) => ({ hole: i + 1, energy: null, hydration: null, nutrition: null }));
+      render(energyData);
     };
 
     makeOverlay('sg34-energy', 'linear-gradient(135deg,#e65100,#ff9800)', '&#x26A1; Round Energy Manager', html);
@@ -794,11 +975,8 @@
   // ===============================================================
   function openHandicapSimulator() {
     SFX.hcp_sim();
-    let rounds = LS('hcp_rounds') || Array.from({length: 20}, () => ({
-      score: 78 + Math.floor(Math.random() * 18),
-      courseRating: 72 + Math.random() * 3,
-      slopeRating: 113 + Math.floor(Math.random() * 20)
-    }));
+    // 라운드 기록은 사용자가 직접 추가한 것만 사용한다 (빈 배열로 시작)
+    let rounds = LS('hcp_rounds_v2') || [];
 
     function calcHCP(rds) {
       if (rds.length < 3) return null;
@@ -837,7 +1015,12 @@
       }
 
       ctx.font = '11px sans-serif'; ctx.fillStyle = cMuted();
-      ctx.fillText('Rounds: ' + rds.length + '/20 | Best 8 differentials used', 20, 85);
+      ctx.fillText('Rounds: ' + rds.length + '/20' + (rds.length >= 3 ? ' | Best differentials used' : ' | 3라운드 이상 입력 시 HCP 계산'), 20, 85);
+
+      if (!rds.length) {
+        drawEmpty(ctx, W, H);
+        return;
+      }
 
       // Score line chart
       const startX = 50, endX = W - 25, startY = 110, endY = H - 50;
@@ -908,14 +1091,26 @@
 
     const html = '<div class="sg34-row"><span class="sg34-badge sg34-badge-purple">Canvas 600x380</span> <span class="sg34-badge sg34-badge-teal">WHS Formula</span></div>' +
       '<p class="sg34-card-desc">WHS 공식 기반 핸디캡을 시뮬레이션합니다. 20라운드 스코어로 핸디캡 인덱스를 계산하고 목표 달성을 예측합니다.</p>' +
-      '<div class="sg34-row" style="margin-top:10px"><button class="sg34-btn sg34-btn-primary" onclick="window._sg34_hcp_sim()">&#x1F3B2; Simulate</button> <button class="sg34-btn sg34-btn-outline" onclick="window._sg34_hcp_reset()">&#x21BB; Reset</button></div>' +
+      '<div class="sg34-row" style="margin-top:10px">' +
+      '<span class="sg34-label">Score</span><input type="number" id="sg34-hcp-score" min="50" max="150" step="1" placeholder="-" style="width:70px;' + IST + '">' +
+      '<span class="sg34-label">Course Rating</span><input type="number" id="sg34-hcp-cr" min="55" max="80" step="0.1" placeholder="72.0" style="width:74px;' + IST + '">' +
+      '<span class="sg34-label">Slope</span><input type="number" id="sg34-hcp-slope" min="55" max="155" step="1" placeholder="113" style="width:70px;' + IST + '">' +
+      '<button class="sg34-btn sg34-btn-primary" onclick="window._sg34_hcp_add()">&#x2795; Add Round</button></div>' +
+      '<div class="sg34-row"><button class="sg34-btn sg34-btn-outline" onclick="window._sg34_hcp_undo()">&#x21A9; Undo</button> <button class="sg34-btn sg34-btn-outline" onclick="window._sg34_hcp_save()">&#x1F4BE; Save</button> <button class="sg34-btn sg34-btn-outline" onclick="window._sg34_hcp_reset()">&#x21BB; Reset</button></div>' +
       '<div id="sg34-canvas-hcp-wrap" class="sg34-canvas-wrap"></div>';
 
-    window._sg34_hcp_sim = () => {
-      rounds = Array.from({length: 20}, () => ({ score: 76 + Math.floor(Math.random() * 20), courseRating: 71.5 + Math.random() * 3, slopeRating: 113 + Math.floor(Math.random() * 22) }));
-      LS('hcp_rounds', rounds); SFX.hcp_sim(); render(rounds);
+    window._sg34_hcp_add = () => {
+      const sc = numVal('sg34-hcp-score', 50, 150);
+      const cr = numVal('sg34-hcp-cr', 55, 80);
+      const sl = numVal('sg34-hcp-slope', 55, 155);
+      if (sc === null || cr === null || sl === null) return; // 세 값 모두 필요
+      rounds.push({ score: Math.round(sc), courseRating: cr, slopeRating: Math.round(sl) });
+      if (rounds.length > 20) rounds.shift(); // WHS: 최근 20라운드
+      SFX.hcp_sim(); render(rounds);
     };
-    window._sg34_hcp_reset = () => { rounds = []; LS('hcp_rounds', rounds); render(rounds); };
+    window._sg34_hcp_undo = () => { rounds.pop(); render(rounds); };
+    window._sg34_hcp_save = () => { LS('hcp_rounds_v2', rounds); SFX.hcp_sim(); };
+    window._sg34_hcp_reset = () => { rounds = []; render(rounds); };
 
     makeOverlay('sg34-hcp', 'linear-gradient(135deg,#4a148c,#7b1fa2)', '&#x1F4C9; Handicap Simulator', html);
     setTimeout(() => render(rounds), 100);

@@ -9,7 +9,7 @@
 (function () {
   'use strict';
 
-  const LS = (k, v) => v === undefined ? JSON.parse(localStorage.getItem('sg35_' + k) || 'null') : localStorage.setItem('sg35_' + k, JSON.stringify(v));
+  const LS = (k, v) => v === undefined ? JSON.parse(localStorage.getItem('sg35b_' + k) || 'null') : localStorage.setItem('sg35b_' + k, JSON.stringify(v));
 
   // ========== SFX ENGINE ==========
   let _ac;
@@ -124,6 +124,25 @@
     return { g: 'D', c: '#9e9e9e', cls: 'sg35-grade-d' };
   }
 
+  // 빈 상태 안내: 저장된 사용자 데이터가 없을 때 캔버스 가운데에 회색 안내문만 그린다.
+  function drawEmpty(ctx, W, H, msg) {
+    ctx.save();
+    ctx.fillStyle = cMuted();
+    ctx.font = '13px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(msg || '기록을 추가하면 표시됩니다', W / 2, H / 2);
+    ctx.restore();
+  }
+
+  // 입력창 값 읽기(비어 있거나 숫자가 아니면 null)
+  function readNum(id) {
+    var el = document.getElementById(id);
+    if (!el || el.value === '') return null;
+    var v = parseFloat(el.value);
+    return isNaN(v) ? null : v;
+  }
+
   // ===============================================================
   // 1. SWING PLANE ANALYZER - Canvas 620x400
   // ===============================================================
@@ -131,7 +150,7 @@
     SFX.swing_check();
     const CHECKPOINTS = ['Address', 'Takeaway', 'Halfway Back', 'Top', 'Transition', 'Halfway Down', 'Impact', 'Follow Through'];
     const CP_COLORS = ['#e91e63', '#2196f3', '#4caf50', '#ff9800', '#9c27b0', '#00bcd4', '#ff5722', '#795548'];
-    let swingData = LS('swing_plane') || CHECKPOINTS.map(() => Math.floor(Math.random() * 5) + 5);
+    let swingData = LS('swing_plane') || [];
     let history = LS('swing_history') || [];
 
     function render(d) {
@@ -146,6 +165,8 @@
 
       ctx.fillStyle = cText(); ctx.font = 'bold 14px sans-serif';
       ctx.fillText('Swing Plane Analysis - 8 Checkpoints', 20, 25);
+
+      if (!d || !d.length) { drawEmpty(ctx, W, H, '체크포인트 점수를 입력하면 표시됩니다'); return; }
 
       // Radar chart
       var cx = 200, cy = 220, maxR = 130;
@@ -242,22 +263,36 @@
       if (pct >= 90) _checkAchievementsV35('swing_s_rank');
     }
 
+    var sliderHtml = CHECKPOINTS.map(function(cp, i) {
+      var v = (swingData.length === CHECKPOINTS.length) ? swingData[i] : 5;
+      return '<div class="sg35-row"><span class="sg35-label">' + cp + '</span>' +
+        '<input type="range" class="sg35-slider" id="sg35-swing-in-' + i + '" min="1" max="10" step="1" value="' + v + '" oninput="document.getElementById(\'sg35-swing-val-' + i + '\').textContent=this.value">' +
+        '<span class="sg35-val" id="sg35-swing-val-' + i + '">' + v + '</span></div>';
+    }).join('');
+
     var html = '<div class="sg35-row"><span class="sg35-badge sg35-badge-green">Canvas 620x400</span> <span class="sg35-badge sg35-badge-pink">8 Checkpoints</span></div>' +
-      '<p class="sg35-card-desc">8개 스윙 체크포인트를 1~10점으로 평가합니다. 레이더 차트로 스윙 플레인 균형을 시각화합니다.</p>' +
-      '<div class="sg35-row" style="margin-top:10px"><button class="sg35-btn sg35-btn-primary" onclick="window._sg35_swing_randomize()">&#x1F3B2; Analyze</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_swing_save()">&#x1F4BE; Save</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_swing_reset()">&#x21BB; Reset</button></div>' +
+      '<p class="sg35-card-desc">8개 스윙 체크포인트를 직접 1~10점으로 평가해 입력하세요. 입력한 점수만 레이더 차트에 표시됩니다.</p>' +
+      sliderHtml +
+      '<div class="sg35-row" style="margin-top:10px"><button class="sg35-btn sg35-btn-primary" onclick="window._sg35_swing_apply()">&#x2713; 평가 적용</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_swing_save()">&#x1F4BE; 기록 저장</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_swing_reset()">&#x21BB; 초기화</button></div>' +
       '<div id="sg35-canvas-swing-wrap" class="sg35-canvas-wrap"></div>';
 
-    window._sg35_swing_randomize = function() {
-      swingData = CHECKPOINTS.map(function() { return Math.floor(Math.random() * 5) + 5; });
+    window._sg35_swing_apply = function() {
+      swingData = CHECKPOINTS.map(function(_, i) {
+        var el = document.getElementById('sg35-swing-in-' + i);
+        var v = el ? parseInt(el.value, 10) : NaN;
+        return isNaN(v) ? 5 : Math.max(1, Math.min(10, v));
+      });
       LS('swing_plane', swingData); SFX.swing_check(); render(swingData);
     };
     window._sg35_swing_save = function() {
+      if (!swingData.length) { alert('먼저 [평가 적용]으로 점수를 입력하세요.'); return; }
       history.push({ date: new Date().toISOString().slice(0, 10), scores: swingData.slice() });
       if (history.length > 50) history = history.slice(-50);
       LS('swing_history', history); SFX.swing_grade();
       _checkAchievementsV35('swing_plane_master');
+      render(swingData);
     };
-    window._sg35_swing_reset = function() { swingData = CHECKPOINTS.map(function() { return 5; }); LS('swing_plane', swingData); render(swingData); };
+    window._sg35_swing_reset = function() { swingData = []; LS('swing_plane', swingData); render(swingData); };
 
     makeOverlay('sg35-swing', 'linear-gradient(135deg,#880e4f,#e91e63)', '&#x1F3CC;&#xFE0F; Swing Plane Analyzer', html);
     setTimeout(function() { render(swingData); }, 100);
@@ -271,14 +306,11 @@
     SFX.strategy_edit();
     var PARS = [4,4,3,5,4,4,3,4,5,4,4,3,5,4,4,3,4,5];
     var DISTS = [380,410,175,520,395,365,190,430,540,400,385,165,510,370,420,200,445,530];
-    var STRATEGIES = ['Draw off tee', 'Lay up left', 'Short iron center', 'Go for it in 2', 'Fade to fairway',
-      'Punch under trees', 'High lob to pin', 'Driver down right', 'Safe layup', 'Mid iron approach',
-      'Avoid right bunker', 'Club up for wind', 'Drive then hybrid', 'Wedge to front', '3W off tee',
-      'Tee shot to 150yd', 'Long iron in', 'Smart layup 100yd'];
-    var CLUBS = ['DR','DR','7I','DR','DR','3W','8I','DR','DR','3W','DR','9I','DR','PW','3W','6I','DR','DR'];
+    var WINDS = ['None', 'Tail', 'Head', 'Cross'];
 
+    // 파/거리는 편집 가능한 코스 템플릿 값이며, 클럽·바람·난이도·공략 노트는 사용자가 입력하기 전까지 비워 둔다.
     var holeData = LS('strategy_map') || PARS.map(function(p, i) {
-      return { par: p, dist: DISTS[i], strategy: STRATEGIES[i], club: CLUBS[i], wind: ['None','Tail','Head','Cross'][Math.floor(Math.random() * 4)], diff: Math.floor(Math.random() * 5) + 1 };
+      return { par: p, dist: DISTS[i], strategy: '', club: '', wind: 'None', diff: 0 };
     });
     var selectedHole = 0;
 
@@ -305,7 +337,8 @@
         // Difficulty color
         var diffColors = ['#e8f5e9','#c8e6c9','#fff9c4','#ffe0b2','#ffcdd2'];
         var diffColorsDark = ['#1a3a25','#2a4a30','#3a3520','#3a2a1a','#3a1a1a'];
-        ctx.fillStyle = isDark() ? diffColorsDark[h.diff - 1] : diffColors[h.diff - 1];
+        var dIdx = (h.diff >= 1 && h.diff <= 5) ? h.diff - 1 : -1;
+        ctx.fillStyle = dIdx < 0 ? (isDark() ? '#2a2a2a' : '#f0f0f0') : (isDark() ? diffColorsDark[dIdx] : diffColors[dIdx]);
         if (i === selectedHole) {
           ctx.fillStyle = '#1a7a3a';
         }
@@ -319,8 +352,8 @@
         ctx.fillText('H' + (i + 1) + ' Par' + h.par, x + cellW / 2, y + 16);
         ctx.font = '9px sans-serif';
         ctx.fillStyle = i === selectedHole ? 'rgba(255,255,255,.8)' : cMuted();
-        ctx.fillText(h.dist + 'yd | ' + h.club, x + cellW / 2, y + 32);
-        ctx.fillText('Diff: ' + h.diff + '/5', x + cellW / 2, y + 46);
+        ctx.fillText(h.dist + 'yd | ' + (h.club || '-'), x + cellW / 2, y + 32);
+        ctx.fillText('Diff: ' + (h.diff >= 1 ? h.diff + '/5' : '-'), x + cellW / 2, y + 46);
       });
       ctx.textAlign = 'left';
 
@@ -336,8 +369,8 @@
       ctx.fillText('Hole ' + (selectedHole + 1) + ' Detail', 35, detailY + 24);
 
       ctx.font = '12px sans-serif'; ctx.fillStyle = cMuted();
-      ctx.fillText('Par: ' + sel.par + '  |  Distance: ' + sel.dist + 'yd  |  Club: ' + sel.club + '  |  Wind: ' + sel.wind, 35, detailY + 46);
-      ctx.fillText('Difficulty: ' + sel.diff + '/5  |  Strategy: ' + sel.strategy, 35, detailY + 66);
+      ctx.fillText('Par: ' + sel.par + '  |  Distance: ' + sel.dist + 'yd  |  Club: ' + (sel.club || '-') + '  |  Wind: ' + (sel.wind || '-'), 35, detailY + 46);
+      ctx.fillText('Difficulty: ' + (sel.diff >= 1 ? sel.diff + '/5' : '-') + '  |  Strategy: ' + (sel.strategy || '-'), 35, detailY + 66);
 
       // Mini hole visualization
       var holeX = 450, holeY = detailY + 20, holeW = 140, holeH = 150;
@@ -377,28 +410,56 @@
       });
 
       // Total difficulty summary
-      var avgDiff = d.reduce(function(s, h) { return s + h.diff; }, 0) / d.length;
+      var rated = d.filter(function(h) { return h.diff >= 1; });
+      var avgDiffTxt = '-', hardestTxt = '-';
+      if (rated.length) {
+        avgDiffTxt = (rated.reduce(function(s, h) { return s + h.diff; }, 0) / rated.length).toFixed(1) + '/5';
+        hardestTxt = 'H' + (d.indexOf(rated.slice().sort(function(a, b) { return b.diff - a.diff; })[0]) + 1);
+      }
       ctx.font = 'bold 12px sans-serif'; ctx.fillStyle = cText();
-      ctx.fillText('Avg Difficulty: ' + avgDiff.toFixed(1) + '/5  |  Hardest: H' + (d.indexOf(d.slice().sort(function(a, b) { return b.diff - a.diff; })[0]) + 1), 35, detailY + 145);
+      ctx.fillText('Avg Difficulty: ' + avgDiffTxt + '  |  Hardest: ' + hardestTxt, 35, detailY + 145);
       var notedCount = d.filter(function(h) { return h.strategy && h.strategy.length > 0; }).length;
       ctx.fillText('Strategy Notes: ' + notedCount + '/18 holes filled', 35, detailY + 165);
     }
 
+    var windOpts = WINDS.map(function(w) { return '<option value="' + w + '">' + w + '</option>'; }).join('');
+    var diffOpts = '<option value="0">미입력</option>' + [1, 2, 3, 4, 5].map(function(n) { return '<option value="' + n + '">' + n + '</option>'; }).join('');
+
     var html = '<div class="sg35-row"><span class="sg35-badge sg35-badge-blue">Canvas 640x400</span> <span class="sg35-badge sg35-badge-green">18 Holes</span></div>' +
-      '<p class="sg35-card-desc">18홀 전략 맵입니다. 홀별 거리, 난이도, 클럽 선택, 바람 상태, 공략 노트를 시각화합니다.</p>' +
+      '<p class="sg35-card-desc">홀을 고른 뒤 거리·클럽·바람·난이도·공략 노트를 직접 입력해 저장하세요. 입력한 홀만 값이 표시됩니다.</p>' +
       '<div class="sg35-tabs" id="sg35-strategy-tabs"></div>' +
-      '<div class="sg35-row" style="margin-top:6px"><button class="sg35-btn sg35-btn-primary" onclick="window._sg35_strategy_randomize()">&#x1F3B2; Randomize</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_strategy_reset()">&#x21BB; Reset</button></div>' +
+      '<div class="sg35-row"><span class="sg35-label">거리(yd)</span><input type="number" id="sg35-st-dist" min="0" max="800" style="width:80px">' +
+      '<span class="sg35-label">클럽</span><input type="text" id="sg35-st-club" maxlength="6" style="width:70px">' +
+      '<span class="sg35-label">바람</span><select id="sg35-st-wind">' + windOpts + '</select>' +
+      '<span class="sg35-label">난이도</span><select id="sg35-st-diff">' + diffOpts + '</select></div>' +
+      '<div class="sg35-row"><span class="sg35-label">공략 노트</span><input type="text" id="sg35-st-note" style="flex:1;min-width:180px"></div>' +
+      '<div class="sg35-row" style="margin-top:6px"><button class="sg35-btn sg35-btn-primary" onclick="window._sg35_strategy_apply()">&#x2713; 이 홀 저장</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_strategy_reset()">&#x21BB; 전체 초기화</button></div>' +
       '<div id="sg35-canvas-strategy-wrap" class="sg35-canvas-wrap"></div>';
 
-    window._sg35_strategy_randomize = function() {
-      holeData = PARS.map(function(p, i) {
-        return { par: p, dist: DISTS[i] + Math.floor(Math.random() * 30 - 15), strategy: STRATEGIES[i], club: CLUBS[i], wind: ['None','Tail','Head','Cross'][Math.floor(Math.random() * 4)], diff: Math.floor(Math.random() * 5) + 1 };
-      });
+    function fillHoleForm() {
+      var distEl = document.getElementById('sg35-st-dist');
+      if (!distEl) return;
+      var h = holeData[selectedHole];
+      distEl.value = h.dist;
+      document.getElementById('sg35-st-club').value = h.club || '';
+      document.getElementById('sg35-st-wind').value = h.wind || 'None';
+      document.getElementById('sg35-st-diff').value = String(h.diff || 0);
+      document.getElementById('sg35-st-note').value = h.strategy || '';
+    }
+
+    window._sg35_strategy_apply = function() {
+      var h = holeData[selectedHole];
+      var dist = readNum('sg35-st-dist');
+      if (dist !== null) h.dist = Math.max(0, Math.round(dist));
+      h.club = (document.getElementById('sg35-st-club').value || '').trim();
+      h.wind = document.getElementById('sg35-st-wind').value || 'None';
+      h.diff = parseInt(document.getElementById('sg35-st-diff').value, 10) || 0;
+      h.strategy = (document.getElementById('sg35-st-note').value || '').trim();
       LS('strategy_map', holeData); SFX.strategy_save(); render(holeData);
     };
     window._sg35_strategy_reset = function() {
-      holeData = PARS.map(function(p, i) { return { par: p, dist: DISTS[i], strategy: '', club: '', wind: 'None', diff: 3 }; });
-      LS('strategy_map', holeData); render(holeData);
+      holeData = PARS.map(function(p, i) { return { par: p, dist: DISTS[i], strategy: '', club: '', wind: 'None', diff: 0 }; });
+      LS('strategy_map', holeData); fillHoleForm(); render(holeData);
     };
 
     makeOverlay('sg35-strategy', 'linear-gradient(135deg,#1565c0,#42a5f5)', '&#x1F5FA;&#xFE0F; Hole Strategy Map', html);
@@ -414,12 +475,13 @@
               selectedHole = idx;
               tabsEl.querySelectorAll('.sg35-tab').forEach(function(t) { t.classList.remove('active'); });
               tab.classList.add('active');
-              SFX.strategy_edit(); render(holeData);
+              SFX.strategy_edit(); fillHoleForm(); render(holeData);
             };
             tabsEl.appendChild(tab);
           })(i);
         }
       }
+      fillHoleForm();
       render(holeData);
     }, 100);
     _checkAchievementsV35('strategy_mapper');
@@ -434,25 +496,16 @@
     var METRIC_COLORS = ['#2196f3', '#4caf50', '#ff9800', '#9c27b0', '#f44336'];
     var activeMetric = 0;
 
-    var trendData = LS('trend_data') || Array.from({length: 30}, function(_, i) {
-      return {
-        round: i + 1,
-        score: 78 + Math.floor(Math.random() * 18),
-        putts: 28 + Math.floor(Math.random() * 10),
-        fir: 40 + Math.floor(Math.random() * 40),
-        gir: 30 + Math.floor(Math.random() * 45),
-        penalties: Math.floor(Math.random() * 5)
-      };
-    });
+    var trendData = LS('trend_data') || [];
 
-    function getMetricValues(d, metric) {
-      return d.map(function(r) {
-        if (metric === 0) return r.score;
-        if (metric === 1) return r.putts;
-        if (metric === 2) return r.fir;
-        if (metric === 3) return r.gir;
-        return r.penalties;
-      });
+    function getMetricValue(r, metric) {
+      var v;
+      if (metric === 0) v = r.score;
+      else if (metric === 1) v = r.putts;
+      else if (metric === 2) v = r.fir;
+      else if (metric === 3) v = r.gir;
+      else v = r.penalties;
+      return (v === null || v === undefined || isNaN(v)) ? null : v;
     }
 
     function movingAvg(arr, window) {
@@ -476,9 +529,18 @@
       ctx.fillStyle = cBg(); ctx.fillRect(0, 0, W, H);
 
       ctx.fillStyle = cText(); ctx.font = 'bold 14px sans-serif';
-      ctx.fillText('Performance Trend - ' + METRICS[activeMetric] + ' (30 Rounds)', 20, 25);
+      ctx.fillText('Performance Trend - ' + METRICS[activeMetric] + ' (' + d.length + ' Rounds)', 20, 25);
 
-      var values = getMetricValues(d, activeMetric);
+      if (!d.length) { drawEmpty(ctx, W, H, '라운드를 추가하면 표시됩니다'); return; }
+
+      var pts = [];
+      d.forEach(function(r, i) {
+        var v = getMetricValue(r, activeMetric);
+        if (v !== null) pts.push({ i: i, v: v });
+      });
+      if (!pts.length) { drawEmpty(ctx, W, H, '이 지표에 입력된 값이 없습니다'); return; }
+
+      var values = pts.map(function(p) { return p.v; });
       var ma = movingAvg(values, 5);
 
       var minVal = Math.min.apply(null, values) - 2;
@@ -486,7 +548,7 @@
       if (maxVal === minVal) maxVal = minVal + 10;
 
       var startX = 55, endX = W - 25, startY = 50, endY = H - 60;
-      var stepX = (endX - startX) / (d.length - 1);
+      var stepX = values.length > 1 ? (endX - startX) / (values.length - 1) : 0;
       var scaleY = (endY - startY) / (maxVal - minVal);
 
       // Grid lines
@@ -537,10 +599,10 @@
       });
 
       // X-axis labels (every 5)
-      for (var xi = 0; xi < d.length; xi += 5) {
+      for (var xi = 0; xi < pts.length; xi += 5) {
         var x = startX + xi * stepX;
         ctx.fillStyle = cText(); ctx.font = '8px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText('R' + (xi + 1), x, endY + 14);
+        ctx.fillText('R' + (pts[xi].i + 1), x, endY + 14);
       }
       ctx.textAlign = 'left';
 
@@ -562,19 +624,34 @@
     }
 
     var html = '<div class="sg35-row"><span class="sg35-badge sg35-badge-blue">Canvas 620x380</span> <span class="sg35-badge sg35-badge-purple">5 Metrics</span></div>' +
-      '<p class="sg35-card-desc">30라운드 퍼포먼스 트렌드를 분석합니다. 5개 지표 선택, 이동평균 오버레이, Best/Worst 마커를 표시합니다.</p>' +
+      '<p class="sg35-card-desc">직접 입력한 라운드 기록만 트렌드로 표시합니다. 지표 탭 선택, 이동평균 오버레이, Best/Worst 마커를 지원합니다.</p>' +
       '<div class="sg35-tabs" id="sg35-trend-tabs"></div>' +
-      '<div class="sg35-row" style="margin-top:6px"><button class="sg35-btn sg35-btn-primary" onclick="window._sg35_trend_sim()">&#x1F3B2; Simulate</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_trend_reset()">&#x21BB; Reset</button></div>' +
+      '<div class="sg35-row"><span class="sg35-label">Score</span><input type="number" id="sg35-tr-score" min="50" max="200" style="width:70px">' +
+      '<span class="sg35-label">Putts</span><input type="number" id="sg35-tr-putts" min="0" max="80" style="width:70px">' +
+      '<span class="sg35-label">FIR%</span><input type="number" id="sg35-tr-fir" min="0" max="100" style="width:70px">' +
+      '<span class="sg35-label">GIR%</span><input type="number" id="sg35-tr-gir" min="0" max="100" style="width:70px">' +
+      '<span class="sg35-label">Penalties</span><input type="number" id="sg35-tr-pen" min="0" max="30" style="width:70px"></div>' +
+      '<div class="sg35-row" style="margin-top:6px"><button class="sg35-btn sg35-btn-primary" onclick="window._sg35_trend_add()">&#x2795; 라운드 추가</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_trend_reset()">&#x21BB; 전체 삭제</button></div>' +
       '<div id="sg35-canvas-trend-wrap" class="sg35-canvas-wrap"></div>';
 
-    window._sg35_trend_sim = function() {
-      trendData = Array.from({length: 30}, function(_, i) {
-        return { round: i + 1, score: 76 + Math.floor(Math.random() * 20), putts: 27 + Math.floor(Math.random() * 10), fir: 35 + Math.floor(Math.random() * 45), gir: 25 + Math.floor(Math.random() * 50), penalties: Math.floor(Math.random() * 6) };
+    window._sg35_trend_add = function() {
+      var score = readNum('sg35-tr-score');
+      var putts = readNum('sg35-tr-putts');
+      var fir = readNum('sg35-tr-fir');
+      var gir = readNum('sg35-tr-gir');
+      var pen = readNum('sg35-tr-pen');
+      if (score === null && putts === null && fir === null && gir === null && pen === null) {
+        alert('라운드 기록을 하나 이상 입력하세요.'); return;
+      }
+      trendData.push({ round: trendData.length + 1, score: score, putts: putts, fir: fir, gir: gir, penalties: pen });
+      LS('trend_data', trendData); SFX.trend_peak();
+      ['sg35-tr-score', 'sg35-tr-putts', 'sg35-tr-fir', 'sg35-tr-gir', 'sg35-tr-pen'].forEach(function(id) {
+        var el = document.getElementById(id); if (el) el.value = '';
       });
-      LS('trend_data', trendData); SFX.trend_peak(); render(trendData);
+      render(trendData);
     };
     window._sg35_trend_reset = function() {
-      trendData = Array.from({length: 30}, function() { return { round: 0, score: 80, putts: 32, fir: 50, gir: 40, penalties: 2 }; });
+      trendData = [];
       LS('trend_data', trendData); render(trendData);
     };
 
@@ -608,10 +685,7 @@
     var ITEMS = ['Driver','3-Wood','5-Wood','3-Hybrid','4-Iron','5-Iron','6-Iron','7-Iron','8-Iron','9-Iron','PW','GW','SW','LW','Bag','Shoes','Gloves'];
     var MAX_USAGE = [300,250,250,250,400,400,400,400,400,400,500,500,500,500,200,150,80];
 
-    var equipData = LS('equip_data') || ITEMS.map(function(item, i) {
-      var usage = Math.floor(Math.random() * MAX_USAGE[i] * 0.9);
-      return { name: item, usage: usage, maxUsage: MAX_USAGE[i] };
-    });
+    var equipData = LS('equip_data') || [];
 
     function render(d) {
       var cid = 'sg35-canvas-equip';
@@ -626,12 +700,15 @@
       ctx.fillStyle = cText(); ctx.font = 'bold 14px sans-serif';
       ctx.fillText('Golf Equipment Life Manager - 17 Items', 20, 25);
 
+      if (!d || !d.length) { drawEmpty(ctx, W, H, '장비 사용 횟수를 입력하면 표시됩니다'); return; }
+
       var barH = 16, gap = 3, startY = 45, startX = 80, maxBarW = W - startX - 80;
       var needReplace = 0;
 
       d.forEach(function(item, i) {
         var y = startY + i * (barH + gap);
-        var wearPct = Math.min(100, Math.round(item.usage / item.maxUsage * 100));
+        var entered = typeof item.usage === 'number';
+        var wearPct = entered ? Math.min(100, Math.round(item.usage / item.maxUsage * 100)) : 0;
 
         // Label
         ctx.fillStyle = cMuted(); ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
@@ -641,6 +718,12 @@
         // Background bar
         ctx.fillStyle = isDark() ? '#333' : '#eee';
         ctx.fillRect(startX, y, maxBarW, barH);
+
+        if (!entered) {
+          ctx.fillStyle = cMuted(); ctx.font = '8px sans-serif';
+          ctx.fillText('미입력', startX + 4, y + barH / 2 + 3);
+          return;
+        }
 
         // Wear bar with color gradient
         var barColor = wearPct >= 80 ? '#f44336' : (wearPct >= 60 ? '#ff9800' : (wearPct >= 40 ? '#ffc107' : '#4caf50'));
@@ -661,10 +744,15 @@
         }
       });
 
-      // Summary
-      var totalWear = d.reduce(function(s, item) { return s + item.usage / item.maxUsage; }, 0) / d.length * 100;
+      // Summary (입력된 장비만 집계)
+      var entered = d.filter(function(item) { return typeof item.usage === 'number'; });
       ctx.fillStyle = cText(); ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'left';
-      ctx.fillText('Overall Wear: ' + Math.round(totalWear) + '%  |  Need Replacement: ' + needReplace + ' items', 20, H - 12);
+      if (!entered.length) {
+        ctx.fillText('입력된 장비 사용량이 없습니다', 20, H - 12);
+      } else {
+        var totalWear = entered.reduce(function(s, item) { return s + item.usage / item.maxUsage; }, 0) / entered.length * 100;
+        ctx.fillText('Overall Wear: ' + Math.round(totalWear) + '%  |  Need Replacement: ' + needReplace + ' items  |  입력 ' + entered.length + '/' + d.length, 20, H - 12);
+      }
 
       // Legend
       var legendX = W - 200;
@@ -678,20 +766,36 @@
       ctx.fillText('Replace', legendX + 154, H - 23);
     }
 
+    var equipInputs = ITEMS.map(function(item, i) {
+      var cur = '';
+      if (equipData.length === ITEMS.length && equipData[i] && typeof equipData[i].usage === 'number') cur = equipData[i].usage;
+      return '<div class="sg35-row"><span class="sg35-label">' + item + '</span>' +
+        '<input type="number" id="sg35-eq-in-' + i + '" min="0" step="1" value="' + cur + '" style="width:80px">' +
+        '<span class="sg35-card-desc">회 사용 / 교체 기준 ' + MAX_USAGE[i] + '회(앱 설정값)</span></div>';
+    }).join('');
+
     var html = '<div class="sg35-row"><span class="sg35-badge sg35-badge-orange">Canvas 600x380</span> <span class="sg35-badge sg35-badge-red">17 Items</span></div>' +
-      '<p class="sg35-card-desc">14클럽 + 백 + 신발 + 글러브 17개 장비의 사용량/마모도를 수평 바 차트로 관리합니다. 교체 시기를 알려줍니다.</p>' +
-      '<div class="sg35-row" style="margin-top:10px"><button class="sg35-btn sg35-btn-primary" onclick="window._sg35_equip_sim()">&#x1F3B2; Simulate Use</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_equip_reset()">&#x21BB; Reset</button></div>' +
+      '<p class="sg35-card-desc">14클럽 + 백 + 신발 + 글러브 17개 장비의 사용 횟수를 직접 입력하면 마모도를 수평 바 차트로 보여줍니다. 교체 기준 횟수는 앱이 정한 설정값입니다.</p>' +
+      equipInputs +
+      '<div class="sg35-row" style="margin-top:10px"><button class="sg35-btn sg35-btn-primary" onclick="window._sg35_equip_apply()">&#x2713; 사용량 저장</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_equip_reset()">&#x21BB; 전체 삭제</button></div>' +
       '<div id="sg35-canvas-equip-wrap" class="sg35-canvas-wrap"></div>';
 
-    window._sg35_equip_sim = function() {
-      equipData = ITEMS.map(function(item, i) {
-        return { name: item, usage: Math.floor(Math.random() * MAX_USAGE[i] * 0.95), maxUsage: MAX_USAGE[i] };
+    window._sg35_equip_apply = function() {
+      var next = [], any = false;
+      ITEMS.forEach(function(item, i) {
+        var v = readNum('sg35-eq-in-' + i);
+        if (v !== null) any = true;
+        next.push({ name: item, usage: v === null ? null : Math.max(0, Math.round(v)), maxUsage: MAX_USAGE[i] });
       });
+      if (!any) { alert('장비 사용 횟수를 하나 이상 입력하세요.'); return; }
+      equipData = next;
       LS('equip_data', equipData); SFX.equip_replace(); render(equipData);
     };
     window._sg35_equip_reset = function() {
-      equipData = ITEMS.map(function(item, i) { return { name: item, usage: 0, maxUsage: MAX_USAGE[i] }; });
-      LS('equip_data', equipData); render(equipData);
+      equipData = [];
+      LS('equip_data', equipData);
+      ITEMS.forEach(function(_, i) { var el = document.getElementById('sg35-eq-in-' + i); if (el) el.value = ''; });
+      render(equipData);
     };
 
     makeOverlay('sg35-equip', 'linear-gradient(135deg,#e65100,#ff9800)', '&#x1F3CC;&#xFE0F; Equipment Life Manager', html);
@@ -704,14 +808,7 @@
   // ===============================================================
   function openWeatherCorrelation() {
     SFX.weather_scan();
-    var weatherData = LS('weather_data') || Array.from({length: 20}, function() {
-      var temp = 10 + Math.floor(Math.random() * 25);
-      var wind = Math.floor(Math.random() * 30);
-      var humidity = 30 + Math.floor(Math.random() * 60);
-      var rain = Math.floor(Math.random() * 100);
-      var score = 78 + Math.floor(Math.random() * 18) + Math.floor(wind / 10) + (temp < 15 || temp > 32 ? 3 : 0) + (rain > 60 ? 2 : 0);
-      return { temp: temp, wind: wind, humidity: humidity, rain: rain, score: score };
-    });
+    var weatherData = LS('weather_data') || [];
 
     function render(d) {
       var cid = 'sg35-canvas-weather';
@@ -725,6 +822,8 @@
 
       ctx.fillStyle = cText(); ctx.font = 'bold 14px sans-serif';
       ctx.fillText('Round Weather Correlation Analysis', 20, 25);
+
+      if (!d || !d.length) { drawEmpty(ctx, W, H, '라운드 날씨 기록을 추가하면 표시됩니다'); return; }
 
       // Scatter plot area (Temperature vs Score)
       var plotX = 60, plotY = 50, plotW = 320, plotH = 260;
@@ -788,14 +887,21 @@
 
       axes.forEach(function(axis, ai) {
         var ay = panelY + 25 + ai * 55;
-        var vals = d.map(function(r) { return r[axis.key]; });
-        var avg = vals.reduce(function(s, v) { return s + v; }, 0) / vals.length;
-        var min = Math.min.apply(null, vals);
-        var max = Math.max.apply(null, vals);
+        var vals = d.map(function(r) { return r[axis.key]; }).filter(function(v) { return typeof v === 'number' && !isNaN(v); });
 
         ctx.fillStyle = axis.color; ctx.fillRect(panelX, ay, 8, 8);
         ctx.fillStyle = cText(); ctx.font = 'bold 10px sans-serif';
         ctx.fillText(axis.name, panelX + 14, ay + 8);
+
+        if (!vals.length) {
+          ctx.fillStyle = cMuted(); ctx.font = '9px sans-serif';
+          ctx.fillText('미입력', panelX + 14, ay + 22);
+          return;
+        }
+
+        var avg = vals.reduce(function(s, v) { return s + v; }, 0) / vals.length;
+        var min = Math.min.apply(null, vals);
+        var max = Math.max.apply(null, vals);
 
         ctx.fillStyle = cMuted(); ctx.font = '9px sans-serif';
         ctx.fillText('Avg: ' + avg.toFixed(1) + axis.unit + '  Min: ' + min + '  Max: ' + max, panelX + 14, ay + 22);
@@ -805,26 +911,23 @@
         ctx.fillRect(panelX + 14, ay + 28, 170, 6);
         var barMax = axis.key === 'temp' ? 40 : 100;
         ctx.fillStyle = axis.color;
-        ctx.fillRect(panelX + 14, ay + 28, 170 * avg / barMax, 6);
+        ctx.fillRect(panelX + 14, ay + 28, Math.max(0, Math.min(170, 170 * avg / barMax)), 6);
       });
 
       // Best/Worst weather identification
       var bestRound = d.slice().sort(function(a, b) { return a.score - b.score; })[0];
       var worstRound = d.slice().sort(function(a, b) { return b.score - a.score; })[0];
 
+      var windTxt = function(r) { return (typeof r.wind === 'number' && !isNaN(r.wind)) ? 'W' + r.wind : 'W-'; };
       ctx.fillStyle = '#4caf50'; ctx.font = 'bold 10px sans-serif';
-      ctx.fillText('Best: ' + bestRound.score + ' (' + bestRound.temp + '&#176;C, W' + bestRound.wind + ')', panelX, H - 50);
+      ctx.fillText('Best: ' + bestRound.score + ' (' + bestRound.temp + 'C, ' + windTxt(bestRound) + ')', panelX, H - 50);
       ctx.fillStyle = '#f44336';
-      ctx.fillText('Worst: ' + worstRound.score + ' (' + worstRound.temp + '&#176;C, W' + worstRound.wind + ')', panelX, H - 34);
+      ctx.fillText('Worst: ' + worstRound.score + ' (' + worstRound.temp + 'C, ' + windTxt(worstRound) + ')', panelX, H - 34);
 
-      // Optimal range
-      var goodRounds = d.filter(function(r) { return r.score <= 82; });
-      if (goodRounds.length > 0) {
-        var optTemp = goodRounds.reduce(function(s, r) { return s + r.temp; }, 0) / goodRounds.length;
-        ctx.fillStyle = '#1a7a3a'; ctx.font = 'bold 10px sans-serif';
-        ctx.fillText('Optimal Temp: ~' + Math.round(optTemp) + '&#176;C', panelX, H - 14);
-        _checkAchievementsV35('weather_best');
-      }
+      // 표본 수만 표기 (지어낸 이력에서 파생된 "Optimal Temp" 주장은 삭제)
+      ctx.fillStyle = cMuted(); ctx.font = '10px sans-serif';
+      ctx.fillText('입력한 ' + d.length + '라운드 기준', panelX, H - 14);
+      if (d.length >= 5) _checkAchievementsV35('weather_best');
 
       // Dot legend
       ctx.fillStyle = '#4caf50'; ctx.beginPath(); ctx.arc(20, H - 42, 5, 0, Math.PI * 2); ctx.fill();
@@ -836,23 +939,31 @@
     }
 
     var html = '<div class="sg35-row"><span class="sg35-badge sg35-badge-teal">Canvas 620x400</span> <span class="sg35-badge sg35-badge-blue">4-Axis</span></div>' +
-      '<p class="sg35-card-desc">기온/풍속/습도/강수확률 4축 날씨와 스코어의 상관관계를 산점도로 분석합니다. 최적 날씨 조건을 찾아냅니다.</p>' +
-      '<div class="sg35-row" style="margin-top:10px"><button class="sg35-btn sg35-btn-primary" onclick="window._sg35_weather_sim()">&#x1F3B2; Simulate</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_weather_reset()">&#x21BB; Reset</button></div>' +
+      '<p class="sg35-card-desc">라운드마다 기온/풍속/습도/강수확률과 스코어를 직접 입력하면 산점도로 표시합니다. 기온과 스코어는 필수입니다.</p>' +
+      '<div class="sg35-row"><span class="sg35-label">기온(C)</span><input type="number" id="sg35-wt-temp" style="width:70px">' +
+      '<span class="sg35-label">풍속(km/h)</span><input type="number" id="sg35-wt-wind" min="0" style="width:70px">' +
+      '<span class="sg35-label">습도(%)</span><input type="number" id="sg35-wt-hum" min="0" max="100" style="width:70px"></div>' +
+      '<div class="sg35-row"><span class="sg35-label">강수확률(%)</span><input type="number" id="sg35-wt-rain" min="0" max="100" style="width:70px">' +
+      '<span class="sg35-label">스코어</span><input type="number" id="sg35-wt-score" min="50" max="200" style="width:70px"></div>' +
+      '<div class="sg35-row" style="margin-top:10px"><button class="sg35-btn sg35-btn-primary" onclick="window._sg35_weather_add()">&#x2795; 라운드 추가</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_weather_reset()">&#x21BB; 전체 삭제</button></div>' +
       '<div id="sg35-canvas-weather-wrap" class="sg35-canvas-wrap"></div>';
 
-    window._sg35_weather_sim = function() {
-      weatherData = Array.from({length: 20}, function() {
-        var temp = 10 + Math.floor(Math.random() * 25);
-        var wind = Math.floor(Math.random() * 30);
-        var humidity = 30 + Math.floor(Math.random() * 60);
-        var rain = Math.floor(Math.random() * 100);
-        var score = 78 + Math.floor(Math.random() * 18) + Math.floor(wind / 10) + (temp < 15 || temp > 32 ? 3 : 0) + (rain > 60 ? 2 : 0);
-        return { temp: temp, wind: wind, humidity: humidity, rain: rain, score: score };
+    window._sg35_weather_add = function() {
+      var temp = readNum('sg35-wt-temp');
+      var score = readNum('sg35-wt-score');
+      if (temp === null || score === null) { alert('기온과 스코어는 반드시 입력해야 합니다.'); return; }
+      weatherData.push({
+        temp: temp, wind: readNum('sg35-wt-wind'), humidity: readNum('sg35-wt-hum'),
+        rain: readNum('sg35-wt-rain'), score: score
       });
-      LS('weather_data', weatherData); SFX.weather_best(); render(weatherData);
+      LS('weather_data', weatherData); SFX.weather_best();
+      ['sg35-wt-temp', 'sg35-wt-wind', 'sg35-wt-hum', 'sg35-wt-rain', 'sg35-wt-score'].forEach(function(id) {
+        var el = document.getElementById(id); if (el) el.value = '';
+      });
+      render(weatherData);
     };
     window._sg35_weather_reset = function() {
-      weatherData = Array.from({length: 20}, function() { return { temp: 22, wind: 0, humidity: 50, rain: 0, score: 85 }; });
+      weatherData = [];
       LS('weather_data', weatherData); render(weatherData);
     };
 
@@ -867,12 +978,7 @@
   function openScorecardHeatmap() {
     SFX.heatmap_log();
     var PARS = [4,4,3,5,4,4,3,4,5,4,4,3,5,4,4,3,4,5];
-    var heatmapData = LS('heatmap_data') || Array.from({length: 10}, function() {
-      return PARS.map(function(p) {
-        var diff = Math.floor(Math.random() * 5) - 1;
-        return p + diff;
-      });
-    });
+    var heatmapData = LS('heatmap_data') || [];
 
     function render(d) {
       var cid = 'sg35-canvas-heatmap';
@@ -886,6 +992,8 @@
 
       ctx.fillStyle = cText(); ctx.font = 'bold 14px sans-serif';
       ctx.fillText('Scorecard Heatmap - 18 Holes x ' + d.length + ' Rounds', 20, 25);
+
+      if (!d || !d.length) { drawEmpty(ctx, W, H, '라운드 스코어를 입력하면 표시됩니다'); return; }
 
       var cellW = 28, cellH = 22, startX = 60, startY = 55;
 
@@ -969,19 +1077,34 @@
       ctx.fillText('Weakness: H' + (worstHole + 1) + ' (avg ' + (PARS[worstHole] + holeAvgs[worstHole]).toFixed(1) + ')', 250, legY + 28);
     }
 
-    var html = '<div class="sg35-row"><span class="sg35-badge sg35-badge-green">Canvas 620x380</span> <span class="sg35-badge sg35-badge-amber">18x10 Grid</span></div>' +
-      '<p class="sg35-card-desc">18홀 x 10라운드 히트맵입니다. 버디=파랑, 파=초록, 보기=노랑, 더블+=빨강으로 패턴을 분석합니다.</p>' +
-      '<div class="sg35-row" style="margin-top:10px"><button class="sg35-btn sg35-btn-primary" onclick="window._sg35_heatmap_sim()">&#x1F3B2; Simulate</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_heatmap_reset()">&#x21BB; Reset</button></div>' +
+    var holeInputs = PARS.map(function(p, i) {
+      return '<div style="display:inline-block;text-align:center;margin:2px 4px">' +
+        '<div style="font-size:10px;color:var(--text-muted,#666)">H' + (i + 1) + ' (P' + p + ')</div>' +
+        '<input type="number" id="sg35-hm-in-' + i + '" min="1" max="15" style="width:46px">' +
+        '</div>';
+    }).join('');
+
+    var html = '<div class="sg35-row"><span class="sg35-badge sg35-badge-green">Canvas 620x380</span> <span class="sg35-badge sg35-badge-amber">18 Holes</span></div>' +
+      '<p class="sg35-card-desc">라운드별 18홀 스코어를 직접 입력해 추가하세요. 버디=파랑, 파=초록, 보기=노랑, 더블+=빨강으로 표시합니다.</p>' +
+      '<div style="margin:6px 0">' + holeInputs + '</div>' +
+      '<div class="sg35-row" style="margin-top:10px"><button class="sg35-btn sg35-btn-primary" onclick="window._sg35_heatmap_add()">&#x2795; 라운드 추가</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_heatmap_reset()">&#x21BB; 전체 삭제</button></div>' +
       '<div id="sg35-canvas-heatmap-wrap" class="sg35-canvas-wrap"></div>';
 
-    window._sg35_heatmap_sim = function() {
-      heatmapData = Array.from({length: 10}, function() {
-        return PARS.map(function(p) { return p + Math.floor(Math.random() * 5) - 1; });
+    window._sg35_heatmap_add = function() {
+      var row = [], missing = [];
+      PARS.forEach(function(p, i) {
+        var v = readNum('sg35-hm-in-' + i);
+        if (v === null) missing.push(i + 1);
+        row.push(v === null ? null : Math.max(1, Math.round(v)));
       });
-      LS('heatmap_data', heatmapData); SFX.heatmap_log(); render(heatmapData);
+      if (missing.length) { alert('18홀 스코어를 모두 입력하세요. 미입력: H' + missing.join(', H')); return; }
+      heatmapData.push(row);
+      LS('heatmap_data', heatmapData); SFX.heatmap_log();
+      PARS.forEach(function(_, i) { var el = document.getElementById('sg35-hm-in-' + i); if (el) el.value = ''; });
+      render(heatmapData);
     };
     window._sg35_heatmap_reset = function() {
-      heatmapData = Array.from({length: 10}, function() { return PARS.slice(); });
+      heatmapData = [];
       LS('heatmap_data', heatmapData); render(heatmapData);
     };
 
@@ -995,7 +1118,14 @@
   // ===============================================================
   function openBodyTypeAnalyzer() {
     SFX.body_scan();
-    var bodyData = LS('body_data') || { height: 175, weight: 75, armLen: 65, legLen: 90, flexibility: 7 };
+    var bodyData = LS('body_data') || null;
+    var BODY_FIELDS = [
+      { id: 'height', label: '키(cm)', min: 100, max: 230 },
+      { id: 'weight', label: '몸무게(kg)', min: 30, max: 200 },
+      { id: 'armLen', label: '팔길이(cm)', min: 30, max: 110 },
+      { id: 'legLen', label: '다리길이(cm)', min: 40, max: 140 },
+      { id: 'flexibility', label: '유연성(1~10)', min: 1, max: 10 }
+    ];
 
     function classify(bd) {
       var bmi = bd.weight / ((bd.height / 100) * (bd.height / 100));
@@ -1019,6 +1149,8 @@
 
       ctx.fillStyle = cText(); ctx.font = 'bold 14px sans-serif';
       ctx.fillText('Golf Body Type Analysis', 20, 25);
+
+      if (!bd) { drawEmpty(ctx, W, H, '신체 정보를 입력하면 표시됩니다'); return; }
 
       // 5-axis radar chart
       var AXES = ['Height', 'Weight', 'Arm Length', 'Leg Length', 'Flexibility'];
@@ -1117,18 +1249,34 @@
       ctx.fillText('BMI: ' + bmi.toFixed(1), 340, H - 20);
     }
 
+    var bodyInputs = BODY_FIELDS.map(function(f) {
+      var v = (bodyData && typeof bodyData[f.id] === 'number') ? bodyData[f.id] : '';
+      return '<div class="sg35-row"><span class="sg35-label">' + f.label + '</span>' +
+        '<input type="number" id="sg35-bd-' + f.id + '" min="' + f.min + '" max="' + f.max + '" value="' + v + '" style="width:90px"></div>';
+    }).join('');
+
     var html = '<div class="sg35-row"><span class="sg35-badge sg35-badge-purple">Canvas 600x380</span> <span class="sg35-badge sg35-badge-pink">5-Axis</span></div>' +
-      '<p class="sg35-card-desc">신장/체중/팔길이/다리길이/유연성 5축 입력으로 체형을 분류합니다. Power/Technical/Balanced/Flexible/Compact 5가지 타입 중 추천 스윙과 클럽 스펙을 안내합니다.</p>' +
-      '<div class="sg35-row" style="margin-top:10px"><button class="sg35-btn sg35-btn-primary" onclick="window._sg35_body_randomize()">&#x1F3B2; Randomize</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_body_reset()">&#x21BB; Reset</button></div>' +
+      '<p class="sg35-card-desc">신장/체중/팔길이/다리길이/유연성을 직접 입력하면 체형을 분류합니다. Power/Technical/Balanced/Flexible/Compact 5가지 타입 중 추천 스윙과 클럽 스펙을 안내합니다.</p>' +
+      bodyInputs +
+      '<div class="sg35-row" style="margin-top:10px"><button class="sg35-btn sg35-btn-primary" onclick="window._sg35_body_apply()">&#x2713; 분석</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_body_reset()">&#x21BB; 초기화</button></div>' +
       '<div id="sg35-canvas-body-wrap" class="sg35-canvas-wrap"></div>';
 
-    window._sg35_body_randomize = function() {
-      bodyData = { height: 160 + Math.floor(Math.random() * 30), weight: 55 + Math.floor(Math.random() * 40), armLen: 55 + Math.floor(Math.random() * 20), legLen: 80 + Math.floor(Math.random() * 20), flexibility: 1 + Math.floor(Math.random() * 10) };
+    window._sg35_body_apply = function() {
+      var next = {}, missing = [];
+      BODY_FIELDS.forEach(function(f) {
+        var v = readNum('sg35-bd-' + f.id);
+        if (v === null) missing.push(f.label);
+        next[f.id] = v;
+      });
+      if (missing.length) { alert('다음 항목을 입력하세요: ' + missing.join(', ')); return; }
+      bodyData = next;
       LS('body_data', bodyData); SFX.body_scan(); render(bodyData);
     };
     window._sg35_body_reset = function() {
-      bodyData = { height: 175, weight: 75, armLen: 65, legLen: 90, flexibility: 7 };
-      LS('body_data', bodyData); render(bodyData);
+      bodyData = null;
+      LS('body_data', null);
+      BODY_FIELDS.forEach(function(f) { var el = document.getElementById('sg35-bd-' + f.id); if (el) el.value = ''; });
+      render(bodyData);
     };
 
     makeOverlay('sg35-body', 'linear-gradient(135deg,#6a1b9a,#ab47bc)', '&#x1F9CD; Body Type Analyzer', html);
@@ -1144,28 +1292,21 @@
     var GOAL_NAMES = ['Score Target', 'FIR%', 'GIR%', 'Total Putts', 'Par Saves', 'Bogey-Free', 'Up&Down%', 'Penalties<N'];
     var GOAL_COLORS = ['#2196f3', '#4caf50', '#9c27b0', '#ff9800', '#00bcd4', '#e91e63', '#795548', '#f44336'];
 
-    var goalData = LS('goal_data') || {
-      targets: [82, 60, 50, 32, 5, 10, 50, 3],
-      actuals: GOAL_NAMES.map(function(_, i) {
-        var targets = [82, 60, 50, 32, 5, 10, 50, 3];
-        var t = targets[i];
-        if (i === 0 || i === 3 || i === 7) return t - Math.floor(Math.random() * 6) + 3; // lower is better
-        return Math.floor(t * (0.6 + Math.random() * 0.6));
-      })
-    };
+    var goalData = LS('goal_data') || null;
 
     var goalHistory = LS('goal_history') || [];
 
+    // 목표/실제가 모두 입력된 항목만 집계한다.
     function calcAchievement(targets, actuals) {
-      var achieved = 0;
+      var achieved = 0, counted = 0;
       targets.forEach(function(t, i) {
-        if (i === 0 || i === 3 || i === 7) { // lower is better
-          if (actuals[i] <= t) achieved++;
-        } else { // higher is better
-          if (actuals[i] >= t) achieved++;
-        }
+        var a = actuals[i];
+        if (typeof t !== 'number' || typeof a !== 'number') return;
+        counted++;
+        if (i === 0 || i === 3 || i === 7) { if (a <= t) achieved++; }
+        else { if (a >= t) achieved++; }
       });
-      return achieved;
+      return { achieved: achieved, counted: counted };
     }
 
     function render(gd) {
@@ -1181,9 +1322,19 @@
       ctx.fillStyle = cText(); ctx.font = 'bold 14px sans-serif';
       ctx.fillText('Round Goal Achievement Rate', 20, 25);
 
-      var achieved = calcAchievement(gd.targets, gd.actuals);
-      var pct = Math.round(achieved / gd.targets.length * 100);
+      if (!gd) { drawEmpty(ctx, W, H, '목표와 실제 값을 입력하면 표시됩니다'); return; }
+
+      var res = calcAchievement(gd.targets, gd.actuals);
+      if (!res.counted) { drawEmpty(ctx, W, H, '목표와 실제 값을 입력하면 표시됩니다'); return; }
+      var achieved = res.achieved;
+      var pct = Math.round(achieved / res.counted * 100);
       var g = grade(pct);
+
+      function goalMet(i) {
+        var t = gd.targets[i], a = gd.actuals[i];
+        if (typeof t !== 'number' || typeof a !== 'number') return null;
+        return (i === 0 || i === 3 || i === 7) ? a <= t : a >= t;
+      }
 
       // Donut chart
       var donutX = 150, donutY = 185, outerR = 100, innerR = 55;
@@ -1191,12 +1342,7 @@
 
       gd.targets.forEach(function(t, i) {
         var angle = (Math.PI * 2) / gd.targets.length;
-        var isAchieved;
-        if (i === 0 || i === 3 || i === 7) {
-          isAchieved = gd.actuals[i] <= t;
-        } else {
-          isAchieved = gd.actuals[i] >= t;
-        }
+        var isAchieved = goalMet(i);
 
         ctx.fillStyle = isAchieved ? GOAL_COLORS[i] : (isDark() ? '#333' : '#e0e0e0');
         ctx.beginPath();
@@ -1219,7 +1365,7 @@
       ctx.font = 'bold 14px sans-serif';
       ctx.fillText(g.g, donutX, donutY + 18);
       ctx.font = '10px sans-serif'; ctx.fillStyle = cMuted();
-      ctx.fillText(achieved + '/' + gd.targets.length + ' goals', donutX, donutY + 34);
+      ctx.fillText(achieved + '/' + res.counted + ' goals', donutX, donutY + 34);
       ctx.textAlign = 'left';
 
       // Goal details panel (right side)
@@ -1229,31 +1375,29 @@
 
       gd.targets.forEach(function(t, i) {
         var y = panelY + 20 + i * 32;
-        var isAchieved;
-        if (i === 0 || i === 3 || i === 7) {
-          isAchieved = gd.actuals[i] <= t;
-        } else {
-          isAchieved = gd.actuals[i] >= t;
-        }
+        var isAchieved = goalMet(i);
+        var a = gd.actuals[i];
 
         ctx.fillStyle = GOAL_COLORS[i]; ctx.fillRect(panelX, y, 8, 8);
         ctx.fillStyle = cText(); ctx.font = 'bold 10px sans-serif';
         ctx.fillText(GOAL_NAMES[i], panelX + 14, y + 8);
 
-        ctx.fillStyle = isAchieved ? '#4caf50' : '#f44336';
+        ctx.fillStyle = isAchieved === null ? cMuted() : (isAchieved ? '#4caf50' : '#f44336');
         ctx.font = '9px sans-serif';
-        var actualStr = gd.actuals[i];
-        var targetStr = t;
-        var symbol = isAchieved ? ' &#x2713;' : ' &#x2717;';
+        var actualStr = typeof a === 'number' ? a : '-';
+        var targetStr = typeof t === 'number' ? t : '-';
+        var symbol = isAchieved === null ? '' : (isAchieved ? ' ✓' : ' ✗');
         ctx.fillText('Actual: ' + actualStr + ' / Target: ' + targetStr + symbol, panelX + 14, y + 22);
 
         // Mini progress bar
         var barX = panelX + 200, barW = 100;
-        var progress;
-        if (i === 0 || i === 3 || i === 7) {
-          progress = Math.min(1, t / Math.max(1, gd.actuals[i]));
-        } else {
-          progress = Math.min(1, gd.actuals[i] / Math.max(1, t));
+        var progress = 0;
+        if (isAchieved !== null) {
+          if (i === 0 || i === 3 || i === 7) {
+            progress = Math.min(1, t / Math.max(1, a));
+          } else {
+            progress = Math.min(1, a / Math.max(1, t));
+          }
         }
         ctx.fillStyle = isDark() ? '#333' : '#eee';
         ctx.fillRect(barX, y, barW, 8);
@@ -1268,29 +1412,50 @@
       if (pct >= 75) _checkAchievementsV35('goal_achiever');
     }
 
+    var goalInputs = GOAL_NAMES.map(function(name, i) {
+      var t = (goalData && typeof goalData.targets[i] === 'number') ? goalData.targets[i] : '';
+      var a = (goalData && typeof goalData.actuals[i] === 'number') ? goalData.actuals[i] : '';
+      return '<div class="sg35-row"><span class="sg35-label">' + name + '</span>' +
+        '<span class="sg35-card-desc">목표</span><input type="number" id="sg35-gl-t-' + i + '" value="' + t + '" style="width:70px">' +
+        '<span class="sg35-card-desc">실제</span><input type="number" id="sg35-gl-a-' + i + '" value="' + a + '" style="width:70px"></div>';
+    }).join('');
+
     var html = '<div class="sg35-row"><span class="sg35-badge sg35-badge-pink">Canvas 620x380</span> <span class="sg35-badge sg35-badge-blue">8 Goals</span></div>' +
-      '<p class="sg35-card-desc">라운드 당 8개 목표(스코어/FIR/GIR/퍼팅/파세이브/보기프리/업앤다운/페널티)의 달성률을 도넛 차트로 시각화합니다.</p>' +
-      '<div class="sg35-row" style="margin-top:10px"><button class="sg35-btn sg35-btn-primary" onclick="window._sg35_goal_sim()">&#x1F3B2; Simulate</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_goal_save()">&#x1F4BE; Save</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_goal_reset()">&#x21BB; Reset</button></div>' +
+      '<p class="sg35-card-desc">8개 목표(스코어/FIR/GIR/퍼팅/파세이브/보기프리/업앤다운/페널티)의 목표값과 실제값을 직접 입력하세요. 두 값이 모두 입력된 항목만 달성률에 반영됩니다.</p>' +
+      goalInputs +
+      '<div class="sg35-row" style="margin-top:10px"><button class="sg35-btn sg35-btn-primary" onclick="window._sg35_goal_apply()">&#x2713; 적용</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_goal_save()">&#x1F4BE; 기록 저장</button> <button class="sg35-btn sg35-btn-outline" onclick="window._sg35_goal_reset()">&#x21BB; 초기화</button></div>' +
       '<div id="sg35-canvas-goal-wrap" class="sg35-canvas-wrap"></div>';
 
-    window._sg35_goal_sim = function() {
-      goalData = {
-        targets: [82, 60, 50, 32, 5, 10, 50, 3],
-        actuals: [82, 60, 50, 32, 5, 10, 50, 3].map(function(t, i) {
-          if (i === 0 || i === 3 || i === 7) return t - Math.floor(Math.random() * 8) + 4;
-          return Math.floor(t * (0.5 + Math.random() * 0.7));
-        })
-      };
+    window._sg35_goal_apply = function() {
+      var targets = [], actuals = [], any = false;
+      GOAL_NAMES.forEach(function(_, i) {
+        var t = readNum('sg35-gl-t-' + i);
+        var a = readNum('sg35-gl-a-' + i);
+        if (t !== null && a !== null) any = true;
+        targets.push(t);
+        actuals.push(a);
+      });
+      if (!any) { alert('목표와 실제 값을 모두 입력한 항목이 최소 1개 필요합니다.'); return; }
+      goalData = { targets: targets, actuals: actuals };
       LS('goal_data', goalData); SFX.goal_achieve(); render(goalData);
     };
     window._sg35_goal_save = function() {
-      goalHistory.push({ date: new Date().toISOString().slice(0, 10), achieved: calcAchievement(goalData.targets, goalData.actuals), total: goalData.targets.length });
+      if (!goalData) { alert('먼저 목표와 실제 값을 입력하고 [적용]을 누르세요.'); return; }
+      var res = calcAchievement(goalData.targets, goalData.actuals);
+      if (!res.counted) { alert('저장할 목표 기록이 없습니다.'); return; }
+      goalHistory.push({ date: new Date().toISOString().slice(0, 10), achieved: res.achieved, total: res.counted });
       if (goalHistory.length > 30) goalHistory = goalHistory.slice(-30);
       LS('goal_history', goalHistory); SFX.goal_set();
+      render(goalData);
     };
     window._sg35_goal_reset = function() {
-      goalData = { targets: [82, 60, 50, 32, 5, 10, 50, 3], actuals: [82, 60, 50, 32, 5, 10, 50, 3] };
-      LS('goal_data', goalData); render(goalData);
+      goalData = null;
+      LS('goal_data', null);
+      GOAL_NAMES.forEach(function(_, i) {
+        var te = document.getElementById('sg35-gl-t-' + i); if (te) te.value = '';
+        var ae = document.getElementById('sg35-gl-a-' + i); if (ae) ae.value = '';
+      });
+      render(goalData);
     };
 
     makeOverlay('sg35-goal', 'linear-gradient(135deg,#ad1457,#f06292)', '&#x1F3AF; Goal Achievement Rate', html);
@@ -1401,7 +1566,7 @@
     { id: 'multi_feature_v35', name: 'v35 Multi-Tooler', desc: 'Opened 5+ v35 features' },
     { id: 'swing_s_rank', name: 'Swing S Rank', desc: 'Got S rank on Swing Plane Analyzer' },
     { id: 'trend_30round', name: 'Trend 30 Round', desc: 'Analyzed 30 rounds of performance' },
-    { id: 'weather_best', name: 'Weather Best', desc: 'Found optimal weather condition' },
+    { id: 'weather_best', name: 'Weather Logger', desc: 'Recorded 5+ rounds of weather data' },
     { id: 'swing_plane_master', name: 'Swing Plane Saved', desc: 'Saved a swing plane session' },
     { id: 'goal_achiever', name: 'Goal Champion', desc: 'Achieved 75%+ goal completion' },
     { id: 'v35_complete', name: 'v35 Complete', desc: 'Unlocked all v35 achievements' }
