@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>스마트골프 개인정보처리방침</title>
+<style>
+  :root { --ink:#16211a; --muted:#5b6b60; --line:#dfe8e2; --brand:#1a7a3a; --bg:#f7faf8; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font-family:"Malgun Gothic","맑은 고딕",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+         line-height:1.75; }
+  .wrap { max-width:760px; margin:0 auto; padding:32px 20px 72px; }
+  header { border-bottom:3px solid var(--brand); padding-bottom:18px; margin-bottom:28px; }
+  h1 { font-size:1.6rem; margin:0 0 6px; }
+  .sub { color:var(--muted); font-size:.92rem; }
+  h2 { font-size:1.12rem; margin:32px 0 10px; color:var(--brand); }
+  p, li { font-size:.97rem; }
+  ul { padding-left:20px; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:.92rem; }
+  th, td { border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top; }
+  th { background:#eef5f0; font-weight:700; }
+  .box { background:#fff; border:1px solid var(--line); border-radius:10px; padding:16px 18px; margin:14px 0; }
+  code { background:#eef5f0; padding:1px 6px; border-radius:4px; font-size:.9em; }
+  footer { margin-top:44px; padding-top:18px; border-top:1px solid var(--line);
+           color:var(--muted); font-size:.88rem; }
+  @media (max-width:520px){ table, thead, tbody, th, td, tr { display:block; }
+    thead { display:none; } td { border-top:none; } tr { margin-bottom:12px; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+    td::before { content:attr(data-l); display:block; font-weight:700; color:var(--brand); font-size:.82rem; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>스마트골프 개인정보처리방침</h1>
+  <div class="sub">시행일: 2026년 8월 14일 · 앱: 스마트골프 (SmartGolf)</div>
+</header>
+
+<p>스마트골프(이하 &ldquo;앱&rdquo;)는 이용자의 개인정보를 소중히 여기며, 아래와 같이 처리방침을 안내합니다.
+본 앱은 <strong>회원가입이 없고, 자체 서버를 운영하지 않습니다.</strong>
+이용자가 앱에서 만든 기록은 원칙적으로 <strong>이용자 기기 안에만</strong> 저장됩니다.</p>
+
+<h2>1. 수집하는 정보와 이용 목적</h2>
+<table>
+  <thead><tr><th>항목</th><th>수집 방식</th><th>이용 목적</th><th>보관 위치</th></tr></thead>
+  <tbody>
+    <tr>
+      <td data-l="항목">위치정보(위도·경도)</td>
+      <td data-l="수집 방식">이용자가 &lsquo;현재 위치&rsquo; 버튼을 누른 경우에만 (선택)</td>
+      <td data-l="이용 목적">출발지 기준 골프장 거리 계산, 날씨 조회</td>
+      <td data-l="보관 위치">기기 내 저장, 서버 저장 없음</td>
+    </tr>
+    <tr>
+      <td data-l="항목">이용자가 입력한 주소·검색어</td>
+      <td data-l="수집 방식">직접 입력 (선택)</td>
+      <td data-l="이용 목적">좌표 변환(지오코딩) 및 골프장 검색</td>
+      <td data-l="보관 위치">기기 내 저장, 서버 저장 없음</td>
+    </tr>
+    <tr>
+      <td data-l="항목">라운드 기록·즐겨찾기·예산·설정</td>
+      <td data-l="수집 방식">이용자 입력 및 기능 이용 중 앱이 생성</td>
+      <td data-l="이용 목적">앱 기능 제공(기록 관리, 통계)</td>
+      <td data-l="보관 위치">기기 내 저장소(localStorage)에만 저장</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="box">
+  <strong>수집하지 않는 정보</strong>
+  <ul>
+    <li>이름, 이메일, 전화번호, 생년월일 등 신원 정보</li>
+    <li>연락처(주소록), 사진, 카메라, 마이크, 통화기록</li>
+    <li>광고 식별자, 결제 정보</li>
+  </ul>
+</div>
+
+<h2>2. 제3자 서비스로의 정보 전송</h2>
+<p>앱은 아래 외부 서비스를 호출하며, 그 과정에서 해당 항목이 전송됩니다.
+전송된 정보는 해당 기능 수행 목적에 한해 사용되며, 본 앱은 이를 별도로 저장하지 않습니다.</p>
+<table>
+  <thead><tr><th>서비스</th><th>전송 항목</th><th>목적</th></tr></thead>
+  <tbody>
+    <tr><td data-l="서비스">Open-Meteo (<code>api.open-meteo.com</code>)</td>
+        <td data-l="전송 항목">위도·경도</td>
+        <td data-l="목적">골프장 지역 날씨 조회</td></tr>
+    <tr><td data-l="서비스">OpenStreetMap Nominatim (<code>nominatim.openstreetmap.org</code>)</td>
+        <td data-l="전송 항목">위도·경도 또는 입력한 주소 문자열</td>
+        <td data-l="목적">주소↔좌표 변환, 지역 검색</td></tr>
+    <tr><td data-l="서비스">OpenStreetMap 타일 서버 (<code>tile.openstreetmap.org</code>)</td>
+        <td data-l="전송 항목">IP 주소, 보고 있는 지도 영역</td>
+        <td data-l="목적">지도뷰의 지도 이미지 표시</td></tr>
+    <tr><td data-l="서비스">OSRM (<code>router.project-osrm.org</code>)</td>
+        <td data-l="전송 항목">출발지·골프장 좌표</td>
+        <td data-l="목적">자동차 기준 이동거리·소요시간 계산</td></tr>
+    <tr><td data-l="서비스">unpkg CDN (<code>unpkg.com</code>)</td>
+        <td data-l="전송 항목">IP 주소</td>
+        <td data-l="목적">지도 라이브러리(Leaflet) 파일 내려받기</td></tr>
+  </tbody>
+</table>
+
+<p><strong>이용자가 직접 눌렀을 때만 열리는 외부 링크</strong> — 아래는 앱이 자동으로 호출하지 않으며,
+버튼을 누르면 브라우저로 이동합니다. 이동 이후에는 각 사이트의 개인정보처리방침이 적용됩니다.</p>
+<ul>
+  <li>카카오맵(<code>map.kakao.com</code>), 네이버지도(<code>map.naver.com</code>),
+      네이버검색(<code>search.naver.com</code>), 구글지도(<code>www.google.com/maps</code>)</li>
+  <li>김캐디(<code>kimcaddie.com</code>) — 골프장 예약 페이지</li>
+</ul>
+
+<p>앱에는 광고 SDK, 분석(Analytics) SDK가 포함되어 있지 않습니다.</p>
+
+<h2>3. 보유 및 파기</h2>
+<p>모든 이용 기록은 이용자 기기의 브라우저 저장소(localStorage)에만 있으며,
+보관 기간을 따로 두지 않고 <strong>이용자가 지울 때까지</strong> 기기에 남습니다.
+운영자는 이 기록에 접근할 수 없습니다.</p>
+<p>언제든지 아래 방법으로 전부 삭제할 수 있습니다.</p>
+<ul>
+  <li><strong>안드로이드 앱으로 이용 중인 경우</strong> — 설정 &gt; 앱 &gt; 스마트골프 &gt; 저장공간 &gt; 데이터 삭제</li>
+  <li><strong>앱 내에서</strong> — 우측 상단 메뉴의 &lsquo;사이트 설정&rsquo;에서 사이트 데이터 삭제</li>
+  <li><strong>웹브라우저로 이용 중인 경우</strong> — 브라우저의 인터넷 사용 기록/사이트 데이터 삭제</li>
+</ul>
+<p>참고로 안드로이드 앱을 삭제하더라도 브라우저에 저장된 사이트 데이터는 남을 수 있으므로,
+완전히 지우려면 위 방법을 함께 이용해 주세요.</p>
+
+<h2>4. 이용자의 권리</h2>
+<ul>
+  <li>위치 권한은 기기 설정에서 언제든지 거부·철회할 수 있으며, 거부해도 주소 직접 입력으로 모든 기능을 이용할 수 있습니다.</li>
+  <li>데이터가 기기에만 저장되므로 열람·정정·삭제를 이용자가 직접 수행합니다.</li>
+</ul>
+
+<h2>5. 아동의 개인정보</h2>
+<p>본 앱은 만 14세 미만 아동을 대상으로 하지 않으며, 아동의 개인정보를 고의로 수집하지 않습니다.</p>
+
+<h2>6. 보안</h2>
+<p>앱은 HTTPS로 제공되며, 외부 서비스 호출 역시 HTTPS로 이루어집니다.
+자체 서버와 계정 체계가 없으므로 서버 측 개인정보 유출 위험이 존재하지 않습니다.</p>
+
+<h2>7. 처리방침 변경</h2>
+<p>본 방침이 변경되는 경우 본 페이지에 변경 내용과 시행일을 게시합니다.</p>
+
+<h2>8. 문의처</h2>
+<p>개인정보 관련 문의: <strong>bsy522@gmail.com</strong></p>
+
+<footer>
+  스마트골프 · 최종 수정일 2026년 8월 14일<br>
+  본 문서는 앱 버전 41.0 기준으로 작성되었습니다.
+</footer>
+
+</div>
+</body>
+</html>
