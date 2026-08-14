@@ -249,6 +249,12 @@
       ctx.font = 'bold 14px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('발사각 × 스핀량 캐리거리 히트맵 (HSP ' + saved.speed + 'mph)', W / 2, 25);
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('일반 탄도 참고표 · 내 스윙 측정치가 아닙니다', W - 12, H - 15);
+      ctx.restore();
 
       var cellW = 88, cellH = 48, startX = 95, startY = 70;
       var speedMult = saved.speed / 100;
@@ -393,7 +399,7 @@
       html += '<div style="font-weight:700;font-size:15px;margin-bottom:6px">' + sc.name + ' &#xC0C1;&#xD669; (Par ' + sc.par + ')</div>';
       html += '<div style="font-size:13px;color:var(--text-muted);margin-bottom:8px">' + sc.desc + '</div>';
       html += '<div class="sg37-stat"><span>&#xB9AC;&#xC2A4;&#xD06C;</span><span style="font-weight:700;color:' + sc.color + '">' + sc.risk + '%</span></div>';
-      html += '<div class="sg37-stat"><span>&#xB9AC;&#xC6CC;&#xB4DC; (Par &#xC138;&#xC774;&#xBE0C; &#xD655;&#xB960;)</span><span style="font-weight:700;color:#2ecc71">' + sc.reward + '%</span></div>';
+      html += '<div class="sg37-stat"><span>&#xB9AC;&#xC6CC;&#xB4DC; &#xC9C0;&#xC218; <span style="font-size:11px;color:var(--text-muted)">(&#xC77C;&#xBC18; &#xCC38;&#xACE0;&#xCE58;)</span></span><span style="font-weight:700;color:#2ecc71">' + sc.reward + '</span></div>';
       html += '<div class="sg37-stat"><span>&#xCD94;&#xCC9C; &#xC804;&#xB7B5;</span><span style="font-weight:600;color:#3498db">' + sc.strategy + '</span></div>';
       html += '</div>';
 
@@ -435,6 +441,11 @@
       ctx.font = 'bold 14px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('리스크 vs 리워드 분석 (Par 4)', W / 2, 25);
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.font = '10px sans-serif';
+      ctx.fillText('일반 전략 참고치 · 내 플레이 기록이 아닙니다', W / 2, 40);
+      ctx.restore();
 
       // scatter plot area
       var plotX = 80, plotY = 50, plotW = W - 130, plotH = H - 110;
@@ -1250,22 +1261,16 @@
 
     var clubs = ['DR', '3W', '5W', '3I', '4I', '5I', '6I', '7I', '8I', '9I', 'PW', 'AW', 'SW'];
     var missTypes = ['슬라이스', '훅', '탑', '청크', '생크', '푸시'];
-    // frequency data: [club][missType] 0~10
-    var freqData = [
-      [7, 3, 2, 1, 0, 5],
-      [6, 4, 3, 2, 0, 4],
-      [5, 4, 3, 2, 1, 3],
-      [4, 3, 4, 3, 2, 2],
-      [4, 3, 4, 4, 2, 2],
-      [3, 4, 3, 5, 2, 2],
-      [3, 5, 2, 5, 3, 1],
-      [2, 5, 2, 5, 3, 1],
-      [2, 4, 3, 6, 3, 1],
-      [1, 3, 4, 6, 4, 1],
-      [1, 2, 4, 7, 4, 1],
-      [1, 2, 5, 7, 5, 1],
-      [1, 1, 5, 8, 5, 0]
-    ];
+    // frequency data: [club][missType] — 사용자가 기록한 미스샷 횟수만 사용
+    var freqData = LS('missfreq');
+    if (!Array.isArray(freqData) || freqData.length !== clubs.length) {
+      freqData = clubs.map(function() { return missTypes.map(function() { return 0; }); });
+    }
+    function missTotal() {
+      return freqData.reduce(function(s, row) {
+        return s + row.reduce(function(a, b) { return a + b; }, 0);
+      }, 0);
+    }
     var drills = {
       '슬라이스': '그립 강화 + 인사이드-아웃 스윙 경로 연습',
       '훅': '클럽페이스 닫기 + 백스윙 템포 늘리기',
@@ -1280,22 +1285,30 @@
     function render() {
       var html = '<canvas id="sg37-miss-canvas" width="620" height="380" style="width:100%;max-width:620px;border-radius:12px;background:#1a1a2e;display:block;margin:0 auto 12px;cursor:crosshair"></canvas>';
 
-      // worst miss for selected club
+      // 선택한 클럽의 기록 — 기록이 없으면 단정하지 않는다
       var clubFreqs = freqData[saved.selClub];
+      var clubTotal = clubFreqs.reduce(function(a, b) { return a + b; }, 0);
       var maxIdx = 0;
       clubFreqs.forEach(function(f, i) { if (f > clubFreqs[maxIdx]) maxIdx = i; });
 
       html += '<div class="sg37-card" style="border-left:4px solid #e74c3c;padding:14px">';
-      html += '<div style="font-weight:700;font-size:15px;margin-bottom:6px">' + clubs[saved.selClub] + ' &#xC8FC;&#xC694; &#xBBF8;&#xC2A4;&#xC0F7;: <span style="color:#e74c3c">' + missTypes[maxIdx] + '</span></div>';
-      html += '<div style="font-size:13px;color:var(--text-muted);margin-bottom:8px">&#xAD50;&#xC815; &#xB4DC;&#xB9B4;: ' + drills[missTypes[maxIdx]] + '</div>';
+      if (clubTotal === 0) {
+        html += '<div style="font-weight:700;font-size:15px;margin-bottom:6px">' + clubs[saved.selClub] + ' &#xBBF8;&#xC2A4;&#xC0F7; &#xAE30;&#xB85D; &#xC5C6;&#xC74C;</div>';
+        html += '<div style="font-size:13px;color:var(--text-muted);margin-bottom:8px">&#xC544;&#xB798;&#xC5D0;&#xC11C; &#xBBF8;&#xC2A4; &#xC720;&#xD615;&#xC744; &#xB20C;&#xB7EC; &#xAE30;&#xB85D;&#xD558;&#xBA74; &#xB0B4; &#xD328;&#xD134;&#xC774; &#xD45C;&#xC2DC;&#xB429;&#xB2C8;&#xB2E4;.</div>';
+      } else {
+        html += '<div style="font-weight:700;font-size:15px;margin-bottom:6px">' + clubs[saved.selClub] + ' &#xAC00;&#xC7A5; &#xC7A6;&#xC740; &#xBBF8;&#xC2A4;: <span style="color:#e74c3c">' + missTypes[maxIdx] + '</span> <span style="font-size:12px;font-weight:400;color:var(--text-muted)">(' + clubFreqs[maxIdx] + '/' + clubTotal + '&#xD68C;)</span></div>';
+        html += '<div style="font-size:13px;color:var(--text-muted);margin-bottom:8px">&#xAD50;&#xC815; &#xB4DC;&#xB9B4;: ' + drills[missTypes[maxIdx]] + '</div>';
+      }
       html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">';
       missTypes.forEach(function(mt, mi) {
         var val = clubFreqs[mi];
-        var color = val >= 6 ? '#e74c3c' : val >= 4 ? '#f39c12' : val >= 2 ? '#3498db' : '#2ecc71';
-        html += '<div style="font-size:11px;padding:4px;text-align:center;background:var(--bg);border-radius:6px;border:1px solid var(--border)">';
-        html += '<span style="color:' + color + ';font-weight:700">' + mt + ': ' + val + '/10</span></div>';
+        var color = val === 0 ? 'var(--text-muted)' : val >= 6 ? '#e74c3c' : val >= 4 ? '#f39c12' : val >= 2 ? '#3498db' : '#2ecc71';
+        html += '<div class="sg37-missrec" data-mi="' + mi + '" style="font-size:11px;padding:6px 4px;text-align:center;background:var(--bg);border-radius:6px;border:1px solid var(--border);cursor:pointer">';
+        html += '<span style="color:' + color + ';font-weight:700">' + mt + ': ' + val + '</span><br><span style="font-size:9px;color:var(--text-muted)">+1 &#xAE30;&#xB85D;</span></div>';
       });
-      html += '</div></div>';
+      html += '</div>';
+      html += '<div style="margin-top:10px;display:flex;gap:6px"><button class="sg37-missreset" style="flex:1;padding:6px;font-size:11px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text)">' + clubs[saved.selClub] + ' &#xAE30;&#xB85D; &#xCD08;&#xAE30;&#xD654;</button></div>';
+      html += '</div>';
 
       html += '<div class="sg37-tabs">';
       clubs.forEach(function(cl, ci) {
@@ -1313,6 +1326,24 @@
           render();
         };
       });
+
+      body.querySelectorAll('.sg37-missrec[data-mi]').forEach(function(cell) {
+        cell.onclick = function() {
+          freqData[saved.selClub][parseInt(this.dataset.mi)] += 1;
+          LS('missfreq', freqData);
+          SFX.miss_drill();
+          render();
+        };
+      });
+
+      var resetBtn = body.querySelector('.sg37-missreset');
+      if (resetBtn) {
+        resetBtn.onclick = function() {
+          freqData[saved.selClub] = missTypes.map(function() { return 0; });
+          LS('missfreq', freqData);
+          render();
+        };
+      }
 
       var cvs = document.getElementById('sg37-miss-canvas');
       if (cvs) {
@@ -1349,6 +1380,13 @@
       ctx.font = 'bold 14px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('클럽별 미스샷 빈도 히트맵', W / 2, 22);
+
+      if (missTotal() === 0) {
+        ctx.fillStyle = 'rgba(255,255,255,0.45)';
+        ctx.font = '14px sans-serif';
+        ctx.fillText('기록을 추가하면 표시됩니다', W / 2, H / 2);
+        return;
+      }
 
       var cellW = 38, cellH = 22, startX = 55, startY = 55;
 
@@ -1409,13 +1447,16 @@
           ctx.fillText(val, x + cellW / 2, y + cellH / 2 + 3);
         });
 
-        // worst miss indicator on right
-        var worstIdx = 0;
-        freqData[ci].forEach(function(v, mi) { if (v > freqData[ci][worstIdx]) worstIdx = mi; });
-        ctx.fillStyle = 'rgba(255,255,255,0.4)';
-        ctx.font = '9px sans-serif';
-        ctx.textAlign = 'left';
-        ctx.fillText('→ ' + missTypes[worstIdx], drillX, startY + ci * cellH + cellH / 2 + 3);
+        // worst miss indicator on right — 기록이 있는 클럽만 단정한다
+        var rowTotal = freqData[ci].reduce(function(a, b) { return a + b; }, 0);
+        if (rowTotal > 0) {
+          var worstIdx = 0;
+          freqData[ci].forEach(function(v, mi) { if (v > freqData[ci][worstIdx]) worstIdx = mi; });
+          ctx.fillStyle = 'rgba(255,255,255,0.4)';
+          ctx.font = '9px sans-serif';
+          ctx.textAlign = 'left';
+          ctx.fillText('→ ' + missTypes[worstIdx], drillX, startY + ci * cellH + cellH / 2 + 3);
+        }
       });
 
       // color legend

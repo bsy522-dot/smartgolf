@@ -136,7 +136,6 @@
   // ===== ACHIEVEMENTS ENGINE (15 new, 332->347) =====
   var achievements40 = [
     { id: 'sg40_swing_mech', name: '스윙 역학자', desc: '스윙 역학 시뮬레이터 첫 분석', icon: '🔬' },
-    { id: 'sg40_torque_master', name: '토크 마스터', desc: '임팩트 토크 90% 이상 달성', icon: '💪' },
     { id: 'sg40_risk_analyst', name: '리스크 분석가', desc: '리스크-리워드 매트릭스 완료', icon: '⚖️' },
     { id: 'sg40_safe_player', name: '안전 루트 전문가', desc: '안전 루트 전략 3회 수립', icon: '🛡️' },
     { id: 'sg40_combo_opt', name: '클럽 조합 최적가', desc: '클럽 조합 최적화 첫 실행', icon: '🎒' },
@@ -182,15 +181,14 @@
 
     var html = '<div class="sg40-panel"><div class="sg40-hdr"><h2><span class="sg40-hdr-icon">🔬</span>스윙 역학 시뮬레이터</h2><button class="sg40-x" onclick="this.closest(\'.sg40-overlay\').classList.remove(\'active\')">&times;</button></div>';
     html += '<canvas id="sg40-swing-cv" width="620" height="400" style="width:100%;border-radius:14px;background:#0a0a1a;margin-bottom:16px"></canvas>';
-    html += '<div class="sg40-card"><h4>📊 스윙 단계별 분석</h4>';
+    html += '<div class="sg40-card"><h4>📊 스윙 단계별 기준값 <span style="font-size:11px;font-weight:400;color:rgba(255,255,255,.5)">(참고 자료 · 측정치 아님)</span></h4>';
     phases.forEach(function (p, i) {
-      var score = Math.max(0, 100 - Math.abs(p.angle - (p.optimal[0] + p.optimal[1]) / 2) * 2);
       html += '<div class="sg40-stat"><span>' + (i + 1) + '. ' + p.name + '</span><span class="sg40-stat-val" style="color:' + p.color + '">' + p.angle + '&deg; / ' + p.torque + '%</span></div>';
     });
     html += '</div>';
-    var totalScore = Math.round(phases.reduce(function (s, p) { return s + Math.max(0, 100 - Math.abs(p.angle - (p.optimal[0] + p.optimal[1]) / 2) * 2); }, 0) / phases.length);
-    if (totalScore >= 90) unlockAchievement('sg40_torque_master');
-    html += '<div class="sg40-card"><h4>🏆 종합 스윙 역학 등급</h4><div style="display:flex;align-items:center;gap:16px;margin-top:10px"><div class="sg40-grade ' + gradeClass(totalScore, 100) + '">' + gradeLetter(totalScore, 100) + '</div><div><div style="color:#fff;font-size:18px;font-weight:800">' + totalScore + '점</div><div style="color:rgba(255,255,255,.5);font-size:12px">7단계 각도+토크 종합</div></div></div></div></div>';
+    html += '<div class="sg40-card"><h4>ℹ️ 이 표에 대하여</h4><p style="color:rgba(255,255,255,.6);font-size:13px;line-height:1.6;margin:8px 0 0">' +
+      '위 각도·토크는 일반적인 스윙 단계를 설명하기 위한 <b>교육용 기준값</b>이며, 내 스윙을 측정한 값이 아닙니다. ' +
+      '따라서 이 화면은 개인 점수나 등급을 매기지 않습니다.</p></div></div>';
     ov.innerHTML = html;
     ov.classList.add('active');
 
