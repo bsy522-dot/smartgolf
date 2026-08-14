@@ -1,7 +1,7 @@
 {
   "name": "SmartGolf - 전국 골프장 파인더",
   "short_name": "SmartGolf",
-  "description": "전국 585개 골프장 검색, AI맞춤추천, 샷분산패턴분석기Canvas620x400, 그린리딩슬로프맵Canvas640x400, 클럽간거리갭분석기Canvas620x400, 라운드멘탈스코어카드Canvas620x400, 퍼팅거리컨트롤맵Canvas600x380, 스윙시퀀스타이밍분석기Canvas620x400, 코스매니지먼트의사결정트리Canvas620x400, 종합골프피트니스인덱스Canvas620x400, Golf IQ v25 15문항, 업적362개, SFX364종",
+  "description": "전국 585개 골프장 검색, AI맞춤추천, 스윙템포탭측정기Canvas620x400, 라운드준비도체크리스트Canvas620x400, 개인코스리뷰기록기Canvas640x400, 라운드복기일지Canvas620x400, 연습세션로거Canvas620x400, 라운드목표트래커Canvas640x400, 클럽가방구성기Canvas620x400, 종합월간셀프진단Canvas620x400, Golf IQ v26 15문항, 업적377개, SFX380종",
   "lang": "ko",
   "categories": [
     "sports",
@@ -675,6 +675,46 @@
       "name": "Golf Fitness",
       "url": "./index.html#fitness41",
       "description": "종합골프피트니스 인덱스 Canvas 620x400"
+    },
+    {
+      "name": "Swing Tempo",
+      "url": "./index.html#tempo42",
+      "description": "스윙 템포 탭 측정기 Canvas 620x400"
+    },
+    {
+      "name": "Round Readiness",
+      "url": "./index.html#readiness42",
+      "description": "라운드 준비도 체크리스트 Canvas 620x400"
+    },
+    {
+      "name": "Course Review",
+      "url": "./index.html#review42",
+      "description": "개인 코스 리뷰 기록기 Canvas 640x400"
+    },
+    {
+      "name": "Round Reflection",
+      "url": "./index.html#reflect42",
+      "description": "라운드 복기 일지 Canvas 620x400"
+    },
+    {
+      "name": "Practice Logger",
+      "url": "./index.html#practice42",
+      "description": "연습 세션 로거 Canvas 620x400"
+    },
+    {
+      "name": "Goal Tracker",
+      "url": "./index.html#goal42",
+      "description": "라운드 목표 트래커 Canvas 640x400"
+    },
+    {
+      "name": "Club Bag",
+      "url": "./index.html#bag42",
+      "description": "클럽 가방 구성기 Canvas 620x400"
+    },
+    {
+      "name": "Monthly Diag",
+      "url": "./index.html#diag42",
+      "description": "종합 월간 셀프 진단 Canvas 620x400"
     }
   ]
 }
