@@ -750,10 +750,13 @@
     { icon: '🧪', label: 'IQ v25', fn: openGolfIQv25 }
   ];
 
+  var navRetries = 20;
   function attachNav() {
-    var bar = document.querySelector('.sg30-bottom-bar');
-    if (!bar) { setTimeout(attachNav, 500); return; }
-    var existingBtn = bar.querySelector('.sg30-bbtn');
+    // sg30 도크가 없을 수 있으므로(해당 패치 미로드) 남아 있는 아무 하단바에나 붙인다.
+    // 폴백이 없으면 버튼이 영영 생성되지 않고 재시도 타이머만 계속 돈다.
+    var bar = document.querySelector('.sg30-bottom-bar') || document.querySelector('[class*="bottom-bar"]');
+    if (!bar) { if (--navRetries > 0) setTimeout(attachNav, 500); return; }
+    var existingBtn = bar.querySelector('.sg30-bbtn') || bar.querySelector('button');
     navItems.forEach(function (item) {
       var btn = document.createElement('button');
       btn.className = existingBtn ? existingBtn.className : 'sg30-bbtn';

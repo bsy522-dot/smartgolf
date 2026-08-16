@@ -164,6 +164,11 @@
     toast.innerHTML = ach.icon + ' <b>' + ach.name + '</b> ' + ach.desc;
     document.body.appendChild(toast);
     setTimeout(function () { toast.remove(); }, 3000);
+    // '완벽주의자'는 나머지 업적을 실제로 모두 달성했을 때만 부여한다
+    if (achId !== 'sg42_complete') {
+      var rest = ACHIEVEMENTS.filter(function (a) { return a.id !== 'sg42_complete'; });
+      if (rest.every(function (a) { return LS('ach_' + a.id); })) unlockAchievement('sg42_complete');
+    }
   }
   function trackFeature(name) {
     var used = LS('featused') || {};
@@ -848,6 +853,7 @@
       var nextBtn = panel.querySelector('#sg42-next-q');
       if (nextBtn) nextBtn.addEventListener('click', function () { currentQ++; renderQuiz(); playSFX('tabSwitch42'); });
     }
+    ov.appendChild(panel);
     renderQuiz();
   }
 
@@ -864,10 +870,13 @@
     { icon: '🧪', label: 'IQ v26', fn: openGolfIQv26 }
   ];
 
+  var navRetries = 20;
   function attachNav() {
-    var bar = document.querySelector('.sg30-bottom-bar');
-    if (!bar) { setTimeout(attachNav, 500); return; }
-    var existingBtn = bar.querySelector('.sg30-bbtn');
+    // sg30 도크가 없을 수 있으므로(해당 패치 미로드) 남아 있는 아무 하단바에나 붙인다.
+    // 폴백이 없으면 버튼이 영영 생성되지 않고 재시도 타이머만 계속 돈다.
+    var bar = document.querySelector('.sg30-bottom-bar') || document.querySelector('[class*="bottom-bar"]');
+    if (!bar) { if (--navRetries > 0) setTimeout(attachNav, 500); return; }
+    var existingBtn = bar.querySelector('.sg30-bbtn') || bar.querySelector('button');
     navItems.forEach(function (item) {
       var btn = document.createElement('button');
       btn.className = existingBtn ? existingBtn.className : 'sg30-bbtn';
