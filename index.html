@@ -544,7 +544,7 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
   <div class="header-inner">
     <div class="logo"><i class="fas fa-golf-ball-tee"></i> Smart<span>Golf</span> <span style="font-size:10px;opacity:0.7;font-weight:400">v26.0</span></div>
     <div class="header-stats">
-      <div class="header-stat"><i class="fas fa-flag"></i> <span id="total-count">578</span>개 골프장</div>
+      <div class="header-stat"><i class="fas fa-flag"></i> <span id="total-count">585</span>개 골프장</div>
       <div class="header-stat"><i class="fas fa-won-sign"></i> 실시간 가격</div>
       <div class="header-stat"><i class="fas fa-map-marker-alt"></i> GPS 거리계산</div>
     </div>
@@ -600,16 +600,6 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
         <option value="양잔디">양잔디</option>
       </select>
     </div>
-    <div class="search-group sg-sm">
-      <label><i class="fas fa-star"></i> 평점</label>
-      <select id="ratingFilter">
-        <option value="0">전체</option>
-        <option value="7">7.0+</option>
-        <option value="8">8.0+</option>
-        <option value="8.5">8.5+</option>
-        <option value="9">9.0+</option>
-      </select>
-    </div>
     <button class="btn-search" id="searchBtn"><i class="fas fa-search"></i> 검색</button>
     <button class="btn-reset" id="resetBtn"><i class="fas fa-undo"></i> 초기화</button>
   </div>
@@ -649,7 +639,6 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
     <button class="quick-btn" data-quick="time60"><i class="fas fa-clock"></i> 1시간 이내</button>
     <button class="quick-btn" data-quick="price10"><i class="fas fa-won-sign"></i> 10만원 이하</button>
     <button class="quick-btn" data-quick="holes27"><i class="fas fa-flag"></i> 27홀 이상</button>
-    <button class="quick-btn" data-quick="rating9"><i class="fas fa-star"></i> 평점 9+</button>
     <button class="quick-btn" data-quick="public"><i class="fas fa-users"></i> 대중제만</button>
   </div>
   <div class="recent-searches" id="recentSearches"></div>
@@ -669,9 +658,7 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
   <div class="results-header">
     <div class="results-count" id="resultsCount"></div>
     <div class="sort-btns">
-      <button class="sort-btn active" data-sort="rating">평점순</button>
-      <button class="sort-btn" data-sort="value">가성비순</button>
-      <button class="sort-btn" data-sort="distance">거리순</button>
+      <button class="sort-btn active" data-sort="distance">거리순</button>
       <button class="sort-btn" data-sort="price">가격순</button>
       <button class="sort-btn" data-sort="name">이름순</button>
       <button class="sort-btn" data-sort="holes">홀수순</button>
@@ -850,7 +837,7 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
   <div class="footer-grid">
     <div class="footer-col">
       <h4><i class="fas fa-golf-ball-tee"></i> SmartGolf v26.0</h4>
-      <p>전국 578개 골프장을 한눈에.<br>클럽매니저, 스코어카드, AI추천,<br>라운드리포트, 피트니스까지.</p>
+      <p>전국 585개 골프장을 한눈에.<br>클럽매니저, 스코어카드, AI추천,<br>라운드리포트, 피트니스까지.</p>
     </div>
     <div class="footer-col">
       <h4><i class="fas fa-chart-line"></i> 통계</h4>
@@ -861,7 +848,7 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
       <div>
         GPS 실시간 거리계산<br>
         OSRM 운전시간 보정<br>
-        가성비 점수 분석<br>
+        주중·주말 그린피 비교<br>
         골프장 비교 (최대 3개)<br>
         라운드 기록 &amp; 핸디캕<br>
         3일 날씨 예보<br>
@@ -886,7 +873,7 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
     </div>
   </div>
   <div class="footer-bottom">
-    PRIME Holdings &middot; NEXTERA &middot; SmartGolf v26.0 &middot; PWA &middot; 578+ 골프장
+    PRIME Holdings &middot; NEXTERA &middot; SmartGolf v26.0 &middot; PWA &middot; 585 골프장
   </div>
 </footer>
 
@@ -905,7 +892,7 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
 <button class="fab-gps" id="fabGps" title="내 위치"><i class="fas fa-crosshairs"></i></button>
 
 <script>
-let allCourses = [], filtered = [], currentSort = 'rating', currentRegion = '', currentPage = 1;
+let allCourses = [], filtered = [], currentSort = 'distance', currentRegion = '', currentPage = 1;
 const PAGE_SIZE = 24;
 let userCoords = null, map = null, markers = [], modalMap = null;
 let favorites = JSON.parse(localStorage.getItem('sg_favs') || '[]');
@@ -933,17 +920,6 @@ function showToast(message, type = 'info', duration = 2500) {
 // Debounce utility
 function debounce(fn, delay) { let t; return function(...args) { clearTimeout(t); t = setTimeout(() => fn.apply(this, args), delay); }; }
 
-// Value Score: rating / (price per 10K) - higher is better bang for buck
-function calcValueScore(c) {
-  if (!c.rt || !c.weekday || c.weekday <= 0) return 0;
-  return (c.rt / (c.weekday / 10000)) * 10;
-}
-function getValueGrade(score) {
-  if (score >= 8) return { grade: 'S', cls: 'value-s', label: 'S급 가성비' };
-  if (score >= 5) return { grade: 'A', cls: 'value-a', label: 'A급' };
-  if (score >= 3) return { grade: 'B', cls: 'value-b', label: 'B급' };
-  return { grade: 'C', cls: 'value-c', label: '' };
-}
 
 // Scroll progress bar
 window.addEventListener('scroll', () => {
@@ -987,7 +963,7 @@ document.getElementById('viewList').addEventListener('click', () => {
 // Course recommendation engine
 function getRecommendations(course, allData, limit = 5) {
   return allData
-    .filter(c => c.n !== course.n && c.rt && c.weekday > 0)
+    .filter(c => c.n !== course.n && c.weekday > 0)
     .map(c => {
       let score = 0;
       if (c.r === course.r) score += 30;
@@ -996,10 +972,6 @@ function getRecommendations(course, allData, limit = 5) {
       if (course.weekday > 0 && c.weekday > 0) {
         const priceDiff = Math.abs(c.weekday - course.weekday) / course.weekday;
         score += Math.max(0, 20 - priceDiff * 40);
-      }
-      if (course.rt && c.rt) {
-        const ratingDiff = Math.abs(c.rt - course.rt);
-        score += Math.max(0, 15 - ratingDiff * 5);
       }
       if (course.h && c.h === course.h) score += 5;
       return { ...c, _simScore: score };
@@ -1266,7 +1238,6 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   document.getElementById('timeDisplay').textContent = '전체';
   document.getElementById('typeFilter').value = '';
   document.getElementById('holesFilter').value = '0';
-  document.getElementById('ratingFilter').value = '0';
   document.getElementById('grassFilter').value = '';
   document.getElementById('priceSlider').value = 400000;
   document.getElementById('priceDisplay').textContent = '전체';
@@ -1303,7 +1274,6 @@ function applyFilters() {
   const timeLimit = timeMinutes >= 300 ? 0 : timeMinutes / 60; // 0 means no filter
   const typeVal = document.getElementById('typeFilter').value;
   const holesMin = parseInt(document.getElementById('holesFilter').value);
-  const ratingMin = parseFloat(document.getElementById('ratingFilter').value);
   const grassVal = document.getElementById('grassFilter').value;
   const priceMax = parseInt(document.getElementById('priceSlider').value);
   const nameQ = document.getElementById('nameSearch').value.trim().toLowerCase();
@@ -1313,7 +1283,6 @@ function applyFilters() {
     if (currentRegion && c.r !== currentRegion) return false;
     if (typeVal && c.t !== typeVal) return false;
     if (holesMin && (!c.h || c.h < holesMin)) return false;
-    if (ratingMin && (!c.rt || c.rt < ratingMin)) return false;
     if (grassVal && c.g !== grassVal) return false;
     if (priceMax < 400000) {
       if (!c.weekday || c.weekday <= 0) return false; // 가격 데이터 없으면 제외
@@ -1346,8 +1315,6 @@ function applyFilters() {
 function sortResults() {
   filtered.sort((a, b) => {
     switch(currentSort) {
-      case 'rating': return (b.rt||0) - (a.rt||0);
-      case 'value': return calcValueScore(b) - calcValueScore(a);
       case 'distance':
         if (userCoords) return (a._calcDist||9999) - (b._calcDist||9999);
         return (a.d||9999) - (b.d||9999);
@@ -1364,8 +1331,6 @@ function sortResults() {
 function updateStats() {
   const withPrice = filtered.filter(c => c.weekday > 0);
   const avgPrice = withPrice.length ? Math.round(withPrice.reduce((s,c) => s+c.weekday, 0)/withPrice.length) : 0;
-  const avgRating = filtered.filter(c=>c.rt).length ?
-    (filtered.filter(c=>c.rt).reduce((s,c) => s+c.rt, 0)/filtered.filter(c=>c.rt).length).toFixed(1) : '-';
   // Region distribution
   const regionCounts = {};
   filtered.forEach(c => { regionCounts[c.r] = (regionCounts[c.r]||0)+1; });
@@ -1380,7 +1345,6 @@ function updateStats() {
   document.getElementById('statsBar').innerHTML = `
     <div class="stat-card"><i class="fas fa-flag"></i> 검색결과 <span class="stat-num">${filtered.length}</span>개</div>
     <div class="stat-card"><i class="fas fa-won-sign"></i> 평균 그린피 <span class="stat-num">${avgPrice > 0 ? fmtPrice(avgPrice) : '-'}</span></div>
-    <div class="stat-card"><i class="fas fa-star"></i> 평균 평점 <span class="stat-num">${avgRating}</span></div>
     <div class="stat-card"><i class="fas fa-list"></i> <span style="font-size:11px">${typeInfo}</span></div>
     ${userCoords ? '<div class="stat-card"><i class="fas fa-car"></i> GPS <span class="stat-num" style="color:#2e7d32">ON</span></div>' : ''}
     <div class="stat-card" style="flex-direction:column;align-items:stretch"><div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">지역분포</div><div class="region-chart">${regionBars}</div></div>
@@ -1404,7 +1368,7 @@ function renderResults() {
 
   grid.innerHTML = pageData.map((c, i) => {
     const idx = start + i;
-    const ratingHTML = c.rt ? `<div class="card-rating"><i class="fas fa-star"></i> ${c.rt.toFixed(1)}</div>` : '';
+    const ratingHTML = '';
     const sq = encodeURIComponent(c.n + ' 골프장');
     const bq = encodeURIComponent(c.n + ' 골프장 예약');
     const cardBook = c.book || c.site || ('https://search.naver.com/search.naver?query=' + bq);
@@ -1433,9 +1397,7 @@ function renderResults() {
     const favClass = isFav(c.n) ? 'active' : '';
     const compClass = compareList.includes(c.n) ? 'active' : '';
     const safeName = c.n.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-    const vs = calcValueScore(c);
-    const vg = getValueGrade(vs);
-    const valueBadgeHTML = vg.grade !== 'C' && vs > 0 ? `<span class="value-badge ${vg.cls}">${vg.grade} ${vs.toFixed(1)}</span>` : '';
+    const valueBadgeHTML = '';
     return `<div class="card" data-index="${idx}" data-type="${c.t||''}" data-name="${safeName}">
       <button class="fav-btn ${favClass}" data-name="${safeName}"><i class="fas fa-heart"></i></button>
       <div class="compare-check ${compClass}" data-name="${safeName}">${compClass ? '<i class="fas fa-check"></i>' : ''}</div>
@@ -1533,10 +1495,10 @@ function updateMapMarkers() {
   shown.forEach(c => {
     if (!c.lat || !c.lng) return;
     const priceLabel = c.weekday > 0 ? ` | ${fmtPrice(c.weekday)}` : '';
-    const popup = `<b>${c.n}</b><br>${c.r} ${c.c||''} | ${c.rt ? c.rt.toFixed(1)+'점' : ''}${priceLabel}<br>${c.a||''}<br>
+    const popup = `<b>${c.n}</b><br>${c.r} ${c.c||''}${priceLabel}<br>${c.a||''}<br>
       <a href="https://search.naver.com/search.naver?query=${encodeURIComponent(c.n+' 골프장 예약')}" target="_blank">예약검색</a> |
       <a href="https://map.kakao.com/?q=${encodeURIComponent(c.n+' 골프장')}" target="_blank">카카오맵</a>`;
-    const color = c.rt >= 9 ? '#1a7a3a' : c.rt >= 8 ? '#2196f3' : '#ff9800';
+    const color = '#1a7a3a';
     const m = L.circleMarker([c.lat, c.lng], {
       radius: 6, fillColor: color, color: '#fff', weight: 1, fillOpacity: 0.8
     }).bindPopup(popup).addTo(map);
@@ -1568,7 +1530,7 @@ function showDetail(c) {
   const sq = encodeURIComponent(c.n + ' 골프장');
   const bq = encodeURIComponent(c.n + ' 골프장 예약');
 
-  let priceSection = '';
+  let priceSection = '<div class="modal-row"><div class="modal-label">그린피</div><div class="modal-value" style="color:var(--text-muted)">정보 없음</div></div>';
   if (c.weekday > 0 || c.weekend > 0 || c.holiday > 0) {
     priceSection = `
       <div class="modal-row"><div class="modal-label">그린피</div><div class="modal-value">
@@ -1596,7 +1558,6 @@ function showDetail(c) {
 
   document.getElementById('modalBody').innerHTML = `
     <div class="modal-row"><div class="modal-label">지역</div><div class="modal-value">${c.r} ${c.c||''}</div></div>
-    ${c.rt ? `<div class="modal-row"><div class="modal-label">평점</div><div class="modal-value"><span style="color:#f59e0b;font-weight:700;font-size:18px">${c.rt.toFixed(1)}</span> / 10.0</div></div>` : ''}
     ${c.t ? `<div class="modal-row"><div class="modal-label">종류</div><div class="modal-value">${c.t}</div></div>` : ''}
     ${c.g ? `<div class="modal-row"><div class="modal-label">잔디</div><div class="modal-value">${c.g}</div></div>` : ''}
     ${c.h ? `<div class="modal-row"><div class="modal-label">홀수</div><div class="modal-value">${c.h}홀</div></div>` : ''}
@@ -1604,14 +1565,6 @@ function showDetail(c) {
     ${travelSection}
     ${c.a ? `<div class="modal-row"><div class="modal-label">주소</div><div class="modal-value">${c.a}</div></div>` : ''}
     ${c.p ? `<div class="modal-row"><div class="modal-label">전화</div><div class="modal-value"><a href="tel:${c.p}">${c.p}</a></div></div>` : ''}
-    ${(() => {
-      const vs = calcValueScore(c);
-      if (vs > 0) {
-        const vg = getValueGrade(vs);
-        return `<div class="modal-row"><div class="modal-label">가성비</div><div class="modal-value"><span class="value-badge ${vg.cls}" style="position:static">${vg.grade}급</span> <strong>${vs.toFixed(1)}점</strong> <span style="font-size:11px;color:var(--text-muted)">(평점 &divide; 만원당 가격 &times; 10)</span></div></div>`;
-      }
-      return '';
-    })()}
     ${c.lat ? `<div id="modal-map"></div>` : ''}
     <div class="recommend-section">
       <div class="recommend-title"><i class="fas fa-star"></i> 비슷한 골프장 추천</div>
@@ -1657,7 +1610,7 @@ function showDetail(c) {
       return `<div class="recommend-card" data-name="${rcSafe}">
         <div class="rc-name">${rc.n}</div>
         <div class="rc-meta">${rc.r} ${rc.c||''} &middot; ${rc.t||''} &middot; ${rc.h||'?'}홀</div>
-        <div class="rc-price">${rc.rt ? rc.rt.toFixed(1)+'점' : ''} ${rc.weekday > 0 ? '&middot; ' + fmtPrice(rc.weekday) : ''}</div>
+        <div class="rc-price">${rc.weekday > 0 ? fmtPrice(rc.weekday) : '가격 정보 없음'}</div>
       </div>`;
     }).join('');
     recContainer.querySelectorAll('.recommend-card').forEach(card => {
@@ -1704,7 +1657,7 @@ document.querySelectorAll('.sort-btn').forEach(btn => {
 });
 
 // Filter listeners
-['typeFilter','holesFilter','ratingFilter','grassFilter'].forEach(id => {
+['typeFilter','holesFilter','grassFilter'].forEach(id => {
   document.getElementById(id).addEventListener('change', applyFilters);
 });
 document.getElementById('nameSearch').addEventListener('input', debounce(applyFilters, 300));
@@ -1765,9 +1718,6 @@ document.querySelectorAll('.quick-btn').forEach(btn => {
     if (activeQuickFilters.has('holes27')) {
       document.getElementById('holesFilter').value = '27';
     }
-    if (activeQuickFilters.has('rating9')) {
-      document.getElementById('ratingFilter').value = '9';
-    }
     if (activeQuickFilters.has('public')) {
       document.getElementById('typeFilter').value = '대중제';
     }
@@ -1782,9 +1732,6 @@ document.querySelectorAll('.quick-btn').forEach(btn => {
     }
     if (!activeQuickFilters.has('holes27') && !btn.classList.contains('active') && q === 'holes27') {
       document.getElementById('holesFilter').value = '0';
-    }
-    if (!activeQuickFilters.has('rating9') && !btn.classList.contains('active') && q === 'rating9') {
-      document.getElementById('ratingFilter').value = '0';
     }
     if (!activeQuickFilters.has('public') && !btn.classList.contains('active') && q === 'public') {
       document.getElementById('typeFilter').value = '';
@@ -1802,7 +1749,6 @@ document.getElementById('compareGo').addEventListener('click', () => {
     ['종류', c => c.t || '-'],
     ['홀수', c => c.h ? c.h + '홀' : '-'],
     ['잔디', c => c.g || '-'],
-    ['평점', c => c.rt ? c.rt.toFixed(1) : '-'],
     ['주중 그린피', c => fmtPriceFull(c.weekday)],
     ['주말 그린피', c => fmtPriceFull(c.weekend)],
     ['카트비', c => fmtPriceFull(c.cart)],
@@ -2139,7 +2085,7 @@ function renderReviewSection(containerId, courseName) {
 let recentlyViewedCourses = JSON.parse(localStorage.getItem('sg_rv') || '[]');
 function addRecentlyViewed(course) {
   recentlyViewedCourses = recentlyViewedCourses.filter(c => c.n !== course.n);
-  recentlyViewedCourses.unshift({ n: course.n, r: course.r, rt: course.rt, weekday: course.weekday });
+  recentlyViewedCourses.unshift({ n: course.n, r: course.r, weekday: course.weekday });
   if (recentlyViewedCourses.length > 8) recentlyViewedCourses.pop();
   localStorage.setItem('sg_rv', JSON.stringify(recentlyViewedCourses));
   renderRecentlyViewed();
@@ -2152,7 +2098,7 @@ function renderRecentlyViewed() {
   items.innerHTML = recentlyViewedCourses.map(c =>
     '<div class="rv-item" data-name="' + (c.n||'').replace(/"/g,'&quot;') + '">' +
     '<div class="rv-name">' + (c.n||'') + '</div>' +
-    '<div class="rv-meta">' + (c.r||'') + (c.rt ? ' &middot; ' + c.rt.toFixed(1) + '점' : '') + (c.weekday ? ' &middot; ' + fmtPrice(c.weekday) : '') + '</div></div>'
+    '<div class="rv-meta">' + (c.r||'') + (c.weekday ? ' &middot; ' + fmtPrice(c.weekday) : '') + '</div></div>'
   ).join('');
   items.querySelectorAll('.rv-item').forEach(item => {
     item.addEventListener('click', () => {
@@ -2326,9 +2272,9 @@ document.getElementById('dashOverlay').addEventListener('click', e => {
 function showOnboarding() {
   if (localStorage.getItem('sg_onboarded')) return;
   const steps = [
-    { icon: '&#9971;', title: 'SmartGolf에 오신 것을 환영합니다!', text: '전국 578개 골프장의 가격, 거리, 평점을 한눈에 비교하세요.' },
+    { icon: '&#9971;', title: 'SmartGolf에 오신 것을 환영합니다!', text: '전국 585개 골프장의 가격, 거리, 홀수를 한눈에 비교하세요.' },
     { icon: '&#128205;', title: 'GPS 거리 계산', text: '출발지를 입력하거나 GPS 버튼을 눌러 모든 골프장까지의 실제 운전시간을 확인하세요.' },
-    { icon: '&#128200;', title: '가성비 분석', text: '평점 대비 가격을 분석해 S/A/B/C 등급으로 가성비를 보여줍니다.' },
+    { icon: '&#128200;', title: '그린피 비교', text: '주중·주말·공휴일 그린피를 나란히 비교하고 가격순으로 정렬할 수 있습니다.' },
     { icon: '&#127783;&#65039;', title: '날씨 예보', text: '골프장 상세 페이지에서 3일 날씨를 확인하고 라운딩 적합 여부를 판단하세요.' },
     { icon: '&#128176;', title: '예산 계산기', text: '상단 예산 버튼으로 그린피, 카트, 캐디, 식사, 교통비를 한 번에 계산하세요.' }
   ];

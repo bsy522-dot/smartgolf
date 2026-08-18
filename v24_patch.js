@@ -144,7 +144,10 @@
     const all = (typeof allCourses !== 'undefined' && allCourses.length) ? allCourses : [];
     const base = (typeof filtered !== 'undefined' && filtered && filtered.length) ? filtered : all;
     const seen = new Set();
-    const cand = base.filter(c => c.lat && c.lng && !c.closed).slice().sort((a, b) => (b.rt || 0) - (a.rt || 0)).filter(c => !seen.has(c.n) && seen.add(c.n)).slice(0, 30);
+    // 후보 선정은 사실 데이터만 사용: 이동시간(_calcTime)이 계산돼 있으면 가까운 순, 없으면 목록 순
+    const dist = c => (typeof c._calcTime === 'number' && isFinite(c._calcTime)) ? c._calcTime : 1e9;
+    const cand = base.filter(c => c.lat && c.lng && !c.closed).filter(c => !seen.has(c.n) && seen.add(c.n)).slice().sort((a, b) => dist(a) - dist(b)).slice(0, 30);
+    const byDist = cand.some(c => dist(c) < 1e9);
     let ov = document.getElementById('wxRecOverlay');
     if (!ov) {
       ov = document.createElement('div'); ov.id = 'wxRecOverlay'; ov.className = 'modal-overlay';
@@ -154,8 +157,8 @@
       document.getElementById('wxRecClose').addEventListener('click', () => ov.classList.remove('active'));
     }
     const body = document.getElementById('wxRecBody');
-    const scope = (base === all) ? '전국 평점 상위' : '검색결과';
-    body.innerHTML = '<div class="weather-loading"><i class="fas fa-spinner fa-spin"></i> ' + scope + ' ' + cand.length + '개 골프장 날씨 분석 중...</div>';
+    const scope = (base === all) ? '전국' : '검색결과';
+    body.innerHTML = '<div class="weather-loading"><i class="fas fa-spinner fa-spin"></i> ' + scope + (byDist ? ' 가까운 순' : '') + ' ' + cand.length + '개 골프장 날씨 분석 중...</div>';
     ov.classList.add('active');
     const res = await mapLimit(cand, 8, async c => { const w = await getGolfWeather(c.lat, c.lng); return { c, w, sc: scoreToday(w) }; });
     const ranked = res.filter(x => x && x.w && x.sc).sort((a, b) => b.sc.score - a.sc.score);
@@ -163,7 +166,7 @@
     body.innerHTML = '<div style="font-size:12px;color:var(--text-muted,var(--text-light));margin-bottom:10px">' + scope + ' 골프장의 <b>오늘</b> 날씨를 분석해 라운드 적합도 순으로 정렬했습니다.</div>' +
       ranked.slice(0, 12).map((x, i) => {
         const ci = wxCodeInfo(x.w.current.weather_code); const safe = x.c.n.replace(/'/g, "\\'");
-        return '<div class="wx-rec-row" data-name="' + x.c.n.replace(/"/g, '&quot;') + '"><span style="width:22px;text-align:center;font-weight:800;color:var(--text-muted,var(--text-light))">' + (i + 1) + '</span><span class="card-wx ' + x.sc.cls + '" style="min-width:42px;justify-content:center">' + x.sc.score + '</span><span style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + x.c.n + '</div><div style="font-size:11px;color:var(--text-muted,var(--text-light))">' + x.c.r + ' ' + (x.c.c || '') + (x.c.rt ? ' · 평점 ' + x.c.rt.toFixed(1) : '') + '</div></span><span style="text-align:right;font-size:12px"><div><i class="fas ' + ci[0] + '" style="color:' + ci[2] + '"></i> ' + Math.round(x.w.current.temperature_2m) + '°</div><div style="font-size:10px;color:var(--text-muted,var(--text-light))"><i class="fas fa-cloud"></i> ' + x.w.current.cloud_cover + '% · <i class="fas fa-umbrella"></i> ' + (x.w.daily.precipitation_probability_max[0] ?? 0) + '%</div></span></div>';
+        return '<div class="wx-rec-row" data-name="' + x.c.n.replace(/"/g, '&quot;') + '"><span style="width:22px;text-align:center;font-weight:800;color:var(--text-muted,var(--text-light))">' + (i + 1) + '</span><span class="card-wx ' + x.sc.cls + '" style="min-width:42px;justify-content:center">' + x.sc.score + '</span><span style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + x.c.n + '</div><div style="font-size:11px;color:var(--text-muted,var(--text-light))">' + x.c.r + ' ' + (x.c.c || '') + (x.c.t ? ' · ' + x.c.t : '') + (x.c.h ? ' · ' + x.c.h + '홀' : '') + '</div></span><span style="text-align:right;font-size:12px"><div><i class="fas ' + ci[0] + '" style="color:' + ci[2] + '"></i> ' + Math.round(x.w.current.temperature_2m) + '°</div><div style="font-size:10px;color:var(--text-muted,var(--text-light))"><i class="fas fa-cloud"></i> ' + x.w.current.cloud_cover + '% · <i class="fas fa-umbrella"></i> ' + (x.w.daily.precipitation_probability_max[0] ?? 0) + '%</div></span></div>';
       }).join('');
     body.querySelectorAll('.wx-rec-row').forEach(row => row.addEventListener('click', () => {
       ov.classList.remove('active');

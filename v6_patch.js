@@ -26,7 +26,6 @@ css.textContent = `
 .roulette-strip{transition:transform .1s linear}
 .roulette-item{height:80px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;padding:0 16px;gap:10px}
 .roulette-item .ri-region{font-size:12px;color:var(--text-muted);font-weight:400}
-.roulette-item .ri-rating{color:#f59e0b;font-size:14px}
 .roulette-result{margin-top:12px;padding:16px;background:linear-gradient(135deg,var(--primary-dark,#0f5a28),var(--primary,#1a7a3a));color:#fff;border-radius:12px;display:none}
 .roulette-result h3{margin:0 0 4px}
 .roulette-result .rr-meta{font-size:12px;opacity:.85}
@@ -238,9 +237,9 @@ rouletteOvl.innerHTML = `
   <div class="roulette-conds" id="rouletteConds">
     <span class="roulette-cond active" data-cond="all">전체</span>
     <span class="roulette-cond" data-cond="public">대중제</span>
+    <span class="roulette-cond" data-cond="member">회원제</span>
     <span class="roulette-cond" data-cond="cheap">10만원이하</span>
-    <span class="roulette-cond" data-cond="top">평점9+</span>
-    <span class="roulette-cond" data-cond="value">가성비S</span>
+    <span class="roulette-cond" data-cond="big">18홀이상</span>
     <span class="roulette-cond" data-cond="near">1시간이내</span>
   </div>
   <div class="roulette-slot" id="rouletteSlot">
@@ -263,15 +262,16 @@ rouletteOvl.querySelectorAll('.roulette-cond').forEach(function(el){
 rouletteOvl.addEventListener('click',function(e){if(e.target===rouletteOvl)rouletteOvl.classList.remove('active')});
 
 $('rouletteSpin').addEventListener('click', function(){
-  var data = window.allCourses || [];
+  // 폐업 표기(closed) 골프장은 추천 대상에서 제외
+  var data = (window.allCourses || []).filter(function(c){ return c && !c.closed; });
   var f = data.filter(function(c){
     switch(rouletteCondActive){
       case 'public': return c.t === '대중제';
+      case 'member': return c.t === '회원제';
       case 'cheap': return c.weekday > 0 && c.weekday <= 100000;
-      case 'top': return c.rt >= 9;
-      case 'value': return window.calcValueScore && window.calcValueScore(c) >= 8;
+      case 'big': return c.h >= 18;
       case 'near': return c._calcTime && c._calcTime <= 1;
-      default: return c.rt > 0;
+      default: return true;
     }
   });
   if(f.length < 3){if(window.showToast)window.showToast('조건에 맞는 골프장이 3개 미만입니다','warning');return}
@@ -287,7 +287,7 @@ $('rouletteSpin').addEventListener('click', function(){
 
   var strip = $('rouletteStrip');
   strip.innerHTML = shuffled.map(function(c){
-    return '<div class="roulette-item"><span>'+c.n+'</span><span class="ri-region">'+c.r+'</span>'+(c.rt?'<span class="ri-rating"><i class="fas fa-star"></i> '+c.rt.toFixed(1)+'</span>':'')+'</div>';
+    return '<div class="roulette-item"><span>'+c.n+'</span><span class="ri-region">'+c.r+(c.h?' · '+c.h+'홀':'')+'</span></div>';
   }).join('');
 
   var total = shuffled.length;
@@ -306,7 +306,7 @@ $('rouletteSpin').addEventListener('click', function(){
     } else {
       setTimeout(function(){
         var p = winner.weekday > 0 ? (winner.weekday/10000).toFixed(0)+'만원' : '-';
-        result.innerHTML = '<h3><i class="fas fa-golf-ball-tee"></i> '+winner.n+'</h3><div class="rr-meta">'+winner.r+' | '+(winner.t||'')+(winner.h?' | '+winner.h+'홀':'')+' | 주중 '+p+(winner.rt?' | &#11088; '+winner.rt.toFixed(1):'')+'</div>';
+        result.innerHTML = '<h3><i class="fas fa-golf-ball-tee"></i> '+winner.n+'</h3><div class="rr-meta">'+winner.r+' | '+(winner.t||'정보 없음')+(winner.h?' | '+winner.h+'홀':'')+' | 주중 '+p+'</div>';
         result.style.display = 'block';
         result.style.cursor = 'pointer';
         result.onclick = function(){rouletteOvl.classList.remove('active');if(window.showDetail)window.showDetail(winner)};
@@ -601,8 +601,9 @@ function drawRadarChart(canvasId, courses){
   var cx = W/2, cy = H/2, r = Math.min(W,H)/2 - 30;
   ctx.clearRect(0,0,W,H);
 
-  var axes = ['평점','가성비','홀수','가격대','접근성'];
+  var axes = ['홀수','가격대','접근성'];
   var n = axes.length;
+  if(!n) return;
   var colors = ['rgba(26,122,58,0.6)','rgba(33,150,243,0.6)','rgba(255,107,53,0.6)'];
 
   // Draw grid
@@ -634,11 +635,11 @@ function drawRadarChart(canvasId, courses){
   // Draw data
   courses.forEach(function(c, ci){
     if(!c)return;
-    var vals = normalizeForRadar(c);
+    var vals = normalizeForRadar(c) || [];
     ctx.beginPath();
     for(var i=0;i<n;i++){
       var angle = (Math.PI*2/n)*i - Math.PI/2;
-      var v = Math.max(0, Math.min(1, vals[i]));
+      var v = Math.max(0, Math.min(1, vals[i] || 0));
       var x = cx + r*v*Math.cos(angle);
       var y = cy + r*v*Math.sin(angle);
       if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
@@ -652,12 +653,11 @@ function drawRadarChart(canvasId, courses){
 }
 
 function normalizeForRadar(c){
-  var rating = c.rt ? c.rt/10 : 0;
-  var value = window.calcValueScore ? Math.min(1, window.calcValueScore(c)/10) : 0;
+  if(!c) return [0,0,0];
   var holes = c.h ? Math.min(1, c.h/36) : 0;
   var price = c.weekday > 0 ? Math.max(0, 1 - c.weekday/300000) : 0.5;
   var access = c._calcTime ? Math.max(0, 1 - c._calcTime/3) : 0.5;
-  return [rating, value, holes, price, access];
+  return [holes, price, access];
 }
 
 // Enhance compare modal with radar chart

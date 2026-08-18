@@ -194,11 +194,6 @@ function getSmartRecommendations(prefs) {
     var score = 0;
     var reasons = [];
 
-    // Rating bonus
-    if(c.rt >= 9){ score += 20; reasons.push('평점 ' + c.rt.toFixed(1) + '점 (최상위)'); }
-    else if(c.rt >= 8){ score += 12; }
-    else if(c.rt >= 7){ score += 6; }
-
     // Region preference
     var regionScore = (visitedRegions[c.r]||0)*3 + (favRegions[c.r]||0)*5;
     if(regionScore > 0){ score += Math.min(regionScore, 15); reasons.push(c.r + ' 지역 선호도 높음'); }
@@ -235,12 +230,6 @@ function getSmartRecommendations(prefs) {
       if(prefs.type && c.t === prefs.type) score += 12;
     }
 
-    // Value score bonus
-    if(c.rt && c.weekday > 0){
-      var vs = (c.rt / (c.weekday / 10000)) * 10;
-      if(vs > 20) score += 8;
-    }
-
     return { course: c, score: score, reasons: reasons.slice(0,3) };
   }).sort(function(a,b){ return b.score - a.score; }).slice(0,8);
 }
@@ -271,8 +260,7 @@ function renderSmartRecommend() {
       return '<div class="sr-card" data-name="' + c.n.replace(/"/g,'&quot;') + '">' +
         '<div class="sr-rank">#' + (i+1) + ' 추천</div>' +
         '<div class="sr-name">' + c.n + '</div>' +
-        '<div class="sr-meta">' + c.r + ' ' + (c.c||'') + ' &middot; ' + (c.t||'') + ' &middot; ' + (c.h||'?') + '홀 &middot; ' + priceStr +
-        (c.rt ? ' &middot; &#11088;' + c.rt.toFixed(1) : '') + '</div>' +
+        '<div class="sr-meta">' + c.r + ' ' + (c.c||'') + ' &middot; ' + (c.t||'') + ' &middot; ' + (c.h||'?') + '홀 &middot; ' + priceStr + '</div>' +
         (r.reasons.length ? '<div class="sr-reason">&#128161; ' + r.reasons.join(' / ') + '</div>' : '') +
         '</div>';
     }).join('') +
@@ -297,8 +285,7 @@ function renderSmartRecommend() {
           return '<div class="sr-card" data-name="' + c.n.replace(/"/g,'&quot;') + '">' +
             '<div class="sr-rank">#' + (i+1) + ' 추천</div>' +
             '<div class="sr-name">' + c.n + '</div>' +
-            '<div class="sr-meta">' + c.r + ' ' + (c.c||'') + ' &middot; ' + (c.t||'') + ' &middot; ' + (c.h||'?') + '홀 &middot; ' + priceStr +
-            (c.rt ? ' &middot; &#11088;' + c.rt.toFixed(1) : '') + '</div>' +
+            '<div class="sr-meta">' + c.r + ' ' + (c.c||'') + ' &middot; ' + (c.t||'') + ' &middot; ' + (c.h||'?') + '홀 &middot; ' + priceStr + '</div>' +
             (r.reasons.length ? '<div class="sr-reason">&#128161; ' + r.reasons.join(' / ') + '</div>' : '') +
             '</div>';
         }).join('');
