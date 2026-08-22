@@ -327,7 +327,7 @@
       ctx.textAlign = 'center';
       ctx.fillText('Total', cx, cy - 6);
       ctx.font = 'bold 14px sans-serif';
-      ctx.fillText((grandTotal / 10000).toFixed(1) + '&#xB9CC;', cx, cy + 12);
+      ctx.fillText((grandTotal / 10000).toFixed(1) + '만', cx, cy + 12);
 
       const barX = 310, barW = W - barX - 30;
       const barH = 22, gap = 6;
@@ -348,7 +348,7 @@
         ctx.fill();
         ctx.fillStyle = textColor;
         ctx.textAlign = 'right';
-        ctx.fillText((totals[i] / 10000).toFixed(1) + '&#xB9CC;', W - 30, y + 15);
+        ctx.fillText((totals[i] / 10000).toFixed(1) + '만', W - 30, y + 15);
       });
 
       ctx.fillStyle = textColor;
@@ -356,7 +356,7 @@
       ctx.textAlign = 'left';
       ctx.fillText('Last ' + rounds.length + ' rounds', barX, H - 20);
       ctx.textAlign = 'right';
-      ctx.fillText('Avg: ' + (grandTotal / rounds.length / 10000).toFixed(1) + '&#xB9CC;/round', W - 30, H - 20);
+      ctx.fillText('Avg: ' + (grandTotal / rounds.length / 10000).toFixed(1) + '만/round', W - 30, H - 20);
 
       const statsEl = document.getElementById('sg32-cost-stats');
       if (statsEl) {
@@ -653,7 +653,7 @@
           ctx.fillStyle = '#4caf50';
           ctx.font = 'bold 10px sans-serif';
           ctx.textAlign = 'left';
-          ctx.fillText('&#x2714; RECOMMENDED', padL + barW + 8, y + barH / 2 - 8);
+          ctx.fillText('✔ 추천', padL + barW + 8, y + barH / 2 - 8);
         }
       });
 
@@ -1241,7 +1241,7 @@
       ctx.textAlign = 'left';
       ctx.fillText('Hole Number', padL, H - 5);
       ctx.textAlign = 'right';
-      ctx.fillText('&#x1F534; = Hazards', W - padR, H - 5);
+      ctx.fillText('빨간 점 = 해저드', W - padR, H - 5);
 
       const front9 = holes.slice(0, 9).reduce((s, h) => s + h.par, 0);
       const back9 = holes.slice(9).reduce((s, h) => s + h.par, 0);

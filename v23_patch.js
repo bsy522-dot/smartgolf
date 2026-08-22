@@ -607,7 +607,7 @@ function v23DrawTrend(){
   if(recent.length<2){
     ctx.fillStyle=isDark?'#999':'#666';
     ctx.font='14px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText('2&#xAC1C; &#xC774;&#xC0C1;&#xC758; &#xB77C;&#xC6B4;&#xB4DC; &#xAE30;&#xB85D;&#xC774; &#xD544;&#xC694;&#xD569;&#xB2C8;&#xB2E4;.',w/2,h/2);
+    ctx.fillText('2개 이상의 라운드 기록이 필요합니다. 하단 ⛳ GPS 라운드로 기록해 보세요.',w/2,h/2);
     return;
   }
   var scores=recent.map(function(r){return r.score;});
@@ -653,7 +653,7 @@ function v23DrawTrend(){
     ctx.fillText(p.date.slice(5),p.x,h-padB+6);
   });
   ctx.fillStyle=isDark?'#ccc':'#333';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
-  ctx.fillText('&#xCD5C;&#xADFC; '+scores.length+'&#xB77C;&#xC6B4;&#xB4DC; &#xC2A4;&#xCF54;&#xC5B4; &#xCD94;&#xC774;',w/2,15);
+  ctx.fillText('최근 '+scores.length+'라운드 스코어 추이',w/2,15);
   var statsEl=document.getElementById('v23TrendStats');
   if(statsEl){
     var avg=Math.round(scores.reduce(function(a,b){return a+b;},0)/scores.length*10)/10;
