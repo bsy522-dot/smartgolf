@@ -31,6 +31,11 @@ self.addEventListener('activate', e => {
     caches.keys().then(keys =>
       Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
+     .then(() => self.clients.matchAll({ type: 'window' }))
+     .then(cs => cs.forEach(c => {
+       /* 새 워커 접수 즉시 열린 화면 자동 새로고침 (2026-08-23) */
+       if (c.url.startsWith(self.location.origin) && 'navigate' in c) c.navigate(c.url).catch(() => {});
+     }))
   );
 });
 
