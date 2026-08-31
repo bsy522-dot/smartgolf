@@ -9,15 +9,15 @@
 <meta name="apple-mobile-web-app-title" content="SmartGolf">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
-<title>SmartGolf — 전국 585개 골프장 비교·GPS 라운드</title>
-<meta name="description" content="전국 585개 골프장을 공공데이터 기반으로 한 화면에서 비교합니다. 실좌표 기준 거리, 그린피, 홀수, 연락처, GPS 라운드 기록. 무료 PWA.">
+<title>SmartGolf — 전국 571개 골프장 비교·GPS 라운드</title>
+<meta name="description" content="전국 571개 골프장을 공공데이터 기반으로 한 화면에서 비교합니다. 실좌표 기준 거리, 그린피, 홀수, 연락처, GPS 라운드 기록. 무료 PWA.">
 <meta name="keywords" content="골프장,전국 골프장,골프장 비교,그린피,골프장 거리,골프장 찾기,SmartGolf">
-<meta property="og:title" content="SmartGolf — 전국 585개 골프장 비교·GPS 라운드">
-<meta property="og:description" content="전국 585개 골프장을 공공데이터 기반으로 비교. 실좌표 거리, 그린피, 홀수.">
+<meta property="og:title" content="SmartGolf — 전국 571개 골프장 비교·GPS 라운드">
+<meta property="og:description" content="전국 571개 골프장을 공공데이터 기반으로 비교. 실좌표 거리, 그린피, 홀수.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="SmartGolf — 전국 585개 골프장 비교·GPS 라운드">
-<meta name="twitter:description" content="전국 585개 골프장을 공공데이터 기반으로 비교. 실좌표 거리, 그린피, 홀수.">
+<meta name="twitter:title" content="SmartGolf — 전국 571개 골프장 비교·GPS 라운드">
+<meta name="twitter:description" content="전국 571개 골프장을 공공데이터 기반으로 비교. 실좌표 거리, 그린피, 홀수.">
 <link rel="stylesheet" href="icons.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -486,8 +486,10 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
 /* === v5.0 NEW FEATURES === */
 
 /* Skip link */
-.skip-link { position:absolute;top:-60px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:8px 20px;border-radius:0 0 8px 8px;z-index:9999;font-weight:700;transition:top 0.3s;text-decoration:none; }
-.skip-link:focus { top:0; }
+/* R-3: top:-60px 고정값이라 글자확대 1.5배에서 높이가 112px가 되면 아래 52px가 화면 안으로
+   들어와 로고를 덮었다. 자기 높이 기준(translateY)으로 숨겨 어떤 글자크기에서도 완전히 감춘다. */
+.skip-link { position:absolute;top:0;left:50%;transform:translate(-50%,-200%);background:var(--primary);color:#fff;padding:8px 20px;border-radius:0 0 8px 8px;z-index:9999;font-weight:700;transition:transform 0.25s;text-decoration:none; }
+.skip-link:focus { transform:translate(-50%,0); }
 
 /* Weather widget */
 .weather-widget { display:flex;gap:8px;margin:10px 0; }
@@ -696,6 +698,52 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
 [data-theme="dark"] #sg44Drawer .sg44-label { color: #a8b0b8; }
 
 
+
+/* ==================== 라운드2 수리 (재감사 2026-08-31) ==================== */
+
+/* R-2: 글자확대 1.5배에서 'GPS 라운드' 알약이 첫 카드의 가격을 100% 가렸다.
+   알약(146px)은 기능 서랍으로 옮기고, 남는 원형 버튼이 가격 줄을 침범하지 못하도록
+   가격 줄에 오른쪽 여백을 확보한다. */
+#sg44Drawer #sgRoundFab {
+  position: static !important; left: auto !important; right: auto !important;
+  bottom: auto !important; top: auto !important;
+  width: 100% !important; min-height: 52px !important; margin: 0 0 4px !important;
+  border-radius: 12px !important; font-size: 14px !important; font-weight: 800 !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  flex-direction: row !important; gap: 8px;
+}
+#sg44GridA { grid-template-columns: 1fr 1fr; }
+#sg44Drawer #sgRoundFab { grid-column: 1 / -1; }
+
+/* R-1: 인라인 안내 배너 — 화면을 덮지 않고 결과 위에 한 번만 놓인다 */
+#sg44Welcome { max-width: 1400px; margin: 0 auto 10px; padding: 11px 13px;
+  background: var(--primary-light); border: 1px solid var(--primary);
+  border-radius: 12px; color: var(--text); }
+#sg44Welcome .w-title { font-size: 14.5px; font-weight: 800; color: var(--primary-dark);
+  display: flex; align-items: center; gap: 7px; }
+#sg44Welcome .w-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.45; }
+#sg44Welcome ul { margin: 10px 0 0; padding-left: 18px; }
+#sg44Welcome li { font-size: 12.5px; color: var(--text); line-height: 1.7; }
+#sg44Welcome .w-actions { display: flex; gap: 8px; margin-top: 9px; }
+#sg44Welcome button { flex: 1 1 0; min-height: 44px; line-height: 1.2; border-radius: 10px; font-size: 13.5px;
+  font-weight: 700; cursor: pointer; padding: 0 12px; }
+#sg44WelcomeMore { background: var(--card-bg); color: var(--primary); border: 1.5px solid var(--primary); }
+#sg44WelcomeClose { background: var(--primary); color: #fff; border: 1.5px solid var(--primary); }
+
+@media (max-width: 768px) {
+  /* GPS 라운드 알약이 서랍으로 갔으므로 떠 있는 원형 버튼은 둘뿐 */
+  .fab-gps { bottom: 68px !important; right: 14px !important; z-index: 99 !important; }
+  #backToTop { bottom: 126px !important; right: 14px !important; left: auto !important;
+               top: auto !important; z-index: 98 !important; }
+  /* 오른쪽 아래 원형 버튼(약 50px)이 가격 숫자를 덮지 못하게 확보하는 여백 */
+  .card-price { padding-right: 58px; }
+  .card-travel { padding-right: 58px; }
+}
+
+
+/* 옛 버전 IQ 버튼 숨김 — 앞선 `display:flex !important` 보다 특이도가 높아야 이긴다 */
+#sg44Drawer .sg44-grid > .sg44-hide { display: none !important; }
+
 </style>
 </head>
 <body>
@@ -706,7 +754,7 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
   <div class="header-inner">
     <div class="logo"><i class="fas fa-golf-ball-tee"></i> Smart<span>Golf</span> <span style="font-size:10px;opacity:0.7;font-weight:400">v44.0</span></div>
     <div class="header-stats">
-      <div class="header-stat"><i class="fas fa-flag"></i> <span id="total-count">585</span>개 골프장</div>
+      <div class="header-stat"><i class="fas fa-flag"></i> <span id="total-count">571</span>개 골프장</div>
       <div class="header-stat"><i class="fas fa-won-sign"></i> 실시간 가격</div>
       <div class="header-stat"><i class="fas fa-map-marker-alt"></i> GPS 거리계산</div>
     </div>
@@ -999,7 +1047,7 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
   <div class="footer-grid">
     <div class="footer-col">
       <h4><i class="fas fa-golf-ball-tee"></i> SmartGolf v44.0</h4>
-      <p>전국 585개 골프장을 한눈에.<br>클럽매니저, 스코어카드, AI추천,<br>라운드리포트, 피트니스까지.</p>
+      <p>전국 571개 골프장을 한눈에.<br>클럽매니저, 스코어카드, AI추천,<br>라운드리포트, 피트니스까지.</p>
     </div>
     <div class="footer-col">
       <h4><i class="fas fa-chart-line"></i> 통계</h4>
@@ -1035,7 +1083,7 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
     </div>
   </div>
   <div class="footer-bottom">
-    AP Works &middot; SmartGolf v44.0 &middot; PWA &middot; 585 골프장
+    AP Works &middot; SmartGolf v44.0 &middot; PWA &middot; 571 골프장
   </div>
 </footer>
 
@@ -1223,8 +1271,10 @@ showSkeleton();
 fetch('courses_enriched.json')
   .then(r => r.json())
   .then(data => {
-    allCourses = data;
-    document.getElementById('total-count').textContent = data.length;
+    // R-4: 같은 골프장이 두 번 들어간 행(dup_of)은 목록에서 제외한다. 파일에는 보존.
+    allCourses = data.filter(c => !c.dup_of);
+    // 중복 행을 제외한 '실제 목록에 나오는 수'를 표기한다(파일 원본은 585행)
+    document.getElementById('total-count').textContent = allCourses.length;
     applyFilters();
     updateStats();
     updateFavCount();
@@ -1584,7 +1634,7 @@ function renderResults() {
       </div>
       <div class="card-actions">
         <a class="card-btn ${cardBookDirect ? 'btn-booking' : 'btn-searchlink'}" href="${cardBook}" target="_blank" rel="noopener" title="${cardBookDirect ? '골프장 공식 예약/홈페이지로 이동' : '이 앱에는 이 골프장의 공식 링크가 없어 네이버 검색으로 연결됩니다'}" onclick="event.stopPropagation()"><i class="fas ${cardBookDirect ? 'fa-calendar-check' : 'fa-search'}"></i> ${cardBookDirect ? '예약·홈페이지' : '네이버에서 찾기'}</a>
-        <a class="card-btn btn-naver" href="https://map.naver.com/v5/search/${sq}" target="_blank" onclick="event.stopPropagation()"><i class="fas fa-map"></i> 지도</a>
+        <a class="card-btn btn-naver" href="https://map.naver.com/v5/search/${sq}" target="_blank" rel="noopener" title="네이버 지도로 이동" onclick="event.stopPropagation()"><i class="fas fa-map"></i> 네이버지도</a>
         <a class="card-btn btn-kakao" href="https://map.kakao.com/?q=${sq}" target="_blank" onclick="event.stopPropagation()"><i class="fas fa-location-dot"></i> 카카오</a>
         ${c.p ? `<a class="card-btn btn-call" href="tel:${c.p.replace(/[^0-9-]/g,'')}" onclick="event.stopPropagation()"><i class="fas fa-phone"></i></a>` : ''}
       </div>
@@ -2441,7 +2491,7 @@ document.getElementById('dashOverlay').addEventListener('click', e => {
 function showOnboarding() {
   if (localStorage.getItem('sg_onboarded')) return;
   const steps = [
-    { icon: '&#9971;', title: 'SmartGolf에 오신 것을 환영합니다!', text: '전국 585개 골프장의 가격, 거리, 홀수를 한눈에 비교하세요.' },
+    { icon: '&#9971;', title: 'SmartGolf에 오신 것을 환영합니다!', text: '전국 571개 골프장의 가격, 거리, 홀수를 한눈에 비교하세요.' },
     { icon: '&#128205;', title: 'GPS 거리 계산', text: '출발지를 입력하거나 GPS 버튼을 눌러 모든 골프장까지의 실제 운전시간을 확인하세요.' },
     { icon: '&#128200;', title: '그린피 비교', text: '주중·주말·공휴일 그린피를 나란히 비교하고 가격순으로 정렬할 수 있습니다.' },
     { icon: '&#127783;&#65039;', title: '날씨 예보', text: '골프장 상세 페이지에서 7일 날씨를 확인하고 라운딩 적합 여부를 판단하세요.' },
@@ -2560,8 +2610,10 @@ document.addEventListener('keydown', e => {
 // --- Init recently viewed on load ---
 renderRecentlyViewed();
 
-// --- Show onboarding after data loads ---
-setTimeout(showOnboarding, 1500);
+// --- R-1: 전체화면 온보딩 모달(z 9000)이 3~4초에 첫 화면을 덮어
+//         카드 387px 개선을 스스로 무효화했다. v44_ui.js의 '인라인 안내 배너'로 대체한다.
+//         showOnboarding 함수와 마크업은 보존(되돌릴 수 있게).
+// setTimeout(showOnboarding, 1500);
 </script>
 <script src="features.js" defer></script>
 <script src="v6_patch.js" defer></script>

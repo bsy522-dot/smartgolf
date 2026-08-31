@@ -174,6 +174,10 @@
     var a = $('sg44GridA'), b = $('sg44GridB'), c = $('sg44GridC');
     if (!a) return 0;
     var moved = 0;
+    // R-2: 'GPS 라운드' 알약(146px)이 글자확대 1.5배에서 첫 카드 가격을 100% 가렸다.
+    //      떠다니게 두지 않고 서랍 맨 위에 전체폭 버튼으로 수납한다(동작은 그대로).
+    var rf = $('sgRoundFab');
+    if (rf && !drawer.contains(rf)) { a.insertBefore(rf, a.firstChild); moved++; }
     var wx = $('wxRecFab');
     if (wx && !drawer.contains(wx)) { a.appendChild(wx); moved++; }
     document.querySelectorAll('.sg27-bbtn').forEach(function (el) {
@@ -199,6 +203,13 @@
       sp.className = 'sg44-label';
       sp.textContent = t;
       el.appendChild(sp);
+    });
+
+    // 같은 기능의 옛 버전 버튼(Golf IQ v9 / IQ v11)은 최신 IQ v13 하나만 남기고 숨긴다.
+    // 코드는 지우지 않으므로 단축키(Shift+Q 등)로는 그대로 접근할 수 있다.
+    drawer.querySelectorAll('.sg44-grid > *').forEach(function (el) {
+      var t = ((el.innerText || '') + ' ' + (el.getAttribute('title') || '')).replace(/\s+/g, ' ');
+      if (/IQ\s*v(9|11)\b/.test(t)) el.classList.add('sg44-hide');
     });
 
     // 빈 껍데기 바는 레이아웃에서 제거
@@ -366,6 +377,54 @@
     f.appendChild(p);
   }
 
+
+  /* ---------------------------------------------------------------------
+   * R-1) 첫 방문 안내 — 전체화면 모달 대신 결과 위 인라인 배너
+   *   기존 #onboardingOverlay 는 position:fixed·z-index 9000 으로 화면 100%를 덮어
+   *   3~4초 시점에 첫 화면 카드를 가렸다(첫 카드 387px 개선을 스스로 무효화).
+   *   같은 내용을 흐름 안의 배너로 옮겨, 아무것도 가리지 않고 한 번만 보여준다.
+   * ------------------------------------------------------------------- */
+  var WELCOME_KEY = 'sg_onboarded';
+
+  function buildWelcome() {
+    if ($('sg44Welcome')) return;
+    try { if (localStorage.getItem(WELCOME_KEY)) return; } catch (e) {}
+    var results = document.querySelector('.results-section');
+    if (!results || !results.parentNode) return;
+
+    var box = document.createElement('div');
+    box.id = 'sg44Welcome';
+    box.setAttribute('role', 'region');
+    box.setAttribute('aria-label', '처음 오신 분 안내');
+    box.innerHTML =
+      '<div class="w-title"><i class="fas fa-golf-ball-tee"></i> 전국 골프장을 거리·가격으로 비교하세요</div>' +
+      '<div class="w-sub">위치를 켜면 <b>실제 운전 시간</b>까지 계산합니다. 확인된 값만 표시하고 지어내지 않습니다.</div>' +
+      '<ul id="sg44WelcomeTips" hidden>' +
+      '<li><b>거리·가격 정렬</b> — 목록 위 “거리순 / 가격순 / 이름순 / 홀수순” 버튼</li>' +
+      '<li><b>지역 좁히기</b> — 지역 칩을 누르면 시·군 칩이 한 줄 더 나옵니다</li>' +
+      '<li><b>상세 화면</b> — 카드를 누르면 주중·주말 그린피와 7일 날씨가 나옵니다</li>' +
+      '<li><b>예산 계산기</b> — 상단 “예산” 버튼에서 그린피·카트·캐디를 한 번에</li>' +
+      '<li><b>그 밖의 기능</b> — 하단 “기능” 버튼에 GPS 라운드 기록 등이 모여 있습니다</li>' +
+      '</ul>' +
+      '<div class="w-actions">' +
+      '<button type="button" id="sg44WelcomeMore">사용법 보기</button>' +
+      '<button type="button" id="sg44WelcomeClose">확인, 닫기</button>' +
+      '</div>';
+    results.parentNode.insertBefore(box, results);
+
+    var tips = $('sg44WelcomeTips');
+    var more = $('sg44WelcomeMore');
+    more.addEventListener('click', function () {
+      var open = !tips.hidden;
+      tips.hidden = open;
+      more.textContent = open ? '사용법 보기' : '접기';
+    });
+    $('sg44WelcomeClose').addEventListener('click', function () {
+      try { localStorage.setItem(WELCOME_KEY, '1'); } catch (e) {}
+      if (box.parentNode) box.parentNode.removeChild(box);
+    });
+  }
+
   /* ---------------------------------------------------------------------
    * 부팅
    * ------------------------------------------------------------------- */
@@ -373,6 +432,14 @@
     setupFilterCollapse();
     liftResultsAboveMap();
     demoteSecondaryBlocks();
+    buildWelcome();
+    // 옛 전체화면 온보딩이 어떤 경로로든 열리면 즉시 닫는다(안전장치)
+    var ob = $('onboardingOverlay');
+    if (ob && window.MutationObserver) {
+      new MutationObserver(function () {
+        if (ob.classList.contains('active')) ob.classList.remove('active');
+      }).observe(ob, { attributes: true, attributeFilter: ['class'] });
+    }
     buildDrawer();
     addToolsNavButton();
     fixMapNav();

@@ -1169,7 +1169,7 @@
     const bar = document.createElement('div');
     bar.className = 'sg29-bottom-bar';
     const btns = [
-      { icon: '⛳', label: '핵디캅', fn: 'handicapTracker' },
+      { icon: '⛳', label: '핸디캡', fn: 'handicapTracker' },
       { icon: '⏱️', label: '페이스', fn: 'paceTimer' },
       { icon: '🔧', label: '피팅', fn: 'clubFitting' },
       { icon: '✈️', label: '여행', fn: 'travelPlanner' },
