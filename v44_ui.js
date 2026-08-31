@@ -209,7 +209,9 @@
     // 코드는 지우지 않으므로 단축키(Shift+Q 등)로는 그대로 접근할 수 있다.
     drawer.querySelectorAll('.sg44-grid > *').forEach(function (el) {
       var t = ((el.innerText || '') + ' ' + (el.getAttribute('title') || '')).replace(/\s+/g, ' ');
-      if (/IQ\s*v(9|11)\b/.test(t)) el.classList.add('sg44-hide');
+      // 최신 IQ v13 하나만 남기고 옛 버전 버튼은 서랍에서 아예 제외한다(숨김 아님).
+      // 퀴즈 본체 코드와 단축키는 그대로라 기능이 사라지는 것은 아니다.
+      if (/IQ\s*v(9|11)\b/.test(t) && el.parentNode) el.parentNode.removeChild(el);
     });
 
     // 빈 껍데기 바는 레이아웃에서 제거
@@ -425,6 +427,67 @@
     });
   }
 
+
+  /* ---------------------------------------------------------------------
+   * ②) 첫 카드의 이름·가격이 어떤 글자 크기에서도 하단바 위에 보이게 한다.
+   *   글자를 키우면 헤더·칩·안내 배너가 함께 커져 첫 카드가 화면 밖으로 밀렸다.
+   *   덜 중요한 것부터 순서대로 줄인다: 안내 배너 축약 -> 계절 팁 강등 -> 배너 숨김.
+   * ------------------------------------------------------------------- */
+  function ensureFirstCardVisible() {
+    // 글자 크기가 바뀌면 문서 높이가 크게 변해 스크롤이 조금 튄다. 그 때문에
+    // 가드가 조기 종료되어 옛 단계에 멈춰 있던 문제가 있었다.
+    if (window.scrollY > 40) return;
+    if (!document.querySelector('#cardGrid .card')) return;
+    var banner = $('sg44Welcome');
+
+    function fits() {
+      var c = document.querySelector('#cardGrid .card');
+      if (!c) return true;
+      var nav = document.querySelector('.mobile-nav');
+      var navTop = (nav && getComputedStyle(nav).display !== 'none')
+        ? nav.getBoundingClientRect().top : window.innerHeight;
+      // 이름과 '가격(없으면 거리)' 줄이 하단바 위에 온전히 들어와야 한다
+      var name = c.querySelector('.card-name');
+      var key = c.querySelector('.card-price') || c.querySelector('.card-travel')
+             || c.querySelector('.card-badges') || name;
+      if (!name || !key) return true;
+      return name.getBoundingClientRect().top >= 0 &&
+             key.getBoundingClientRect().bottom <= navTop;
+    }
+
+    function apply(n) {
+      if (banner) banner.classList.toggle('sg44-compact', n >= 1);
+      document.body.classList.toggle('sg44-tight', n >= 2);
+      document.body.classList.toggle('sg44-tighter', n >= 3);
+      if (banner) banner.style.display = (n >= 4) ? 'none' : '';
+    }
+
+    // 0단계부터 다시 시도하므로 글자를 다시 줄이면 원래 화면으로 되돌아간다
+    for (var n = 0; n <= 4; n++) {
+      apply(n);
+      if (fits()) return;
+    }
+  }
+
+  // 글자 크기·화면 회전 등으로 레이아웃이 바뀌면 다시 계산한다
+  function watchLayout() {
+    var run = function () { setTimeout(ensureFirstCardVisible, 120); };
+    window.addEventListener('resize', run);
+    window.addEventListener('orientationchange', run);
+    var hdr = document.querySelector('.header');
+    if (hdr && window.ResizeObserver) {
+      var last = 0;
+      new ResizeObserver(function (es) {
+        var h = Math.round(es[0].contentRect.height);
+        if (h !== last) { last = h; run(); }        // 글자 확대 시 헤더 높이가 바뀐다
+      }).observe(hdr);
+    }
+    var grid = document.getElementById('cardGrid');
+    if (grid && window.ResizeObserver) {
+      new ResizeObserver(function () { run(); }).observe(grid);
+    }
+  }
+
   /* ---------------------------------------------------------------------
    * 부팅
    * ------------------------------------------------------------------- */
@@ -460,5 +523,7 @@
     }
     setTimeout(annotateCards, 800);
     setTimeout(addSourceNote, 1200);
+    [600, 1400, 2600, 4200].forEach(function (ms) { setTimeout(ensureFirstCardVisible, ms); });
+    watchLayout();
   });
 })();

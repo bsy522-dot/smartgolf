@@ -248,7 +248,7 @@
       ctx.fillStyle = dk ? '#ccc' : '#333';
       ctx.font = 'bold 13px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('핵디캅 추이 차트', 280, 18);
+      ctx.fillText('핸디캡 추이 차트', 280, 18);
 
       entries.forEach((e, i) => {
         if (i % Math.max(1, Math.floor(entries.length / 6)) === 0 || i === entries.length - 1) {
@@ -1039,7 +1039,7 @@
     ov.classList.add('active');
 
     const questions = [
-      { q: '핵디캅 인덱스에서 &lsquo;슬로프 레이팅&rsquo;이란?', opts: ['코스 경사도', '코스 난이도 지표', '그린 속도', '페어웨이 유지율'], correct: 1 },
+      { q: '핸디캡 인덱스에서 &lsquo;슬로프 레이팅&rsquo;이란?', opts: ['코스 경사도', '코스 난이도 지표', '그린 속도', '페어웨이 유지율'], correct: 1 },
       { q: '스트로크 게인드(SG) 분석에서 가장 중요한 분야는?', opts: ['SG Off the Tee', 'SG Approach', 'SG Around the Green', 'SG Putting'], correct: 3 },
       { q: '스템프미터는 무엇을 측정하나요?', opts: ['바람 속도', '그린 스피드', '볼 바운스', '코스 길이'], correct: 1 },
       { q: '드라이버 헤드스피드 100mph일 때 예상 비거리는?', opts: ['200야드', '230야드', '250야드', '280야드'], correct: 2 },
@@ -1115,9 +1115,9 @@
 
   // ========== ACHIEVEMENTS ==========
   const ACHIEVEMENTS = [
-    { id: 'hcp_first', name: '핵디캅 첫 기록', icon: '⛳', desc: '핵디캅을 처음으로 기록했습니다' },
-    { id: 'hcp_10', name: '핵디캅 10회 기록', icon: '📊', desc: '핵디캅을 10회 이상 기록했습니다' },
-    { id: 'hcp_goal_reached', name: '목표 핵디캅 달성', icon: '🏆', desc: '목표 핵디캅을 달성했습니다' },
+    { id: 'hcp_first', name: '핸디캡 첫 기록', icon: '⛳', desc: '핸디캡을 처음으로 기록했습니다' },
+    { id: 'hcp_10', name: '핸디캡 10회 기록', icon: '📊', desc: '핸디캡을 10회 이상 기록했습니다' },
+    { id: 'hcp_goal_reached', name: '목표 핸디캡 달성', icon: '🏆', desc: '목표 핸디캡을 달성했습니다' },
     { id: 'pace_complete', name: '18홀 페이스 완료', icon: '⏱️', desc: '18홀 페이스 타이머를 완료했습니다' },
     { id: 'fitting_first', name: '클럽 피팅 분석', icon: '🔧', desc: '클럽 피팅 분석을 처음 실행했습니다' },
     { id: 'travel_explorer', name: '골프 여행 탐험가', icon: '✈️', desc: '골프 여행 플래너를 탐색했습니다' },

@@ -735,14 +735,45 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
   .fab-gps { bottom: 68px !important; right: 14px !important; z-index: 99 !important; }
   #backToTop { bottom: 126px !important; right: 14px !important; left: auto !important;
                top: auto !important; z-index: 98 !important; }
-  /* 오른쪽 아래 원형 버튼(약 50px)이 가격 숫자를 덮지 못하게 확보하는 여백 */
-  .card-price { padding-right: 58px; }
-  .card-travel { padding-right: 58px; }
+  /* 오른쪽 아래 원형 버튼(약 50px)이 가격 숫자를 덮지 못하게 확보하는 여백.
+     여백만 주면 글자확대 시 한 줄에 안 들어가 카드 밖(화면 밖)으로 넘치므로
+     반드시 줄바꿈을 함께 허용한다 — 실측 1.5배에서 '9만'이 x=411(화면 390)까지 밀려났었다. */
+  .card-price { padding-right: 46px; flex-wrap: wrap; row-gap: 4px; }
+  .card-travel { padding-right: 46px; flex-wrap: wrap; row-gap: 4px; }
 }
 
 
 /* 옛 버전 IQ 버튼 숨김 — 앞선 `display:flex !important` 보다 특이도가 높아야 이긴다 */
 #sg44Drawer .sg44-grid > .sg44-hide { display: none !important; }
+
+
+/* ② 글자확대 시 안내 배너가 첫 카드를 화면 밖으로 밀어내던 문제 — 단계적으로 줄인다 */
+#sg44Welcome.sg44-compact { padding: 9px 12px; }
+#sg44Welcome.sg44-compact .w-sub,
+#sg44Welcome.sg44-compact ul { display: none !important; }
+#sg44Welcome.sg44-compact .w-title { font-size: 13.5px; }
+#sg44Welcome.sg44-compact .w-actions { margin-top: 8px; }
+#sg44Welcome { max-height: 40vh; overflow: auto; }
+
+
+/* ② 글자를 키우면 헤더·계절팁·정렬줄이 함께 커져 첫 카드가 하단바 뒤로 밀린다.
+   필요할 때만 켜지는 축소 모드(가역). 실측 1.5배 기준 계절팁만 247px를 먹고 있었다. */
+body.sg44-tight .seasonal-tip { display: none !important; }
+body.sg44-tight .results-header { margin-bottom: 6px; }
+body.sg44-tight .sort-btns { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+body.sg44-tight .sort-btns::-webkit-scrollbar { display: none; }
+body.sg44-tight .search-section { padding-top: 8px; padding-bottom: 8px; }
+body.sg44-tight #regionTags { margin-bottom: 0; }
+body.sg44-tight .header-inner { padding: 0 12px; gap: 8px; }
+body.sg44-tight .header-stats { display: none !important; }
+body.sg44-tighter .header .view-toggle { display: none !important; }
+body.sg44-tighter .recent-searches { display: none !important; }
+/* 가장 깊은 단계: 카드 자체의 여백도 줄여 이름+가격을 하단바 위로 끌어올린다 */
+body.sg44-tighter .card { padding-top: 10px; padding-bottom: 10px; }
+body.sg44-tighter .card-badges { margin-top: 4px; margin-bottom: 4px; }
+body.sg44-tighter .card-price { padding-top: 2px; padding-bottom: 2px; row-gap: 2px; }
+body.sg44-tighter .card-top { margin-bottom: 2px; }
+body.sg44-tighter .results-header { margin-bottom: 2px; }
 
 </style>
 </head>
@@ -1273,13 +1304,30 @@ fetch('courses_enriched.json')
   .then(data => {
     // R-4: 같은 골프장이 두 번 들어간 행(dup_of)은 목록에서 제외한다. 파일에는 보존.
     allCourses = data.filter(c => !c.dup_of);
+    // ④ 이름이 같은 다른 골프장(예: 제주 블랙스톤 / 충북 블랙스톤)을 카드에서 구분할 수 있게
+    //    '표시용 이름'을 따로 만든다. 즐겨찾기·비교의 식별자인 c.n 은 그대로 둔다.
+    (function tagAmbiguousNames(list) {
+      const by = {};
+      list.forEach(c => { (by[c.n] = by[c.n] || []).push(c); });
+      Object.keys(by).forEach(k => {
+        const g = by[k];
+        if (g.length < 2) return;
+        const sido = new Set(g.map(c => c.r || ''));
+        const sgg = new Set(g.map(c => (c.r || '') + '|' + (c.c || '')));
+        g.forEach(c => {
+          if (sido.size > 1) c.disp = c.n + ' (' + (c.r || '') + ')';
+          else if (sgg.size > 1) c.disp = c.n + ' (' + (c.c || '') + ')';
+        });
+      });
+    })(allCourses);
     // 중복 행을 제외한 '실제 목록에 나오는 수'를 표기한다(파일 원본은 585행)
     document.getElementById('total-count').textContent = allCourses.length;
     applyFilters();
     updateStats();
     updateFavCount();
     renderRecentSearches();
-    showToast(`${data.length}개 골프장 데이터 로드 완료`, 'success');
+    // 중복 행을 제외한 실제 노출 건수로 알린다(파일 원본은 585행)
+    showToast(`${allCourses.length}개 골프장 데이터 로드 완료`, 'success');
     updateFooterStats();
   });
 
@@ -1619,7 +1667,7 @@ function renderResults() {
       <button class="fav-btn ${favClass}" data-name="${safeName}"><i class="fas fa-heart"></i></button>
       <div class="compare-check ${compClass}" data-name="${safeName}">${compClass ? '<i class="fas fa-check"></i>' : ''}</div>
       ${valueBadgeHTML}
-      <div class="card-top"><div class="card-name">${c.n}</div>${ratingHTML}</div>
+      <div class="card-top"><div class="card-name">${c.disp || c.n}</div>${ratingHTML}</div>
       <div class="card-badges">
         ${c.r ? `<span class="badge badge-region">${c.r} ${c.c||''}</span>` : ''}
         ${c.t ? `<span class="badge badge-type">${c.t}</span>` : ''}
@@ -1743,7 +1791,7 @@ document.getElementById('viewGrid').addEventListener('click', () => {
 
 // Detail modal
 function showDetail(c) {
-  document.getElementById('modalTitle').textContent = c.n;
+  document.getElementById('modalTitle').textContent = c.disp || c.n;
   const sq = encodeURIComponent(c.n + ' 골프장');
   const bq = encodeURIComponent(c.n + ' 골프장 예약');
 
