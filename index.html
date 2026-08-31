@@ -86,6 +86,7 @@
 })();
 </script>
 
+<script src="v45_privacy.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -774,6 +775,31 @@ body.sg44-tighter .card-badges { margin-top: 4px; margin-bottom: 4px; }
 body.sg44-tighter .card-price { padding-top: 2px; padding-bottom: 2px; row-gap: 2px; }
 body.sg44-tighter .card-top { margin-bottom: 2px; }
 body.sg44-tighter .results-header { margin-bottom: 2px; }
+
+
+/* ==================== v45 위치 국외이전 고지·동의 ==================== */
+#sgGeoConsent { position: fixed; inset: 0; z-index: 12000; background: rgba(0,0,0,.55);
+  display: flex; align-items: flex-end; justify-content: center; padding: 0; }
+#sgGeoConsent .sgc-card { background: var(--card-bg, #fff); color: var(--text, #1a1a1a);
+  width: 100%; max-width: 560px; border-radius: 16px 16px 0 0; padding: 18px 18px 20px;
+  box-shadow: 0 -8px 34px rgba(0,0,0,.3); max-height: 88vh; overflow: auto; }
+#sgGeoConsent .sgc-title { font-size: 16px; font-weight: 800; color: var(--primary, #1a7a3a); }
+#sgGeoConsent .sgc-body { font-size: 13.5px; line-height: 1.6; margin-top: 8px; }
+#sgGeoConsent .sgc-list { margin: 10px 0 0 18px; padding: 0; }
+#sgGeoConsent .sgc-list li { font-size: 12.5px; line-height: 1.7; color: var(--text-muted, #666); }
+#sgGeoConsent .sgc-actions { display: flex; gap: 8px; margin-top: 16px; }
+#sgGeoConsent .sgc-actions button { flex: 1 1 0; min-height: 48px; border-radius: 10px;
+  font-size: 14px; font-weight: 700; cursor: pointer; line-height: 1.2; padding: 0 10px; }
+#sgcNo { background: var(--card-bg, #fff); color: var(--primary, #1a7a3a);
+  border: 1.5px solid var(--primary, #1a7a3a); }
+#sgcYes { background: var(--primary, #1a7a3a); color: #fff; border: 1.5px solid var(--primary, #1a7a3a); }
+#sgGeoConsent .sgc-link { display: inline-block; margin-top: 12px; font-size: 12px;
+  color: var(--text-muted, #666); }
+#sgGeoRevokeBtn { min-height: 44px; padding: 0 14px; border-radius: 9px; cursor: pointer;
+  font-size: 12.5px; font-weight: 700; background: var(--card-bg, #fff);
+  color: var(--primary, #1a7a3a); border: 1.5px solid var(--primary, #1a7a3a); }
+[data-theme="dark"] #sgGeoConsent .sgc-card { background: #1e1e1e; color: #e0e0e0; }
+[data-theme="dark"] #sgcNo, [data-theme="dark"] #sgGeoRevokeBtn { background: #2a2a2a; color: #7bed9f; border-color: #2e7d32; }
 
 </style>
 </head>

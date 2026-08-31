@@ -109,6 +109,43 @@
 
 <p>앱에는 광고 SDK, 분석(Analytics) SDK가 포함되어 있지 않습니다.</p>
 
+
+<h2>2-1. 위치정보의 제3자 제공 및 국외 이전</h2>
+<p>이용자가 &lsquo;현재 위치&rsquo;를 사용하거나 출발지를 입력해 거리를 계산할 때,
+위치 좌표가 <strong>해외에 있는 아래 서비스로 전송</strong>됩니다.
+「개인정보 보호법」상 국외 이전에 해당하므로 아래와 같이 알려드리며,
+<strong>앱에서 처음 위치를 사용하는 시점에 한 번 고지하고 동의를 받습니다.</strong>
+동의하기 전에는 좌표가 전송되지 않습니다.</p>
+<table>
+  <thead><tr><th>구분</th><th>OpenStreetMap Nominatim</th><th>Project OSRM</th></tr></thead>
+  <tbody>
+    <tr><td data-l="구분">이전받는 자</td>
+        <td data-l="Nominatim">OpenStreetMap Foundation<br><code>nominatim.openstreetmap.org</code></td>
+        <td data-l="OSRM">Project OSRM<br><code>router.project-osrm.org</code></td></tr>
+    <tr><td data-l="구분">이전되는 국가</td>
+        <td data-l="Nominatim">해외(영국 등)</td>
+        <td data-l="OSRM">해외</td></tr>
+    <tr><td data-l="구분">이전 항목</td>
+        <td data-l="Nominatim">현재 위치 좌표(위도·경도) 또는 이용자가 입력한 출발지 주소</td>
+        <td data-l="OSRM">출발지 좌표와 골프장 좌표</td></tr>
+    <tr><td data-l="구분">이전 목적</td>
+        <td data-l="Nominatim">좌표↔주소 변환(현재 위치를 주소로 표시)</td>
+        <td data-l="OSRM">자동차 기준 이동거리·소요시간 계산</td></tr>
+    <tr><td data-l="구분">이전 일시·방법</td>
+        <td data-l="Nominatim" colspan="2">이용자가 위치·출발지 기능을 사용하는 시점에 HTTPS로 1회 전송</td></tr>
+    <tr><td data-l="구분">보유·이용 기간</td>
+        <td data-l="Nominatim" colspan="2">요청 처리 후 즉시 폐기. 본 앱은 별도로 저장하지 않으며, 운영자의 서버 자체가 없습니다.</td></tr>
+    <tr><td data-l="구분">거부 방법과 효과</td>
+        <td data-l="Nominatim" colspan="2">
+          앱의 고지 창에서 <strong>&lsquo;지역 선택으로&rsquo;</strong>를 누르거나 기기의 위치 권한을 허용하지 않으면 전송되지 않습니다.
+          이 경우 거리 계산은 이용할 수 없지만, <strong>지역·시·군 선택으로 골프장 목록·그린피·상세정보를 그대로 이용</strong>할 수 있습니다.
+          한 번 동의한 뒤에도 화면 맨 아래 <strong>&lsquo;위치 전송 동의 철회&rsquo;</strong>로 언제든 철회할 수 있습니다.
+        </td></tr>
+  </tbody>
+</table>
+<p>※ 골프장 날씨 조회에 쓰이는 Open-Meteo에는 <strong>골프장의 좌표</strong>가 전송되며,
+이용자의 위치는 전송되지 않습니다.</p>
+
 <h2>3. 보유 및 파기</h2>
 <p>모든 이용 기록은 이용자 기기의 브라우저 저장소(localStorage)에만 있으며,
 보관 기간을 따로 두지 않고 <strong>이용자가 지울 때까지</strong> 기기에 남습니다.
@@ -124,7 +161,8 @@
 
 <h2>4. 이용자의 권리</h2>
 <ul>
-  <li>위치 권한은 기기 설정에서 언제든지 거부·철회할 수 있으며, 거부해도 주소 직접 입력으로 모든 기능을 이용할 수 있습니다.</li>
+  <li>위치 권한은 기기 설정에서 언제든지 거부·철회할 수 있으며, 거부해도 지역·시·군 선택으로 골프장 목록을 이용할 수 있습니다.</li>
+  <li>위치정보의 국외 이전 동의는 앱 화면 맨 아래 <strong>&lsquo;위치 전송 동의 철회&rsquo;</strong> 버튼으로 언제든 철회할 수 있고, 철회하면 다음 사용 때 다시 물어봅니다.</li>
   <li>데이터가 기기에만 저장되므로 열람·정정·삭제를 이용자가 직접 수행합니다.</li>
 </ul>
 
