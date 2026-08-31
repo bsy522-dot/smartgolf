@@ -685,6 +685,17 @@ body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg)
 #sg44DrawerClose { position: absolute; right: 14px; top: 10px; background: none; border: none;
   font-size: 22px; color: var(--text-muted); cursor: pointer; line-height: 1; }
 
+/* v44 요소들의 다크모드 대응 (감사에서 다크모드 8/10 — 회귀시키지 않는다) */
+[data-theme="dark"] .card-btn.btn-searchlink { background: #2b3138; color: #c3ccd6; }
+[data-theme="dark"] .sg44-nobadge { background: #2a2e33; color: #9aa3ad; }
+[data-theme="dark"] .sg44-milbadge { background: #3a2f1c; color: #f0b45e; }
+[data-theme="dark"] #sg44Drawer { background: #1e1e1e; color: #e0e0e0; }
+[data-theme="dark"] #sg44Drawer .sg44-grid > * { background: #2a2a2a !important; border-color: #3a3a3a !important; color: #e0e0e0 !important; }
+[data-theme="dark"] #sg44FilterToggle { background: #2a2a2a; color: #e0e0e0; border-color: #3a3a3a; }
+[data-theme="dark"] #sg44FilterToggle.on { background: #1a3a25; color: #7bed9f; border-color: #2e7d32; }
+[data-theme="dark"] #sg44Drawer .sg44-label { color: #a8b0b8; }
+
+
 </style>
 </head>
 <body>
