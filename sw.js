@@ -3,11 +3,12 @@
    1) HTML에 패치 스크립트를 강제 주입하던 코드 제거 — index.html에서 정리한
       유령 스크립트(v10~v21)를 다시 꽂아 404를 만들고 있었다. 주입 없이 원문 그대로 준다.
    2) 신규 sg_round.js(GPS 라운드)를 자산 목록에 추가. */
-const CACHE_NAME = 'smartgolf-v52';
+const CACHE_NAME = 'smartgolf-v53';
 const ASSETS = [
   './',
   './index.html',
   './icons.css',
+  './hub-back.js',
   './features.js',
   './v6_patch.js', './v7_patch.js', './v8_patch.js', './v9_patch.js',
   './v22_patch.js', './v23_patch.js', './v24_patch.js', './v25_patch.js',

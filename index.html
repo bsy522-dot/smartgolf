@@ -21,6 +21,7 @@
 <link rel="stylesheet" href="icons.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="hub-back.js"></script>
 <script>
 /* v44: 사용자가 화면을 건드리기 전에는 진짜 AudioContext를 만들지 않는다.
    (감사 C-9 — 사용자 조작 없이 효과음을 시도해 자동재생 경고 24회)
@@ -2731,5 +2732,50 @@ renderRecentlyViewed();
 <script src="v42_patch.js" defer></script>
 <script src="sg_round.js" defer></script>
 <script src="v44_ui.js" defer></script>
+<!-- 폰 뒤로가기(◁) 한 단계 되돌리기 — hub-back 배선 (2026-09-14) -->
+<script>
+/* 모달·지도가 열리면 히스토리에 가짜 칸을 하나 쌓고, ◁ 가 오면 그 화면만 닫는다.
+   기존 닫기 코드는 손대지 않는다 — 오버레이의 active 클래스(지도는 display)를 지켜보다가
+   앱이 스스로 닫으면 쌓아 둔 칸을 되돌린다. 패치 스크립트가 추가한 닫기 경로까지 함께 덮는다. */
+(function () {
+  if (!window.HubBack) return;
+  function closer(btnId, el) {
+    return function () {
+      var b = document.getElementById(btnId);
+      if (b) b.click();                       /* 앱이 쓰는 닫기 경로 그대로(지도 정리 포함) */
+      else el.classList.remove('active');
+    };
+  }
+  function watch(id, btnId) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var token = null;
+    new MutationObserver(function () {
+      var on = el.classList.contains('active');
+      if (on && !token) token = HubBack.push(id, closer(btnId, el));
+      else if (!on && token) { var t = token; token = null; HubBack.pop(t); }
+    }).observe(el, { attributes: true, attributeFilter: ['class'] });
+  }
+  watch('modalOverlay',   'modalClose');    /* 골프장 상세 */
+  watch('compareOverlay', 'compareClose');  /* 비교 */
+  watch('budgetOverlay',  'budgetClose');   /* 예산 계산기 */
+  watch('dashOverlay',    'dashClose');     /* 내 골프 대시보드 */
+
+  /* 지도 보기 ↔ 목록 보기: 한 층만 쌓는다(뿌리 = 목록 보기) */
+  var sec = document.getElementById('map-section');
+  if (sec) {
+    var vToken = null;
+    new MutationObserver(function () {
+      var on = sec.style.display === 'block';
+      if (on && !vToken) {
+        vToken = HubBack.push('view', function () {
+          var g = document.getElementById('viewGrid');
+          if (g) g.click();
+        }, { replace: true });
+      } else if (!on && vToken) { var t = vToken; vToken = null; HubBack.pop(t); }
+    }).observe(sec, { attributes: true, attributeFilter: ['style'] });
+  }
+})();
+</script>
 </body>
 </html>
