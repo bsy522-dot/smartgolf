@@ -1330,6 +1330,20 @@ fetch('courses_enriched.json')
   .then(data => {
     // R-4: 같은 골프장이 두 번 들어간 행(dup_of)은 목록에서 제외한다. 파일에는 보존.
     allCourses = data.filter(c => !c.dup_of);
+    // ── 트립스튜디오 연결(2026-09-14) — ?from=tripstudio&ts=<주소> 로 오면 그 주소를 기억해 두고,
+    //    ?course=<이름> 이면 그 골프장 상세를 바로 연다. 트립스튜디오는 개인 PC 앱이라 그 주소를
+    //    아는 기기(= 거기서 넘어온 기기)에서만 '여행 짜기' 버튼이 보인다. 다른 사용자에겐 아무 변화 없음.
+    try {
+      const sp = new URLSearchParams(location.search);
+      if (sp.get('from') === 'tripstudio' && sp.get('ts')) localStorage.setItem('ts_base', sp.get('ts'));
+      const want = (sp.get('course') || '').trim();
+      if (want) {
+        const norm = (x) => String(x || '').toLowerCase().replace(/\s+/g, '');
+        const found = allCourses.find(x => norm(x.n) === norm(want))
+          || allCourses.find(x => norm(x.n).includes(norm(want)) || norm(want).includes(norm(x.n)));
+        if (found) setTimeout(() => showDetail(found), 300);
+      }
+    } catch (e) {}
     // ④ 이름이 같은 다른 골프장(예: 제주 블랙스톤 / 충북 블랙스톤)을 카드에서 구분할 수 있게
     //    '표시용 이름'을 따로 만든다. 즐겨찾기·비교의 식별자인 c.n 은 그대로 둔다.
     (function tagAmbiguousNames(list) {
@@ -1883,7 +1897,11 @@ function showDetail(c) {
     }, 100);
   }
 
-  document.getElementById('modalActions').innerHTML = `
+  const tsBaseFromTripStudio = (() => { try { return localStorage.getItem('ts_base') || ''; } catch (e) { return ''; } })();
+  const tsBtn = (tsBaseFromTripStudio && c.lat && c.lng)
+    ? `<a class="modal-btn" style="background:#ecfdf5;color:#065f46;border:1.5px solid #6ee7b7" href="${tsBaseFromTripStudio.replace(/\/$/, '')}/?add=${c.lat},${c.lng},${encodeURIComponent(c.n)}&cat=${encodeURIComponent('골프장')}" target="_blank" rel="noopener"><i class="fas fa-route"></i> 트립스튜디오로 여행 짜기</a>`
+    : '';
+  document.getElementById('modalActions').innerHTML = `${tsBtn}
     ${(c.book || c.site)
       ? `<a class="modal-btn modal-btn-primary" href="${c.book || c.site}" target="_blank" rel="noopener"><i class="fas fa-calendar-check"></i> 예약·홈페이지</a>`
       : `<a class="modal-btn modal-btn-primary" href="https://search.naver.com/search.naver?query=${bq}" target="_blank" rel="noopener"><i class="fas fa-search"></i> 네이버에서 찾기</a>`}
