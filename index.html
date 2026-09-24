@@ -803,6 +803,52 @@ body.sg44-tighter .results-header { margin-bottom: 2px; }
 [data-theme="dark"] #sgcNo, [data-theme="dark"] #sgGeoRevokeBtn { background: #2a2a2a; color: #7bed9f; border-color: #2e7d32; }
 
 </style>
+<style id="sgMobile0924">
+/* 2026-09-24 폰 화면 수선 — 폭 760px 이하 전용(PC 화면 무변경).
+   병석님 폰(412px·시스템 글자 약 1.7배)에서 글자를 줄이지 않고 배치가 버티게 한다.
+   뒤에 붙는 패치 스타일(v22~v27)보다 이기도록 'html body' 로 시작한다. */
+@media (max-width: 760px) {
+  html body { word-break: keep-all; overflow-wrap: anywhere; }
+  /* ① 머리글: 3줄 190px 가 스크롤해도 붙어 있던 것 → 2줄(로고 / 버튼 한 줄 옆으로 밀기), 스크롤하면 같이 올라감 */
+  html body .header { position: relative; padding: 8px 0; }
+  html body .header-inner { flex-wrap: wrap; gap: 6px 8px; padding: 0 12px; }
+  html body .header .logo { flex: 1 1 auto; min-width: 0; white-space: nowrap; }
+  html body .sg-hdr-tools { display: flex; flex: 1 1 100%; min-width: 0; gap: 6px; align-items: center;
+    overflow-x: auto; overflow-y: hidden; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-right: 22px;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 22px), transparent);
+            mask-image: linear-gradient(90deg, #000 calc(100% - 22px), transparent); }
+  html body .sg-hdr-tools::-webkit-scrollbar { display: none; }
+  html body .sg-hdr-tools > *, html body .sg-hdr-tools .view-toggle > * { flex: 0 0 auto; white-space: nowrap; }
+  html body .sg-hdr-tools .view-toggle { margin-left: 2px; }
+  html body .sg-hdr-tools button { min-height: 36px; }
+  /* ② 카드 아래 버튼: 글자를 한두 글자씩 끊지 않는다. 한 줄에 안 들어가면 버튼째 다음 줄로 */
+  html body .card-actions { flex-wrap: wrap; }
+  html body .card-actions .card-btn { flex: 1 1 auto; white-space: nowrap; min-width: 44px; }
+  /* ③ 카드 제목: 65% 폭 제한 해제(체크칸·하트 자리는 오른쪽 여백으로 이미 비워 둠) */
+  html body .card .card-name { max-width: none; flex: 1 1 auto; min-width: 0; }
+  /* ④ 떠 있는 버튼: 바닥 탭 실제 높이(--sgNavH, 글자 크기 따라 변함) 위로 올리고, 목록 끝에 그만큼 여백 */
+  html body .fab-gps { bottom: calc(var(--sgNavH, 62px) + 10px) !important; }
+  html body #backToTop { bottom: calc(var(--sgNavH, 62px) + 70px) !important; }
+  html body #sgRoundFab { bottom: calc(var(--sgNavH, 62px) + 126px) !important; }
+  html body .compare-bar { bottom: var(--sgNavH, 56px) !important; }
+  html body { padding-bottom: calc(var(--sgNavH, 62px) + 70px) !important; }
+  /* ⑤ 계절 팁 위 빈 틈: 내용 없는 빠른버튼 칸(.v7-quick)의 위아래 여백 24px */
+  html body .v7-quick:empty { display: none; }
+  /* ⑥ 예산 계산기: 입력칸이 창 오른쪽 밖으로 나가던 것 */
+  html body .budget-row label { flex: 0 1 auto; min-width: 0; }
+  html body .budget-row input, html body .budget-row select { flex: 1 1 0; min-width: 0; width: auto; }
+  html body .budget-form { grid-template-columns: minmax(0, 1fr); }
+  html body .budget-row { min-width: 0; }
+  /* ⑦ 골프장 상세의 그린피 3칸: 좁은 칸에서 '23,/000/원'으로 끊기던 것 → 한 줄에 하나씩(이름 왼쪽·금액 오른쪽) */
+  html body .modal-price-grid { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  html body .modal-price-card { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline;
+    gap: 2px 10px; text-align: left; padding: 8px 12px; }
+  html body .modal-price-card .label { margin-bottom: 0; }
+  html body .modal-price-card .amount { white-space: nowrap; }
+  /* ⑧ 안내 상자를 화면 가장자리에서 띄워 다른 칸과 줄 맞춤 */
+  html body #sg44Welcome { margin-left: 14px; margin-right: 14px; }
+}
+</style>
 </head>
 <body>
 <a href="#cardGrid" class="skip-link">본문 바로가기</a>
@@ -2775,6 +2821,57 @@ renderRecentlyViewed();
       } else if (!on && vToken) { var t = vToken; vToken = null; HubBack.pop(t); }
     }).observe(sec, { attributes: true, attributeFilter: ['style'] });
   }
+})();
+</script>
+<script>
+/* 2026-09-24 폰 화면 수선 — 폭 760px 이하일 때만 동작(PC 무변경). 버튼 동작·데이터는 그대로.
+   · 머리글 버튼(내정보·예산·찜·보기방식)을 한 줄 가로 밀기 칸으로 묶는다(폭이 넓어지면 원래 자리로)
+   · 검색칸 안내 글자를 짧게(큰 글자에서 잘리던 것)
+   · 바닥 탭의 실제 높이를 --sgNavH 로 알려 떠 있는 버튼이 탭·카드 버튼을 덮지 않게 */
+(function () {
+  var mq = window.matchMedia('(max-width: 760px)');
+  var tools = null, longPh = null, SHORT_PH = '골프장·지역 검색';
+  var longAddr = null, SHORT_ADDR = '예: 강남구, 판교역';
+  function navVar() {
+    var nav = document.querySelector('.mobile-nav');
+    var h = (nav && getComputedStyle(nav).display !== 'none') ? Math.round(nav.getBoundingClientRect().height) : 0;
+    document.documentElement.style.setProperty('--sgNavH', (h || 62) + 'px');
+  }
+  function apply() {
+    var on = mq.matches;
+    var inner = document.querySelector('.header .header-inner');
+    if (inner && on && !tools) {
+      tools = document.createElement('div');
+      tools.className = 'sg-hdr-tools';
+      ['dashBtn', 'budgetBtn', 'favFilter'].forEach(function (id) {
+        var el = document.getElementById(id); if (el && el.parentNode === inner) tools.appendChild(el);
+      });
+      var vt = inner.querySelector(':scope > .view-toggle'); if (vt) tools.appendChild(vt);
+      inner.appendChild(tools);
+    } else if (inner && !on && tools) {
+      while (tools.firstChild) inner.insertBefore(tools.firstChild, tools);
+      tools.remove(); tools = null;
+    }
+    var inp = document.getElementById('nameSearch');
+    if (inp) {
+      if (inp.placeholder !== SHORT_PH) longPh = inp.placeholder;
+      inp.placeholder = on ? SHORT_PH : (longPh || inp.placeholder);
+    }
+    var addr = document.getElementById('addressInput');
+    if (addr) {
+      if (addr.placeholder !== SHORT_ADDR) longAddr = addr.placeholder;
+      addr.placeholder = on ? SHORT_ADDR : (longAddr || addr.placeholder);
+    }
+    navVar();
+  }
+  function boot() {
+    apply();
+    setTimeout(apply, 1500);                       /* 늦게 붙는 패치(v44)가 안내 글자를 다시 쓴 뒤 한 번 더 */
+    var nav = document.querySelector('.mobile-nav');
+    if (nav && window.ResizeObserver) new ResizeObserver(navVar).observe(nav);
+    if (mq.addEventListener) mq.addEventListener('change', apply); else if (mq.addListener) mq.addListener(apply);
+  }
+  if (document.readyState === 'complete') boot(); else window.addEventListener('load', boot);
 })();
 </script>
 </body>
