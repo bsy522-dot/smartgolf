@@ -847,6 +847,15 @@ body.sg44-tighter .results-header { margin-bottom: 2px; }
   html body .modal-price-card .amount { white-space: nowrap; }
   /* ⑧ 안내 상자를 화면 가장자리에서 띄워 다른 칸과 줄 맞춤 */
   html body #sg44Welcome { margin-left: 14px; margin-right: 14px; }
+  /* 2026-09-26 잔손질 ⑨ 머리글 버튼 줄: 큰 글자에서 끝(보기방식·어두운 모드)이 옆으로 밀어야 보이던 것 → 넘치면 다음 줄로 감기 */
+  html body .sg-hdr-tools { flex-wrap: wrap; overflow: visible; padding-right: 0; row-gap: 6px;
+    -webkit-mask-image: none; mask-image: none; }
+  /* ⑩ '기능 전체보기' 서랍: '오늘 라운드 좋은 골프' 칸 이름이 좁은 칸에서 3줄로 접히던 것 → 위 'GPS 라운드'처럼 한 줄 전체 폭 */
+  html body #sg44Drawer .sg44-grid > #wxRecFab { grid-column: 1 / -1; display: flex !important; flex-direction: row !important;
+    gap: 8px; min-height: 48px; }
+  /* ⑪ 서랍 닫기 ✕ 누름 영역 22px → 44px(보이는 자리 그대로) */
+  html body #sg44DrawerClose { min-width: 44px; min-height: 44px; right: 3px; top: 6px; padding: 0;
+    display: flex; align-items: center; justify-content: center; }
 }
 </style>
 </head>
